@@ -1,1 +1,0 @@
-/usr/bin/c++   -pedantic -Werror -Wall -Wextra -Wno-unused-parameter -Wno-error=unused-variable -Wno-error=sign-compare -g -O2 -DNDEBUG  -rdynamic CMakeFiles/pool_test.dir/entityx/help/Pool_test.cc.o  -o pool_test -Wl,-rpath,/home/clyne/Programming/git/gamedev2/lib/entityx/build libentityx.so.1.1.2 

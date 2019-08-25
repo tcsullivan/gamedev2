@@ -22,11 +22,11 @@ CC  = gcc
 CXX = g++
 
 LIBDIR = lib
-LIBS = -lSDL2 -lpthread -lentityx
+LIBS = -L$(LIBDIR) -lSDL2 -lpthread -lentityx
 
 CXXFLAGS = -ggdb -std=c++17 \
 	-Wall -Wextra -Werror -pedantic \
-	-Isrc -I$(LIBDIR)/LuaJIT -I$(LIBDIR)/entityx/entityx
+	-Isrc -I$(LIBDIR)/LuaJIT -I$(LIBDIR)/entityx/entityx -I$(LIBDIR)/entityx
 
 CXXSRCDIR = src
 CXXOUTDIR = out

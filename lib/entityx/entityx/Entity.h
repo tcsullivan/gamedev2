@@ -239,8 +239,8 @@ struct BaseComponent {
 
   // NOTE: Component memory is *always* managed by the EntityManager.
   // Use Entity::destroy() instead.
-  void operator delete(void *p) { fail(); }
-  void operator delete[](void *p) { fail(); }
+  void operator delete([[maybe_unused]] void *p) { fail(); }
+  void operator delete[]([[maybe_unused]] void *p) { fail(); }
 
 
  protected:
