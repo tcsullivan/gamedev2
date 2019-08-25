@@ -22,7 +22,7 @@ CC  = gcc
 CXX = g++
 
 LIBDIR = lib
-LIBS = -L$(LIBDIR) -lSDL2 -lpthread -lentityx
+LIBS = -L$(LIBDIR) -lSDL2 -lpthread -lentityx -lluajit
 
 CXXFLAGS = -ggdb -std=c++17 \
 	-Wall -Wextra -Werror -pedantic \
