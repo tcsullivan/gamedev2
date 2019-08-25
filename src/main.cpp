@@ -18,6 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <entityx.h>
+
 #include <SDL2/SDL.h>
 
 #include <atomic>
