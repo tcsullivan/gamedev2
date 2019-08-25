@@ -20,12 +20,20 @@
 
 #include <SDL2/SDL.h>
 
+#include <atomic>
+#include <chrono>
 #include <iostream>
 #include <memory>
+#include <thread>
 
 constexpr const char *title = "gamedev2";
 constexpr int width = 640;
 constexpr int height = 480;
+
+std::atomic_bool shouldRun;
+
+static void renderLoop(void);
+static void logicLoop(void);
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 {
@@ -49,9 +57,44 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		return -1;
 	}
 
-	// TODO game
-	SDL_Delay(1000);
+	// Start game
+	shouldRun.store(true);
+	std::thread logic (logicLoop);
+	renderLoop();
+	logic.join();
 
 	return 0;
+}
+
+void renderLoop(void)
+{
+	using namespace std::chrono_literals;
+
+	// TODO render
+	while (shouldRun.load())
+		std::this_thread::sleep_for(100ms);
+}
+
+void logicLoop(void)
+{
+	using namespace std::chrono_literals;
+
+	std::cout << "Press escape to exit." << std::endl;
+
+	while (shouldRun.load()) {
+		for (SDL_Event event; SDL_PollEvent(&event);) {
+			switch (event.type) {
+			case SDL_KEYUP:
+				// Exit game on escape
+				if (event.key.keysym.sym == SDLK_ESCAPE)
+					shouldRun.store(false);
+				break;
+			default:
+				break;
+			}
+		}
+
+		std::this_thread::sleep_for(100ms);
+	}
 }
 
