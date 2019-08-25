@@ -21,10 +21,17 @@
 #include <SDL2/SDL.h>
 
 #include <iostream>
+#include <memory>
+
+constexpr const char *title = "gamedev2";
+constexpr int width = 640;
+constexpr int height = 480;
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 {
-	if (SDL_Init(0) != 0) {
+	std::cout << "Hello, world!" << std::endl;
+
+	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 		std::cerr << "SDL failed to initialize: " << SDL_GetError() <<
 			std::endl;
 		return -1;
@@ -32,7 +39,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		atexit(SDL_Quit);
 	}
 
-	std::cout << "Hello, world!" << std::endl;
+	std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> window
+		(SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED,
+		SDL_WINDOWPOS_UNDEFINED, width, height, 0), SDL_DestroyWindow);
+
+	if (window.get() == nullptr) {
+		std::cerr << "SDL window creation failed: " << SDL_GetError() <<
+			std::endl;
+	}
+
+	SDL_Delay(1000);
 
 	return 0;
 }
