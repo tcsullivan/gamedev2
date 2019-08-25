@@ -29,25 +29,27 @@ constexpr int height = 480;
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 {
-	std::cout << "Hello, world!" << std::endl;
-
+	// Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-		std::cerr << "SDL failed to initialize: " << SDL_GetError() <<
-			std::endl;
+		std::cerr << "SDL failed to initialize: " << SDL_GetError()
+			<< std::endl;
 		return -1;
 	} else {
 		atexit(SDL_Quit);
 	}
 
+	// Create our window
 	std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> window
 		(SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED, width, height, 0), SDL_DestroyWindow);
 
 	if (window.get() == nullptr) {
-		std::cerr << "SDL window creation failed: " << SDL_GetError() <<
-			std::endl;
+		std::cerr << "SDL window creation failed: " << SDL_GetError()
+			<< std::endl;
+		return -1;
 	}
 
+	// TODO game
 	SDL_Delay(1000);
 
 	return 0;
