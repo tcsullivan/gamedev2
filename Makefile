@@ -21,11 +21,12 @@
 CC  = gcc
 CXX = g++
 
+LIBDIR = lib
 LIBS = -lSDL2
 
 CXXFLAGS = -ggdb -std=c++17 \
-	-Wall -Wextra -Werror -pedantic \
-	-Isrc
+	-Wall -Wextra -Werror -pedantic -Wno-unused\
+	-Isrc -I$(LIBDIR)
 
 CXXSRCDIR = src
 CXXOUTDIR = out
