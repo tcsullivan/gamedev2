@@ -21,7 +21,7 @@
 CC  = gcc
 CXX = g++
 
-LIBS =
+LIBS = -lSDL2
 
 CXXFLAGS = -ggdb -std=c++17 \
 	-Wall -Wextra -Werror -pedantic \

@@ -18,11 +18,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <SDL2/SDL.h>
+
 #include <iostream>
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 {
+	if (SDL_Init(0) != 0) {
+		std::cerr << "SDL failed to initialize: " << SDL_GetError() <<
+			std::endl;
+		return -1;
+	} else {
+		atexit(SDL_Quit);
+	}
+
 	std::cout << "Hello, world!" << std::endl;
+
 	return 0;
 }
 
