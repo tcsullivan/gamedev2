@@ -1,11 +1,11 @@
 # gamedev2
 
 gamedev2 is a reincarnation of a previous 
-    [project](github.com/tcsullivan/gamedev) created by 
-    [Andy Belle-Isle](github.com/drumsetmonkey) and 
-    [Clyne Sullivan](github.com/tcsullivan).
+    [project](https://github.com/tcsullivan/gamedev) created by 
+    [Andy Belle-Isle](https://github.com/drumsetmonkey) and 
+    [Clyne Sullivan](https://github.com/tcsullivan).
 
-After a long time developing [gamedev](github.com/tcsullivan/gamedev),
+After a long time developing [gamedev](https://github.com/tcsullivan/gamedev),
 we decided a large amount of the codebase was rather messy and inefficient.
 Instead of rewriting gamedev piece by piece, we decided that the final
 product would be of a much higher quality if the project was restarted from
