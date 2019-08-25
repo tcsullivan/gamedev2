@@ -77,8 +77,24 @@ void renderLoop(void)
 
 void logicLoop(void)
 {
-	// TODO handle logic
-	SDL_Delay(1000);
-	shouldRun.store(false);
+	using namespace std::chrono_literals;
+
+	std::cout << "Press escape to exit." << std::endl;
+
+	while (shouldRun.load()) {
+		for (SDL_Event event; SDL_PollEvent(&event);) {
+			switch (event.type) {
+			case SDL_KEYUP:
+				// Exit game on escape
+				if (event.key.keysym.sym == SDLK_ESCAPE)
+					shouldRun.store(false);
+				break;
+			default:
+				break;
+			}
+		}
+
+		std::this_thread::sleep_for(100ms);
+	}
 }
 
