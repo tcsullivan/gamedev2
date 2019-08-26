@@ -19,6 +19,7 @@
  */
 
 #include <entityx.h>
+#include <Script/entityx/LuaTypes.hpp>
 
 #include <SDL2/SDL.h>
 
