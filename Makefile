@@ -26,7 +26,7 @@ LIBS = -L$(LIBDIR) -lSDL2 -lpthread -lentityx -lluajit
 
 CXXFLAGS = -ggdb -std=c++17 \
 	-Wall -Wextra -Werror -pedantic \
-	-Isrc -I$(LIBDIR)/LuaJIT -I$(LIBDIR)/entityx/entityx -I$(LIBDIR)/entityx
+	-Isrc -I$(LIBDIR)/LuaJIT/src -I$(LIBDIR)/entityx
 
 CXXSRCDIR = src
 CXXOUTDIR = out
