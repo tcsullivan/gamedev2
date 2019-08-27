@@ -3,6 +3,7 @@
 # Script to build source files
 #
 # Copyright (C) 2019 Clyne Sullivan
+# Copyright (C) 2019 Andy Belle-Isle
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -11,45 +12,67 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# along with this program.	If not, see <https://www.gnu.org/licenses/>.
+#
+
+#
+# VARIABLES
 #
 
 CC  = gcc
 CXX = g++
 
-LIBDIR = lib
-LIBS = -L$(LIBDIR) -lSDL2 -lpthread -lentityx -lluajit
-
-CXXFLAGS = -ggdb -std=c++17 \
-	-Wall -Wextra -Werror -pedantic \
-	-Isrc -I$(LIBDIR)/LuaJIT -I$(LIBDIR)/entityx/entityx -I$(LIBDIR)/entityx
-
-CXXSRCDIR = src
-CXXOUTDIR = out
-CXXSRC    = $(wildcard $(CXXSRCDIR)/*.cpp) $(wildcard $(CXXSRCDIR)/*/*.cpp)
-CXXOBJ    = $(patsubst $(CXXSRCDIR)/%.cpp, $(CXXOUTDIR)/%.o, $(CXXSRC))
-
 EXEC = main
+EXECDIR = .
 
-all: $(EXEC)
+SRCDIR = src
+OUTDIR = out
+SRCEXT = cpp
+OBJEXT = o
+DEPEXT = d
+
+LIBDIR = lib
+LIBS   = -L$(LIBDIR) -lSDL2 -lpthread -lentityx -ldl -lluajit
+
+CXXFLAGS = -ggdb -std=c++17 -Wall -Wextra -Werror -pedantic
+
+CXXINCS = -Isrc -I$(LIBDIR)/LuaJIT/src -I$(LIBDIR)/entityx
+
+CXXSRC := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
+CXXOBJ := $(patsubst $(SRCDIR)/%,$(OUTDIR)/%,$(CXXSRC:.$(SRCEXT)=.$(OBJEXT)))
+
+#
+# COMPILE STUFF
+#
+
+all: resources $(EXEC)
+
+resources: directories
+
+directories:
+	@mkdir -p $(EXECDIR)
+	@mkdir -p $(OUTDIR)
 
 clean:
-	@echo "  CLEAN"
-	@rm -f $(EXEC)
-	@rm -rf out
+	@$(RM) -rf $(OUTDIR)
 
-$(EXEC): $(CXXOUTDIR) $(CXXOUTDIR)/$(CXXOBJ)
-	@echo "  CXX/LD  main"
-	@$(CXX) $(CXXFLAGS) -o $(EXEC) $(CXXOBJ) $(LIBS)
+cleaner: clean
+	@$(RM) -rf $(EXECDIR)
 
-$(CXXOUTDIR)/%.o: $(CXXSRCDIR)/%.cpp
-	@echo "  CXX    " $<
-	@$(CXX) $(CXXFLAGS) -c $< -o $@
+$(EXEC): $(CXXOBJ)
+	$(CXX) -o $(EXECDIR)/$(EXEC) $^ $(LIBS)
 
-$(CXXOUTDIR):
-	@mkdir $(CXXOUTDIR)
+$(OUTDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $(CXXINCS) -c -o $@ $<
+	@$(CXX) $(CXXFLAGS) $(INCDEP) -MM $(SRCDIR)/$*.$(SRCEXT) > $(OUTDIR)/$*.$(DEPEXT)
+	@cp -f $(OUTDIR)/$*.$(DEPEXT) $(OUTDIR)/$*.$(DEPEXT).tmp
+	@sed -e 's|.*:|$(OUTDIR)/$*.$(OBJEXT):|' < $(OUTDIR)/$*.$(DEPEXT).tmp > $(OUTDIR)/$*.$(DEPEXT)
+	@sed -e 's/.*://' -e 's/\\$$//' < $(OUTDIR)/$*.$(DEPEXT).tmp | fmt -1 | sed -e 's/^ *//' -e 's/$$/:/' >> $(OUTDIR)/$*.$(DEPEXT)
+	@rm -f $(OUTDIR)/$*.$(DEPEXT).tmp
 
+.PHONY: all remake clean cleaner resources

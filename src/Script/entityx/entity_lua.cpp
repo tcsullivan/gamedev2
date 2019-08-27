@@ -1,4 +1,7 @@
-#include "entityx_lua.h"
+//#include "entityx_lua.h"
+#include <Script/entityx/entity_lua.hpp>
+#include <stdio.h>
+#include <string.h>
 
 using namespace entityx::lua;
 ComponentList entityx::lua::components;
@@ -61,7 +64,6 @@ void entityx::lua::setup_entityx_api(lua_State* L)
 	lua_setfield(L, -2, "type");
 	// We don't need __gc for Entity::Id (with static_assert it is_trivially_destructible)
 	ref_EntityId = luaL_ref(L, LUA_REGISTRYINDEX);
-
 
 	// Create global entityx table
 	lua_newtable(L);

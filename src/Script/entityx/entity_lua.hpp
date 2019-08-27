@@ -5,7 +5,7 @@
 #include <type_traits>
 
 #include <lua.hpp>
-#include <entityx.h>
+#include <entityx/entityx.h>
 
 #include <Script/entityx/LuaTypes.hpp>
 #include <Script/entityx/EntityLua.hpp>

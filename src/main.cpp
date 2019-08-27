@@ -18,7 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <entityx.h>
+#include <lua.hpp>
+#include <entityx/entityx.h>
 #include <Script/entityx/entity_lua.hpp>
 
 #include <SDL2/SDL.h>
@@ -29,19 +30,63 @@
 #include <memory>
 #include <thread>
 
-constexpr const char *title = "gamedev2";
-constexpr int width = 640;
-constexpr int height = 480;
+class Window {
+private:
+	constexpr static const char *title = "gamedev2";
+	constexpr static int width = 640;
+	constexpr static int height = 480;
+
+	static std::unique_ptr<SDL_Window, void (*)(SDL_Window *)> window;
+	static SDL_GLContext context;
+
+	static void destroyWindow(SDL_Window *w) {
+		SDL_GL_DeleteContext(context);
+		SDL_DestroyWindow(w);
+	}
+
+public:
+	static int init(void) {
+		if (SDL_InitSubSystem(SDL_INIT_VIDEO) != 0) {
+			std::cerr << "SDL video failed to initialize: "
+				<< SDL_GetError() << std::endl;
+			return -1;
+		}
+
+		window.reset(SDL_CreateWindow(title,
+			SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+			width, height,
+			SDL_WINDOW_OPENGL));
+
+		if (window.get() == nullptr) {
+			std::cerr << "SDL window creation failed: "
+				<< SDL_GetError() << std::endl;
+			return -1;
+		}
+
+		context = SDL_GL_CreateContext(window.get());
+
+		return 0;
+	}
+
+	static void render(void) {
+		SDL_GL_SwapWindow(window.get());
+	}
+};
+
+std::unique_ptr<SDL_Window, void (*)(SDL_Window *)> Window::window (nullptr,
+	Window::destroyWindow);
+SDL_GLContext Window::context;
 
 std::atomic_bool shouldRun;
 
 static void renderLoop(void);
 static void logicLoop(void);
+static void LuaTest(void);
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 {
 	// Initialize SDL
-	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+	if (SDL_Init(0) != 0) {
 		std::cerr << "SDL failed to initialize: " << SDL_GetError()
 			<< std::endl;
 		return -1;
@@ -49,16 +94,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		atexit(SDL_Quit);
 	}
 
-	// Create our window
-	std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> window
-		(SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED, width, height, 0), SDL_DestroyWindow);
+    LuaTest();
 
-	if (window.get() == nullptr) {
-		std::cerr << "SDL window creation failed: " << SDL_GetError()
-			<< std::endl;
-		return -1;
-	}
+	// Create our window
+	Window::init();
 
 	// Start game
 	shouldRun.store(true);
@@ -71,11 +110,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 void renderLoop(void)
 {
-	using namespace std::chrono_literals;
-
-	// TODO render
-	while (shouldRun.load())
-		std::this_thread::sleep_for(100ms);
+	while (shouldRun.load()) {
+		Window::render();
+		std::this_thread::yield();
+	}
 }
 
 void logicLoop(void)
@@ -101,3 +139,15 @@ void logicLoop(void)
 	}
 }
 
+
+void LuaTest(void)
+{
+    using namespace entityx;
+    using namespace entityx::lua;
+
+    lua_State* L = luaL_newstate();
+    luaL_openlibs(L);
+    setup_entityx_api(L);
+
+    lua_close(L);
+}
