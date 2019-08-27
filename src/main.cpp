@@ -139,15 +139,38 @@ void logicLoop(void)
 	}
 }
 
+struct Position : entityx::Component<Position>
+{
+    Position(float _x, float _y): x(_x), y(_y) {}
+
+    float x,y;
+};
+
 
 void LuaTest(void)
 {
     using namespace entityx;
     using namespace entityx::lua;
 
+    //export_component<Position>("Position",
+    //        wrap_ctor<Position, float, float>([](float x, float y) {
+    //            return Position(x, y);
+    //        }),
+    //        [](MemberRegister<Position>& m) {
+    //            m.add("x", &Position::x);
+    //            m.add("y", &Position::y);
+    //        }
+    //);
+
     lua_State* L = luaL_newstate();
     luaL_openlibs(L);
     setup_entityx_api(L);
+
+    std::shared_ptr<EventManager> events(new EventManager());
+    std::shared_ptr<EntityManager> entities(new EntityManager(*events));
+    new_entity_manager(L, entities, "manager");
+
+    luaL_dofile(L, "Scripts/init.lua");
 
     lua_close(L);
 }
