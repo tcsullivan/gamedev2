@@ -21,6 +21,7 @@
 #include <lua.hpp>
 #include <entityx/entityx.h>
 #include <Script/entityx/entity_lua.hpp>
+#include <LuaBridge/LuaBridge.h>
 
 #include <SDL2/SDL.h>
 
@@ -142,7 +143,8 @@ void logicLoop(void)
 struct Position : entityx::Component<Position>
 {
     Position(float _x, float _y): x(_x), y(_y) {}
-
+    Position(void){x = y = 0.0;}
+    
     float x,y;
 };
 
@@ -151,11 +153,15 @@ void LuaTest(void)
 {
     using namespace entityx;
     using namespace entityx::lua;
+    namespace lb = luabridge;
+    
+    std::function<Position(float, float)> ctor = [](float x, float y) {
+        return Position(x, y);
+    };
 
-    //export_component<Position>("Position",
-    //        wrap_ctor<Position, float, float>([](float x, float y) {
-    //            return Position(x, y);
-    //        }),
+    ctor(6,7);
+
+    //export_component<Position>("Position", ctor,
     //        [](MemberRegister<Position>& m) {
     //            m.add("x", &Position::x);
     //            m.add("y", &Position::y);
@@ -164,13 +170,26 @@ void LuaTest(void)
 
     lua_State* L = luaL_newstate();
     luaL_openlibs(L);
+
+    lb::getGlobalNamespace(L).
+        beginNamespace("comp")
+            .beginClass<Position>("Position")
+                .addConstructor<void(*)(float, float)>()
+                .addProperty("x", &Position::x)
+                .addProperty("y", &Position::y)
+            .endClass()
+        .endNamespace();
+
     setup_entityx_api(L);
 
     std::shared_ptr<EventManager> events(new EventManager());
     std::shared_ptr<EntityManager> entities(new EntityManager(*events));
     new_entity_manager(L, entities, "manager");
 
-    luaL_dofile(L, "Scripts/init.lua");
+    if (luaL_dofile(L, "Scripts/init.lua")) {
+        std::cout << "Lua Error: " << lua_tostring(L, -1) << std::endl;
+    }
+
 
     lua_close(L);
 }

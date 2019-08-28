@@ -48,7 +48,7 @@ namespace entityx
                 // Now the ComponentHandler should be at #-2 of stack (-1 is the metatable), this will be used as up-values
                 lua_pushvalue(L, -2);
                 // Also remember the offset
-                int offset = ComponentHelper<C>::offset(ptr);
+                int offset = typename ComponentHelper<C>::offset(ptr);
                 lua_pushinteger(L, offset);
                 lua_pushcclosure(L, [](lua_State* L){
                     // This function is used as both getter and setter:
