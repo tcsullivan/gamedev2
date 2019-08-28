@@ -35,14 +35,15 @@ CXXOBJ    = $(patsubst $(CXXSRCDIR)/%.cpp, $(CXXOUTDIR)/%.o, $(CXXSRC))
 
 EXEC = main
 
-all: $(EXEC)
+all: $(CXXOUTDIR)
+	@$(MAKE) $(EXEC)
 
 clean:
 	@echo "  CLEAN"
 	@rm -f $(EXEC)
 	@rm -rf out
 
-$(EXEC): $(CXXOUTDIR) $(CXXOUTDIR)/$(CXXOBJ)
+$(EXEC): $(CXXOUTDIR)/$(CXXOBJ)
 	@echo "  CXX/LD  main"
 	@$(CXX) $(CXXFLAGS) -o $(EXEC) $(CXXOBJ) $(LIBS)
 
