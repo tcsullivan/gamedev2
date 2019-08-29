@@ -20,7 +20,6 @@
 
 #include <lua.hpp>
 #include <entityx/entityx.h>
-#include <Script/entityx/entity_lua.hpp>
 #include <LuaBridge/LuaBridge.h>
 
 #include <SDL2/SDL.h>
@@ -30,6 +29,9 @@
 #include <iostream>
 #include <memory>
 #include <thread>
+
+#include <components/Position.hpp>
+#include <script.hpp>
 
 class Window {
 private:
@@ -140,16 +142,15 @@ void logicLoop(void)
 	}
 }
 
-struct Position : entityx::Component<Position>
-{
-    Position(float _x, float _y): x(_x), y(_y) {}
-    Position(void){x = y = 0.0;}
-    
-    float x,y;
-};
+//struct Position : entityx::Component<Position>
+//{
+//    Position(float _x, float _y): x(_x), y(_y) {}
+//    Position(void){x = y = 0.0;}
+//    
+//    float x,y;
+//};
 
 using namespace entityx;
-using namespace entityx::lua;
 namespace lb = luabridge;
 
 EventManager events;
@@ -157,58 +158,75 @@ EntityManager entities(events);
 
 lua_State* L;
 
+//lb::LuaRef spawn(lb::LuaRef ref)
+//{
+//    lb::LuaRef entity(L);
+//    entity = lb::newTable(L);
+//    
+//    if (ref.isTable()) {
+//
+//        Entity e = entities.create();
+//
+//        for (auto &&comp : lb::pairs(ref)) {
+//            if (comp.first.cast<std::string>() == "Position") {
+//                entity["Position"] = 
+//                    e.assign<Position>(Position().FromLua(comp.second)).get();
+//            } else if (comp.first.cast<std::string>() == "init") {
+//                entity["init"] = comp.second;
+//            }
+//        }
+//    } else {
+//        std::cerr << "Parameter to spawn() must be a table!" << std::endl;
+//    }
+//
+//    return entity;
+//}
+//
+
+ScriptSystem sc;
+
 lb::LuaRef spawn(lb::LuaRef ref)
 {
-    lb::LuaRef entity(L);
-    entity = lb::newTable(L);
-    
-    if (ref.isTable()) {
-
-        Entity e = entities.create();
-
-        for (auto &&comp : lb::pairs(ref)) {
-            if (comp.first.cast<std::string>() == "Position") {
-                float x = comp.second["x"];
-                float y = comp.second["y"];
-                entity["Position"] = e.assign<Position>(x, y).get();
-            } else if (comp.first.cast<std::string>() == "init") {
-                entity["init"] = comp.second;
-            }
-        }
-    } else {
-        std::cerr << "Parameter to spawn() must be a table!" << std::endl;
-    }
-
-    return entity;
+    return sc.spawn(ref);
 }
 
 
 void LuaTest(void)
 {
-
-    L = luaL_newstate();
-    luaL_openlibs(L);
-
-    lb::getGlobalNamespace(L).
-        beginNamespace("comp")
-            .beginClass<Position>("Position")
-                .addConstructor<void(*)(float, float)>()
-                .addProperty("x", &Position::x)
-                .addProperty("y", &Position::y)
-            .endClass()
-        .endNamespace();
-
-    lb::getGlobalNamespace(L)
+    
+    sc.configure(entities, events);
+    
+    // Functions export
+    lb::getGlobalNamespace(sc.getState())
         .beginNamespace("game")
             .addFunction("spawn", spawn)
         .endNamespace();
 
-    if (luaL_dofile(L, "Scripts/init.lua"))
-    {
-        std::cout << "Lua error: " << lua_tostring(L, -1) << std::endl;
-    }
+    sc.doFile();
 
-    entities.each<Position>([&](Entity e, Position& p){ (void)e;std::cout << p.x << std::endl;});
 
-    lua_close(L);
+    //L = luaL_newstate();
+    //luaL_openlibs(L);
+
+    //lb::getGlobalNamespace(L).
+    //    beginNamespace("comp")
+    //        .beginClass<Position>("Position")
+    //            .addConstructor<void(*)(float, float)>()
+    //            .addProperty("x", &Position::x)
+    //            .addProperty("y", &Position::y)
+    //        .endClass()
+    //    .endNamespace();
+
+    //lb::getGlobalNamespace(L)
+    //    .beginNamespace("game")
+    //        .addFunction("spawn", spawn)
+    //    .endNamespace();
+
+    //if (luaL_dofile(L, "Scripts/init.lua")) {
+    //    std::cout << "Lua error: " << lua_tostring(L, -1) << std::endl;
+    //}
+
+    //entities.each<Position>([&](Entity, Position& p){std::cout << p.x << "," << p.y << std::endl;});
+
+    //lua_close(L);
 }

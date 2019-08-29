@@ -24,5 +24,19 @@ bird = {
     end
 }
 
+dog = {
+    Position = {
+        x = 6.5,
+        y = 1.3
+    },
+    init = function(self)
+        print(self.Position.x .. "," .. self.Position.y)
+    end
+}
+
 birdSpawn = game.spawn(bird);
 birdSpawn:init()
+
+dogSpawn = game.spawn(dog);
+dogSpawn:init()
+dogSpawn.Position.x = 37.5
