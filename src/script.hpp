@@ -22,6 +22,7 @@
 #include <entityx/entityx.h>
 #include <lua.hpp>
 #include <LuaBridge/LuaBridge.h>
+#include <script/script.hpp>
 
 /****************
 *  COMPONENTS  *
@@ -31,10 +32,11 @@
 namespace lb = luabridge;
 
 struct EntitySpawnEvent {
-    EntitySpawnEvent (const lb::LuaRef ref)
-        : ref(ref){}
+    EntitySpawnEvent (lb::LuaRef ref)
+        : ref(ref), ret(nullptr){}
 
     lb::LuaRef ref;
+    lb::LuaRef ret;
 };
 
 /**
@@ -71,6 +73,11 @@ class ScriptSystem : public entityx::System<ScriptSystem>
         int init(void)
         {
             luaL_openlibs(state.get());
+            scriptExport();
+            //doFile();
+
+            Script::CreateNewState();
+
             return 0;
         }
 
@@ -82,7 +89,6 @@ class ScriptSystem : public entityx::System<ScriptSystem>
             events.subscribe<EntitySpawnEvent>(*this);
 
             init();
-            scriptExport();
         }
         
         void update([[maybe_unused]] entityx::EntityManager& entites,
@@ -98,8 +104,9 @@ class ScriptSystem : public entityx::System<ScriptSystem>
                 std::cout << "Lua error: " << lua_tostring(state.get(), -1) << std::endl;
             }
 
-            manager.each<Position>([&](entityx::Entity, Position& p){std::cout << p.x << "," << p.y << std::endl;});
-
+            manager.each<Position>(
+                    [&](entityx::Entity, Position& p)
+                    {std::cout << p.x << "," << p.y << std::endl;});
         }
 
         lb::LuaRef spawn(lb::LuaRef ref)
@@ -138,6 +145,10 @@ class ScriptSystem : public entityx::System<ScriptSystem>
                     .endClass()
                 .endNamespace();
 
+            lb::getGlobalNamespace(state.get())
+                .beginNamespace("game")
+                .endNamespace();
+
             // Functions export
             //lb::getGlobalNamespace(state.get())
             //    .beginNamespace("game")
@@ -145,9 +156,10 @@ class ScriptSystem : public entityx::System<ScriptSystem>
             //    .endNamespace();
         }
 
-        void receive (const EntitySpawnEvent &spawn)
+        void receive (const EntitySpawnEvent &toSpawn)
         {
-            lb::push(state.get(), this->spawn(spawn.ref));
+            //toSpawn.ret = spawn(toSpawn.ref);
+            (void)toSpawn;
         }
 };
 

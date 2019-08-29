@@ -40,7 +40,8 @@ LIBS   = -L$(LIBDIR) -lSDL2 -lpthread -lentityx -ldl -lluajit
 
 CXXFLAGS = -ggdb -std=c++17 -Wall -Wextra -Werror -pedantic
 
-CXXINCS = -Isrc -I$(LIBDIR)/LuaJIT/src -I$(LIBDIR)/entityx -I$(LIBDIR)/LuaBridge/Source
+CXXINCS = -Isrc -I$(LIBDIR)/LuaJIT/src -I$(LIBDIR)/entityx \
+		-I$(LIBDIR)/LuaBridge/Source -I$(LIBDIR)/sol2/include
 
 CXXSRC := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 CXXOBJ := $(patsubst $(SRCDIR)/%,$(OUTDIR)/%,$(CXXSRC:.$(SRCEXT)=.$(OBJEXT)))
