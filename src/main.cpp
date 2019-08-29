@@ -148,27 +148,45 @@ struct Position : entityx::Component<Position>
     float x,y;
 };
 
+using namespace entityx;
+using namespace entityx::lua;
+namespace lb = luabridge;
+
+EventManager events;
+EntityManager entities(events);
+
+lua_State* L;
+
+lb::LuaRef spawn(lb::LuaRef ref)
+{
+    lb::LuaRef entity(L);
+    entity = lb::newTable(L);
+    
+    if (ref.isTable()) {
+
+        Entity e = entities.create();
+
+        for (auto &&comp : lb::pairs(ref)) {
+            if (comp.first.cast<std::string>() == "Position") {
+                float x = comp.second["x"];
+                float y = comp.second["y"];
+                entity["Position"] = e.assign<Position>(x, y).get();
+            } else if (comp.first.cast<std::string>() == "init") {
+                entity["init"] = comp.second;
+            }
+        }
+    } else {
+        std::cerr << "Parameter to spawn() must be a table!" << std::endl;
+    }
+
+    return entity;
+}
+
 
 void LuaTest(void)
 {
-    using namespace entityx;
-    using namespace entityx::lua;
-    namespace lb = luabridge;
-    
-    std::function<Position(float, float)> ctor = [](float x, float y) {
-        return Position(x, y);
-    };
 
-    ctor(6,7);
-
-    //export_component<Position>("Position", ctor,
-    //        [](MemberRegister<Position>& m) {
-    //            m.add("x", &Position::x);
-    //            m.add("y", &Position::y);
-    //        }
-    //);
-
-    lua_State* L = luaL_newstate();
+    L = luaL_newstate();
     luaL_openlibs(L);
 
     lb::getGlobalNamespace(L).
@@ -180,16 +198,17 @@ void LuaTest(void)
             .endClass()
         .endNamespace();
 
-    setup_entityx_api(L);
+    lb::getGlobalNamespace(L)
+        .beginNamespace("game")
+            .addFunction("spawn", spawn)
+        .endNamespace();
 
-    std::shared_ptr<EventManager> events(new EventManager());
-    std::shared_ptr<EntityManager> entities(new EntityManager(*events));
-    new_entity_manager(L, entities, "manager");
-
-    if (luaL_dofile(L, "Scripts/init.lua")) {
-        std::cout << "Lua Error: " << lua_tostring(L, -1) << std::endl;
+    if (luaL_dofile(L, "Scripts/init.lua"))
+    {
+        std::cout << "Lua error: " << lua_tostring(L, -1) << std::endl;
     }
 
+    entities.each<Position>([&](Entity e, Position& p){ (void)e;std::cout << p.x << std::endl;});
 
     lua_close(L);
 }

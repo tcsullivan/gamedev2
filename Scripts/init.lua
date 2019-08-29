@@ -13,3 +13,16 @@ local q = comp.Position(6, 3)
 print(q.x .. "," .. q.y)
 
 print("HEY")
+
+bird = {
+    Position = {
+        x = 1.2,
+        y = 3.4
+    },
+    init = function(self)
+        print(self.Position.x .. "," .. self.Position.y)
+    end
+}
+
+birdSpawn = game.spawn(bird);
+birdSpawn:init()

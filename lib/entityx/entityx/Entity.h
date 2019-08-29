@@ -437,7 +437,7 @@ class EntityManager : entityx::help::NonCopyable {
         ViewIterator<Iterator, All>::next();
       }
 
-      void next_entity(Entity &entity) {}
+      void next_entity([[maybe_unused]]Entity &entity) {}
     };
 
     Iterator begin() { return Iterator(manager_, mask_, 0); }
