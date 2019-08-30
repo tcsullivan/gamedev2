@@ -19,7 +19,7 @@
 #ifndef COMPONENT_HPP_
 #define COMPONENT_HPP_
 
-#include "LuaBridge/LuaBridge.h"
+#include "sol/sol.hpp"
 
 template <typename T>
 class Component 
@@ -27,7 +27,7 @@ class Component
     public:
     Component(){};
 
-    virtual T FromLua(luabridge::LuaRef) = 0;
+    virtual T FromLua(sol::object) = 0;
 };
 
 #endif//COMPONENT_HPP_

@@ -9,39 +9,30 @@
 --print(p.position.x(), p.position.y())
 
 --p = comp:Position(6.5, 2.3)
-local q = Position.new(6, 3)
-print(q.x .. "," .. q.y)
 
-print("HEY")
+bird = {
+    Position = {
+        x = 1.2,
+        y = 3.4
+    },
+    init = function(self)
+        print(self.Position.x .. "," .. self.Position.y)
+    end
+}
 
-local g = game.testfunc({});
-print(g.Position.x .. "," .. g.Position.y);
-g.Position.x = 5.4;
-g.Position.y = 1.2;
+dog = {
+    Position = {
+        x = 6.5,
+        y = 1.3
+    },
+    init = function(self)
+        print(self.Position.x .. "," .. self.Position.y)
+    end
+}
 
---bird = {
---    Position = {
---        x = 1.2,
---        y = 3.4
---    },
---    init = function(self)
---        print(self.Position.x .. "," .. self.Position.y)
---    end
---}
---
---dog = {
---    Position = {
---        x = 6.5,
---        y = 1.3
---    },
---    init = function(self)
---        print(self.Position.x .. "," .. self.Position.y)
---    end
---}
---
---birdSpawn = game.spawn(bird);
---birdSpawn:init()
---
---dogSpawn = game.spawn(dog);
---dogSpawn:init()
---dogSpawn.Position.x = 37.5
+birdSpawn = game.spawn(bird);
+birdSpawn:init()
+
+dogSpawn = game.spawn(dog);
+dogSpawn:init()
+dogSpawn.Position.x = 37.5

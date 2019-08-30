@@ -29,17 +29,17 @@ struct Position : Component<Position>, entityx::Component<Position>
         Position(float _x, float _y): x(_x), y(_y) {}
         Position(void){x = y = 0.0;}
 
-        Position FromLua(luabridge::LuaRef ref)
+        Position FromLua(sol::object ref)
         {
-            if (ref.isTable()){
-                if (!ref["x"].isNil())
-                    this->x = ref["x"];
-                if (!ref["y"].isNil())
-                    this->y = ref["y"];
+            if (ref.get_type() == sol::type::table){
+                sol::table tab = ref;
+                if (tab["x"] != nullptr)
+                    this->x = tab["x"];
+                if (tab["y"] != nullptr)
+                    this->y = tab["y"];
             } else {
                 throw std::string("Position table not formatted properly");
             }
-
             return *this;
         }
 };

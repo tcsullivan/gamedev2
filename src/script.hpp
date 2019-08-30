@@ -21,22 +21,18 @@
 
 #include <entityx/entityx.h>
 #include <lua.hpp>
-#include <LuaBridge/LuaBridge.h>
-#include <script/script.hpp>
+#include <sol/sol.hpp>
 
 /****************
 *  COMPONENTS  *
 ****************/
 #include <components/Position.hpp>
 
-namespace lb = luabridge;
-
 struct EntitySpawnEvent {
-    EntitySpawnEvent (lb::LuaRef ref)
-        : ref(ref), ret(nullptr){}
+    EntitySpawnEvent (sol::object ref)
+        : ref(ref) {}
 
-    lb::LuaRef ref;
-    lb::LuaRef ret;
+    sol::object ref;
 };
 
 /**
@@ -51,32 +47,27 @@ class ScriptSystem : public entityx::System<ScriptSystem>
          * The script systems internal lua state that handles all
          * interactions between C and Lua
          */
-        std::unique_ptr<lua_State, void(*)(lua_State *)> state;
         entityx::EventManager events;
         entityx::EntityManager manager;
 
+        sol::state lua;
+
     public:
         ScriptSystem(void)
-            : state(luaL_newstate(), lua_close),
-              manager(events){}
+            : manager(events){}
 
         ~ScriptSystem(void)
         {
 
         }
 
-        lua_State* getState()
-        {
-            return state.get();
-        }
-
         int init(void)
         {
-            luaL_openlibs(state.get());
+            lua.open_libraries(sol::lib::base);
             scriptExport();
-            //doFile();
+            doFile();
 
-            Script::CreateNewState();
+            //Script::CreateNewState();
 
             return 0;
         }
@@ -100,8 +91,9 @@ class ScriptSystem : public entityx::System<ScriptSystem>
 
         void doFile(void)
         {
-            if (luaL_dofile(state.get(), "Scripts/init.lua")) {
-                std::cout << "Lua error: " << lua_tostring(state.get(), -1) << std::endl;
+            auto result = lua.script_file("Scripts/init.lua");
+            if (!result.valid()) {
+                std::cout << "Lua error: " << std::endl;
             }
 
             manager.each<Position>(
@@ -109,51 +101,48 @@ class ScriptSystem : public entityx::System<ScriptSystem>
                     {std::cout << p.x << "," << p.y << std::endl;});
         }
 
-        lb::LuaRef spawn(lb::LuaRef ref)
+        sol::table spawn([[maybe_unused]]sol::object param)
         {
-            lb::LuaRef entity(state.get());
-            entity = lb::newTable(state.get());
+            sol::table toRet = lua.create_table_with();
+
+            //lb::LuaRef entity(state.get());
+            //entity = lb::newTable(state.get());
             
-            if (ref.isTable()) {
+            if (param.get_type() == sol::type::table) {
+                sol::table tab = param;
 
                 entityx::Entity e = manager.create();
 
-                for (auto &&comp : lb::pairs(ref)) {
-                    if (comp.first.cast<std::string>() == "Position") {
-                        entity["Position"] = 
-                            e.assign<Position>(Position().FromLua(comp.second)).get();
-                    } else if (comp.first.cast<std::string>() == "init") {
-                        entity["init"] = comp.second;
-                    }
+                if (tab["Position"] != nullptr) {
+                    toRet["Position"] = 
+                        e.assign<Position>(Position().FromLua(tab["Position"])).get();
                 }
+
+                if (tab["init"] != nullptr) {
+                    toRet["init"] = tab["init"];
+                }
+
             } else {
                 std::cerr << "Parameter to spawn() must be a table!" << std::endl;
             }
 
-            return entity;
+            //return entity;
+            return toRet;
         }
 
         void scriptExport()
         {
-            // Components export
-            lb::getGlobalNamespace(state.get()).
-                beginNamespace("comp")
-                    .beginClass<Position>("Position")
-                        .addConstructor<void(*)(float, float)>()
-                        .addProperty("x", &Position::x)
-                        .addProperty("y", &Position::y)
-                    .endClass()
-                .endNamespace();
 
-            lb::getGlobalNamespace(state.get())
-                .beginNamespace("game")
-                .endNamespace();
+            std::function<sol::table(sol::table)> func = 
+                [this](sol::table t){ return spawn(t);};
 
-            // Functions export
-            //lb::getGlobalNamespace(state.get())
-            //    .beginNamespace("game")
-            //        .addFunction("spawn", &ScriptSystem::spawn)
-            //    .endNamespace();
+            lua.new_usertype<Position>("Position",
+                    sol::constructors<Position(float x, float y), Position()>(),
+                    "x", &Position::x,
+                    "y", &Position::y);
+
+            auto gamespace = lua["game"].get_or_create<sol::table>();
+            gamespace.set_function("spawn", func);
         }
 
         void receive (const EntitySpawnEvent &toSpawn)
