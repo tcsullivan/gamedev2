@@ -3,6 +3,7 @@
  * Manages all game systems.
  *
  * Copyright (C) 2019 Clyne Sullivan
+ * Copyright (C) 2019 Belle-Isle, Andrew <drumsetmonkey@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
