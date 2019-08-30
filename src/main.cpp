@@ -18,9 +18,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <lua.hpp>
-#include <entityx/entityx.h>
-
 #include "engine.hpp"
 
 #include <SDL2/SDL.h>
