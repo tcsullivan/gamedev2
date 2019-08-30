@@ -1,4 +1,5 @@
 /**
+
  * Copyright (C) 2019  Belle-Isle, Andrew <drumsetmonkey@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,11 +27,11 @@ struct Position : Component<Position>, entityx::Component<Position>
     public:
         float x,y;
         Position(float _x, float _y): x(_x), y(_y) {}
-        Position(void){x = y = 0.0;}
+        Position(void): x(0), y(0) {}
 
         Position FromLua(sol::object ref)
         {
-            if (ref.get_type() == sol::type::table){
+            if (ref.get_type() == sol::type::table) {
                 sol::table tab = ref;
                 if (tab["x"] != nullptr)
                     this->x = tab["x"];

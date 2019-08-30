@@ -24,11 +24,6 @@
 #include <entityx/entityx.h>
 #include <sol/sol.hpp>
 
-/****************
-*  COMPONENTS  *
-****************/
-#include <components/Position.hpp>
-
 struct EntitySpawnEvent {
     EntitySpawnEvent (sol::object ref)
         : ref(ref) {}

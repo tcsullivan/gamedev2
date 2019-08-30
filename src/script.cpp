@@ -62,6 +62,11 @@ int ScriptSystem::init(void)
     return 0;
 }
 
+// TODO move all of these below once the test printouts are gone
+#include <components/Position.hpp>
+#include <components/Name.hpp>
+#include <components/Render.hpp>
+
 void ScriptSystem::doFile(void)
 {
     auto result = lua.script_file("Scripts/init.lua");
@@ -72,11 +77,20 @@ void ScriptSystem::doFile(void)
     manager->each<Position>(
             [&](entityx::Entity, Position& p)
             {std::cout << p.x << "," << p.y << std::endl;});
+
+    manager->each<Name>(
+            [&](entityx::Entity, Name& n)
+            {std::cout << n.name << std::endl;});
+
+    manager->each<Render>(
+            [&](entityx::Entity, Render& r)
+            {std::cout << r.texture << ": " << r.visible << std::endl;});
 }
 
 /********************
 *  SCRIPT PARSING  *
 ********************/
+// TODO here
 
 void ScriptSystem::scriptExport()
 {
@@ -88,6 +102,15 @@ void ScriptSystem::scriptExport()
             sol::constructors<Position(float x, float y), Position()>(),
             "x", &Position::x,
             "y", &Position::y);
+
+    lua.new_usertype<Name>("Name",
+            sol::constructors<Name(std::string), Name()>(),
+            "value", &Name::name);
+
+    lua.new_usertype<Render>("Render",
+            sol::constructors<Render(std::string), Render()>(),
+            "visible", &Render::visible,
+            "texture", &Render::texture);
 
     auto gamespace = lua["game"].get_or_create<sol::table>();
     gamespace.set_function("spawn", func);
@@ -109,6 +132,16 @@ sol::table ScriptSystem::spawn(sol::object param)
 
         if (tab["init"] != nullptr) {
             toRet["init"] = tab["init"];
+        }
+
+        if (tab["Name"] != nullptr) {
+            toRet["Name"] =
+                e.assign<Name>(Name().FromLua(tab["Name"])).get();
+        }
+
+        if (tab["Render"] != nullptr) {
+            toRet["Render"] =
+                e.assign<Render>(Render().FromLua(tab["Render"])).get();
         }
 
     } else {
