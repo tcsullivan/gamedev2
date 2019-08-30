@@ -35,7 +35,7 @@ SRCEXT = cpp
 OBJEXT = o
 DEPEXT = d
 
-LIBDIR = lib
+LIBDIR = deps
 LIBS   = -L$(LIBDIR) -lSDL2 -lpthread -lentityx -ldl -lluajit
 
 CXXFLAGS = -ggdb -std=c++17 -Wall -Wextra -Werror -pedantic
