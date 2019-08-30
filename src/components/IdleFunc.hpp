@@ -1,6 +1,6 @@
-/**
-
+/*
  * Copyright (C) 2019  Belle-Isle, Andrew <drumsetmonkey@gmail.com>
+ * Author: Belle-Isle, Andrew <drumsetmonkey@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,31 +16,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef POSITION_HPP_
-#define POSITION_HPP_
+#ifndef IDLEFUNC_HPP_
+#define IDLEFUNC_HPP_
 
-#include "components/Component.hpp"
+#include <components/Component.hpp>
 
-struct Position : Component<Position>, entityx::Component<Position>
+struct IdleFunc : Component<IdleFunc>, entityx::Component<IdleFunc>
 {
+    sol::function luafunc;
     public:
-        float x,y;
-        Position(float _x, float _y): x(_x), y(_y) {}
-        Position(void): x(0), y(0) {}
+        IdleFunc() {}
 
-        Position FromLua(sol::object ref)
+        IdleFunc FromLua(sol::object ref)
         {
-            if (ref.get_type() == sol::type::table) {
-                sol::table tab = ref;
-                if (tab["x"] != nullptr)
-                    this->x = tab["x"];
-                if (tab["y"] != nullptr)
-                    this->y = tab["y"];
-            } else {
-                throw std::string("Position table not formatted properly");
+            if (ref.get_type() == sol::type::function) {
+                this->luafunc = ref;
             }
             return *this;
         }
 };
 
-#endif//POSITION_HPP_
+#endif//IDLEFUNC_HPP_

@@ -66,6 +66,7 @@ int ScriptSystem::init(void)
 #include <components/Position.hpp>
 #include <components/Name.hpp>
 #include <components/Render.hpp>
+#include <components/IdleFunc.hpp>
 
 void ScriptSystem::doFile(void)
 {
