@@ -25,13 +25,14 @@ without the extra bloat brought on by a general purpose game engine.
 
 ## Libraries
 The libraries used to develop gamedev2 are as follows:
-* SDL2
-* OpenGL
-* GLEW
-* GLU
-* Lua
-* EntityX
-* FreeType 2
+* [SDL2](https://www.libsdl.org/)
+* [OpenGL](https://opengl.org/)
+* [GLEW](https://github.com/nigels-com/glew)
+* [GLM](https://glm.g-truc.net/0.9.9/index.html)
+* [LuaJIT](https://luajit.org/)
+* [sol2](https://github.com/ThePhD/sol2)
+* [EntityX](https://github.com/alecthomas/entityx)
+* [FreeType 2](https://www.freetype.org/)
 
 
 ## Building gamedev2
