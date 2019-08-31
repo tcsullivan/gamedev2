@@ -1,5 +1,6 @@
 /**
-
+ * @file Velocity.hpp
+ *
  * Copyright (C) 2019  Belle-Isle, Andrew <drumsetmonkey@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,19 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef POSITION_HPP_
-#define POSITION_HPP_
+#ifndef VELOCITY_HPP_
+#define VELOCITY_HPP_
 
-#include "components/Component.hpp"
+#include <components/Component.hpp>
 
-struct Position : Component<Position>, entityx::Component<Position>
+struct Velocity : Component<Velocity>, entityx::Component<Velocity>
 {
     public:
         float x, y;
-        Position(float _x, float _y): x(_x), y(_y) {}
-        Position(void): x(0), y(0) {}
+        Velocity(): x(0), y(0) {}
+        Velocity(float _x, float _y): x(_x), y(_y) {}
 
-        Position FromLua(sol::object ref)
+        Velocity FromLua(sol::object ref)
         {
             if (ref.get_type() == sol::type::table) {
                 sol::table tab = ref;
@@ -37,10 +38,10 @@ struct Position : Component<Position>, entityx::Component<Position>
                 if (tab["y"] != nullptr)
                     this->y = tab["y"];
             } else {
-                throw std::string("Position table not formatted properly");
+                throw std::string("Velocity table not formatted properly");
             }
             return *this;
         }
 };
 
-#endif//POSITION_HPP_
+#endif//VELOCITY_HPP_

@@ -79,6 +79,7 @@ void ScriptSystem::doFile(void)
 #include <components/Name.hpp>
 #include <components/Render.hpp>
 #include <components/Script.hpp>
+#include <components/Velocity.hpp>
 
 void ScriptSystem::scriptExport()
 {
@@ -130,8 +131,17 @@ sol::table ScriptSystem::spawn(sol::object param)
         }
 
         if (tab["Render"] != nullptr) {
+            if (!e.has_component<Position>())
+                e.assign<Position>();
             (*toRet)["Render"] =
                 e.assign<Render>(Render().FromLua(tab["Render"])).get();
+        }
+
+        if (tab["Velocity"] != nullptr) {
+            if (!e.has_component<Position>())
+                e.assign<Position>();
+            (*toRet)["Velocity"] =
+                e.assign<Velocity>(Velocity().FromLua(tab["Velocity"])).get();
         }
 
     } else {

@@ -1,6 +1,6 @@
-/*
+/**
+ * @file Script.hpp
  * Copyright (C) 2019  Belle-Isle, Andrew <drumsetmonkey@gmail.com>
- * Author: Belle-Isle, Andrew <drumsetmonkey@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,10 +39,6 @@ struct Scripted : Component<Scripted>, entityx::Component<Scripted>
 
         Scripted FromLua(sol::object)
         {
-            //if (ref.get_type() == sol::type::function) {
-            //    this->luafunc = ref;
-            //}
-            //init = true;
             return *this;
         }
 

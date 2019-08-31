@@ -10,6 +10,10 @@ bird = {
 }
 
 dog = {
+    Velocity = {
+        x = 0.01,
+        y = 10.5
+    },
     Position = {
         x = 6.5,
         y = 1.3
