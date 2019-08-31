@@ -62,36 +62,23 @@ int ScriptSystem::init(void)
     return 0;
 }
 
-// TODO move all of these below once the test printouts are gone
-#include <components/Position.hpp>
-#include <components/Name.hpp>
-#include <components/Render.hpp>
-#include <components/IdleFunc.hpp>
-
 void ScriptSystem::doFile(void)
 {
+
     auto result = lua.script_file("Scripts/init.lua");
+
     if (!result.valid()) {
         std::cout << "Lua error: " << std::endl;
     }
-
-    manager->each<Position>(
-            [&](entityx::Entity, Position& p)
-            {std::cout << p.x << "," << p.y << std::endl;});
-
-    manager->each<Name>(
-            [&](entityx::Entity, Name& n)
-            {std::cout << n.name << std::endl;});
-
-    manager->each<Render>(
-            [&](entityx::Entity, Render& r)
-            {std::cout << r.texture << ": " << r.visible << std::endl;});
 }
 
 /********************
 *  SCRIPT PARSING  *
 ********************/
-// TODO here
+#include <components/Position.hpp>
+#include <components/Name.hpp>
+#include <components/Render.hpp>
+#include <components/Script.hpp>
 
 void ScriptSystem::scriptExport()
 {
@@ -119,29 +106,31 @@ void ScriptSystem::scriptExport()
 
 sol::table ScriptSystem::spawn(sol::object param)
 {
-    sol::table toRet = lua.create_table_with();
-    
+    sol::table* toRet;
     if (param.get_type() == sol::type::table) {
         sol::table tab = param;
 
         entityx::Entity e = manager->create();
+        auto d = e.assign<Scripted>().get();
+        d->caller = lua.create_table();
+        toRet = &(d->caller);
+
+        *toRet = tab; // Copy table to our new entity to preserve functions
+                      //  this reduces the amount of work done in this function
+                      //  as well
 
         if (tab["Position"] != nullptr) {
-            toRet["Position"] = 
+            (*toRet)["Position"] = 
                 e.assign<Position>(Position().FromLua(tab["Position"])).get();
         }
 
-        if (tab["init"] != nullptr) {
-            toRet["init"] = tab["init"];
-        }
-
         if (tab["Name"] != nullptr) {
-            toRet["Name"] =
+            (*toRet)["Name"] =
                 e.assign<Name>(Name().FromLua(tab["Name"])).get();
         }
 
         if (tab["Render"] != nullptr) {
-            toRet["Render"] =
+            (*toRet)["Render"] =
                 e.assign<Render>(Render().FromLua(tab["Render"])).get();
         }
 
@@ -149,5 +138,5 @@ sol::table ScriptSystem::spawn(sol::object param)
         std::cerr << "Parameter to spawn() must be a table!" << std::endl;
     }
 
-    return toRet;
+    return *toRet;
 }

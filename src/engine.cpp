@@ -25,6 +25,9 @@
 #include "window.hpp"
 #include "script.hpp"
 
+#include "components/Script.hpp"
+#include "components/Position.hpp"
+
 int Engine::init(void)
 {
 	systems.add<GameRunSystem>();
@@ -44,8 +47,16 @@ void Engine::logicLoop(void)
 
 	while (shouldRun()) {
 		systems.update<InputSystem>(dt);
+
+        // All entities with an idle function should be run here
+        entities.each<Scripted>([](entityx::Entity, Scripted &f){
+            f.exec();
+        });
 		std::this_thread::sleep_for(100ms);
 	}
+
+    // Remove all Lua references from entities
+    entities.each<Scripted>([](entityx::Entity, Scripted &f){ f.cleanup(); });
 }
 
 void Engine::renderLoop(void)

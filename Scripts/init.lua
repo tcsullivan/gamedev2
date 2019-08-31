@@ -4,7 +4,7 @@ bird = {
         y = 3.4
     },
     Name = "bord",
-    init = function(self)
+    Init = function(self)
         print(self.Position.x .. "," .. self.Position.y)
     end
 }
@@ -18,8 +18,11 @@ dog = {
         texture = "assets/tex.png",
         visible = true
     },
-    init = function(self)
+    Init = function(self)
         print(self.Position.x .. "," .. self.Position.y)
+    end,
+    Idle = function(self)
+        self.Position.x = self.Position.x + 0.01;
     end
 }
 
@@ -31,12 +34,10 @@ animal = {
 }
 
 birdSpawn = game.spawn(bird);
-birdSpawn:init()
-print(birdSpawn.Name.value)
+birdSpawn:Init()
 
 dogSpawn = game.spawn(dog);
-dogSpawn:init()
+dogSpawn:Init()
 dogSpawn.Position.x = 37.5
 
 animalSpawn = game.spawn(animal);
-animalSpawn.Render.texture = "assets/newText.png"

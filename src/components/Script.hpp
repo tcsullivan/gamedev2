@@ -16,24 +16,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef IDLEFUNC_HPP_
-#define IDLEFUNC_HPP_
+#ifndef SCRIPT_COMPONENT_HPP_
+#define SCRIPT_COMPONENT_HPP_
 
 #include <components/Component.hpp>
 
-struct IdleFunc : Component<IdleFunc>, entityx::Component<IdleFunc>
+struct Scripted : Component<Scripted>, entityx::Component<Scripted>
 {
-    sol::function luafunc;
     public:
-        IdleFunc() {}
+        sol::table caller;
+        Scripted() {}
+        Scripted(sol::table call): caller(call) {}
 
-        IdleFunc FromLua(sol::object ref)
+
+        ~Scripted()
+        {}
+
+        void cleanup()
         {
-            if (ref.get_type() == sol::type::function) {
-                this->luafunc = ref;
-            }
+            caller = sol::nil;
+        }
+
+        Scripted FromLua(sol::object)
+        {
+            //if (ref.get_type() == sol::type::function) {
+            //    this->luafunc = ref;
+            //}
+            //init = true;
             return *this;
+        }
+
+        void exec() {
+            if (caller["Idle"] == sol::type::function)
+                caller["Idle"](caller); // Call idle function and pass itself
+                                        //  in or to fulfill the 'self' param
         }
 };
 
-#endif//IDLEFUNC_HPP_
+#endif//SCRIPT_COMPONENT_HPP_
