@@ -87,6 +87,9 @@ class ScriptSystem : public entityx::System<ScriptSystem>
 
         /**
          * The function called by lua scripts in order to spawn an entity.
+         * @param param The table that must be passed in by Lua. This is a
+         * sol2 object instead of a sol2 table because this allows us to handle
+         * errors easier instead of letting sol2 do the error handling.
          */
         sol::table spawn(sol::object param);
 

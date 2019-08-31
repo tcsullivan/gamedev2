@@ -107,19 +107,26 @@ void ScriptSystem::scriptExport()
 
 sol::table ScriptSystem::spawn(sol::object param)
 {
-    sol::table* toRet;
+    sol::table* toRet; // "Entitiy" table to be returned
     if (param.get_type() == sol::type::table) {
-        sol::table tab = param;
+        sol::table tab = param; // Cast the generic parameter to a table
 
-        entityx::Entity e = manager->create();
-        auto d = e.assign<Scripted>().get();
-        d->caller = lua.create_table();
-        toRet = &(d->caller);
+        entityx::Entity e = manager->create(); // Create a new entity
+        auto d = e.assign<Scripted>().get(); // Since this entity was created
+                                             //  via Lua, assign the Scripted
+                                             //  component.
+        d->caller = lua.create_table(); // Create our Entity "table"
+        toRet = &(d->caller); // set our return table to the Entity "table"
 
-        *toRet = tab; // Copy table to our new entity to preserve functions
-                      //  this reduces the amount of work done in this function
-                      //  as well
+        *toRet = tab; /* Copy table to our new entity to preserve functions
+                      *   this reduces the amount of work done in this function
+                      *   as well. We are allowed to do this because lua allows
+                      *   for the reallocation of types.
+                      */
 
+        /*
+         * Create the component dependancies (i.e.: position) first
+         */
         if (tab["Position"] != nullptr) {
             (*toRet)["Position"] = 
                 e.assign<Position>(Position().FromLua(tab["Position"])).get();
@@ -131,22 +138,27 @@ sol::table ScriptSystem::spawn(sol::object param)
         }
 
         if (tab["Render"] != nullptr) {
-            if (!e.has_component<Position>())
-                e.assign<Position>();
+            if (!e.has_component<Position>()) // Position must exist for render
+                (*toRet)["Position"] = e.assign<Position>().get();
             (*toRet)["Render"] =
                 e.assign<Render>(Render().FromLua(tab["Render"])).get();
         }
 
         if (tab["Velocity"] != nullptr) {
-            if (!e.has_component<Position>())
-                e.assign<Position>();
+            if (!e.has_component<Position>()) // Position must exist for vel.
+                (*toRet)["Position"] = e.assign<Position>().get();
             (*toRet)["Velocity"] =
                 e.assign<Velocity>(Velocity().FromLua(tab["Velocity"])).get();
         }
 
     } else {
+        // TODO better logging
         std::cerr << "Parameter to spawn() must be a table!" << std::endl;
     }
+
+    // If the Entity has an Init function defined, call it
+    if ((*toRet)["Init"].get_type() == sol::type::function)
+        (*toRet)["Init"](*toRet);
 
     return *toRet;
 }

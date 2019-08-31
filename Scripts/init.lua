@@ -6,6 +6,7 @@ bird = {
     Name = "bord",
     Init = function(self)
         print(self.Position.x .. "," .. self.Position.y)
+        print("Bird spawn")
     end
 }
 
@@ -38,10 +39,9 @@ animal = {
 }
 
 birdSpawn = game.spawn(bird);
-birdSpawn:Init()
 
 dogSpawn = game.spawn(dog);
-dogSpawn:Init()
 dogSpawn.Position.x = 37.5
 
 animalSpawn = game.spawn(animal);
+print("Animal pos: " .. animalSpawn.Position.x)
