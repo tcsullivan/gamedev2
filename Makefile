@@ -54,22 +54,25 @@ all: resources $(EXEC)
 
 resources: directories
 
-directories:
+directories: 
 	@mkdir -p $(EXECDIR)
 	@mkdir -p $(OUTDIR)
 
 clean:
+	@echo "  CLEAN"
 	@$(RM) -rf $(OUTDIR)
 
 cleaner: clean
 	@$(RM) -rf $(EXECDIR)
 
 $(EXEC): $(CXXOBJ)
-	$(CXX) -o $(EXECDIR)/$(EXEC) $^ $(LIBS)
+	@echo "  CXX   " $(EXEC)
+	@$(CXX) -o $(EXECDIR)/$(EXEC) $^ $(LIBS)
 
 $(OUTDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
+	@echo "  CXX   " $<
 	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) $(CXXINCS) -c -o $@ $<
+	@$(CXX) $(CXXFLAGS) $(CXXINCS) -c -o $@ $<
 	@$(CXX) $(CXXFLAGS) $(INCDEP) -MM $(SRCDIR)/$*.$(SRCEXT) > $(OUTDIR)/$*.$(DEPEXT)
 	@cp -f $(OUTDIR)/$*.$(DEPEXT) $(OUTDIR)/$*.$(DEPEXT).tmp
 	@sed -e 's|.*:|$(OUTDIR)/$*.$(OBJEXT):|' < $(OUTDIR)/$*.$(DEPEXT).tmp > $(OUTDIR)/$*.$(DEPEXT)

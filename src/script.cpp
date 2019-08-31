@@ -43,9 +43,8 @@ void ScriptSystem::update([[maybe_unused]] entityx::EntityManager& entites,
 }
 
 
-void ScriptSystem::receive(const EntitySpawnEvent &toSpawn)
+void ScriptSystem::receive([[maybe_unused]] const EntitySpawnEvent &toSpawn)
 {
-    (void)toSpawn;
 }
 
 /*********************
