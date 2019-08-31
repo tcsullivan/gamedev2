@@ -101,6 +101,11 @@ void ScriptSystem::scriptExport()
             "visible", &Render::visible,
             "texture", &Render::texture);
 
+    lua.new_usertype<Velocity>("Velocity",
+            sol::constructors<Velocity(float, float), Velocity()>(),
+            "x", &Velocity::x,
+            "y", &Velocity::y);
+
     auto gamespace = lua["game"].get_or_create<sol::table>();
     gamespace.set_function("spawn", func);
 }
