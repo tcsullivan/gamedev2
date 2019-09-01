@@ -18,11 +18,11 @@ bird = {
         visible = true
     },
     Idle = function(self)
-        if (self.visibleTick >= 20) then
-            self.Render.visible = not self.Render.visible
-            self.visibleTick = 0
-        end
-        self.visibleTick = self.visibleTick + 1
+        --if (self.visibleTick >= 20) then
+        --    self.Render.visible = not self.Render.visible
+        --    self.visibleTick = 0
+        --end
+        --self.visibleTick = self.visibleTick + 1
     end,
     visibleTick = 0
 }
