@@ -22,6 +22,7 @@
 #include "engine.hpp"
 #include "gamerun.hpp"
 #include "input.hpp"
+#include "player.hpp"
 #include "script.hpp"
 #include "render.hpp"
 
@@ -33,10 +34,14 @@ int Engine::init(void)
 {
 	systems.add<GameRunSystem>();
 	systems.add<InputSystem>();
+	systems.add<PlayerSystem>();
     systems.add<RenderSystem>();
     systems.add<ScriptSystem>();
 
 	systems.configure();
+
+	systems.system<ScriptSystem>()->init();
+
 	return 0;
 }
 

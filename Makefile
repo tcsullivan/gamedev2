@@ -36,7 +36,7 @@ OBJEXT = o
 DEPEXT = d
 
 LIBDIR = lib
-LIBS   = -L$(LIBDIR) -lSDL2 -lpthread -lentityx -ldl -lluajit -lGLEW -lGL -lSDL_image
+LIBS   = -L$(LIBDIR) -lSDL2 -lpthread -lentityx -ldl -lluajit -lGLEW -lGL -lSDL2_image
 
 CXXFLAGS = -ggdb -std=c++17 -Wall -Wextra -Werror -pedantic
 

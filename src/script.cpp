@@ -32,7 +32,7 @@ void ScriptSystem::configure([[maybe_unused]]entityx::EntityManager& entities,
 
     events.subscribe<EntitySpawnEvent>(*this);
 
-    init();
+    //init();
 }
 
 void ScriptSystem::update([[maybe_unused]] entityx::EntityManager& entites,
@@ -75,6 +75,7 @@ void ScriptSystem::doFile(void)
 *  SCRIPT PARSING  *
 ********************/
 #include <components/Position.hpp>
+#include <components/Player.hpp>
 #include <components/Name.hpp>
 #include <components/Render.hpp>
 #include <components/Script.hpp>
@@ -104,6 +105,9 @@ void ScriptSystem::scriptExport()
             sol::constructors<Velocity(double, double), Velocity()>(),
             "x", &Velocity::x,
             "y", &Velocity::y);
+
+    lua.new_usertype<Player>("Player",
+            sol::constructors<Player(void), Player()>());
 
     auto gamespace = lua["game"].get_or_create<sol::table>();
     gamespace.set_function("spawn", func);
@@ -153,6 +157,10 @@ sol::table ScriptSystem::spawn(sol::object param)
                 (*toRet)["Position"] = e.assign<Position>().get();
             (*toRet)["Velocity"] =
                 e.assign<Velocity>(Velocity().FromLua(tab["Velocity"])).get();
+        }
+
+        if (tab["Player"] != nullptr) {
+            (*toRet)["Player"] = e.assign<Player>().get();
         }
 
     } else {

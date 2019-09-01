@@ -1,5 +1,8 @@
 /**
- * Copyright (C) 2019  Belle-Isle, Andrew <drumsetmonkey@gmail.com>
+ * @file Player.h
+ * Component for designating player-controlled entities.
+ *
+ * Copyright (C) 2019 Clyne Sullivan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,18 +18,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef COMPONENT_HPP_
-#define COMPONENT_HPP_
+#ifndef PLAYER_HPP_
+#define PLAYER_HPP_
 
-#include <sol/sol.hpp>
+#include "Component.hpp"
 
-template <typename T>
-class Component 
+struct Player : Component<Player>, entityx::Component<Player>
 {
-    public:
-    Component(){};
-
-    virtual T FromLua(sol::object) = 0;
+        Player FromLua([[maybe_unused]] sol::object ref)
+        {
+		return *this;
+        }
 };
 
-#endif//COMPONENT_HPP_
+#endif // PLAYER_HPP_

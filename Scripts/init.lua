@@ -1,7 +1,12 @@
 bird = {
+    Player = 0,
     Position = {
         x = 150,
         y = 75
+    },
+    Velocity = {
+        x = 0.0,
+        y = 0.0
     },
     Name = "bord",
     Init = function(self)
