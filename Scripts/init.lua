@@ -28,8 +28,8 @@ cat = {
         y = 0.0
     },
     Position = {
-        x = 50,
-        y = 0
+        x = 180,
+        y = -75
     },
     Render = {
         texture = "Assets/cat.png",
@@ -58,7 +58,7 @@ animal = {
     },
     Idle = function(self)
         self.Velocity.x = -200 * math.sin(math.rad(self.counter));
-        self.Velocity.y =  100 * math.cos(math.rad(self.counter*5));
+        self.Velocity.y =  500 * math.cos(math.rad(self.counter*5));
         self.counter = self.counter + 5;
     end,
     counter = 0;
