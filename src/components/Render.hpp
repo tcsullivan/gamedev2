@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef RENDER_HPP_
-#define RENDER_HPP_
+#ifndef RENDERC_HPP_
+#define RENDERC_HPP_
 
 #include <components/Component.hpp>
 
@@ -49,4 +49,4 @@ struct Render : Component<Render>, entityx::Component<Render>
 
 };
 
-#endif//RENDER_HPP_
+#endif//RENDERC_HPP_

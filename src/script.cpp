@@ -53,7 +53,7 @@ void ScriptSystem::receive([[maybe_unused]] const EntitySpawnEvent &toSpawn)
 
 int ScriptSystem::init(void)
 {
-    lua.open_libraries(sol::lib::base);
+    lua.open_libraries(sol::lib::base, sol::lib::math);
 
     scriptExport();
     doFile();
@@ -87,7 +87,7 @@ void ScriptSystem::scriptExport()
         [this](sol::table t){ return spawn(t);};
 
     lua.new_usertype<Position>("Position",
-            sol::constructors<Position(float x, float y), Position()>(),
+            sol::constructors<Position(double x, double y), Position()>(),
             "x", &Position::x,
             "y", &Position::y);
 
@@ -101,7 +101,7 @@ void ScriptSystem::scriptExport()
             "texture", &Render::texture);
 
     lua.new_usertype<Velocity>("Velocity",
-            sol::constructors<Velocity(float, float), Velocity()>(),
+            sol::constructors<Velocity(double, double), Velocity()>(),
             "x", &Velocity::x,
             "y", &Velocity::y);
 

@@ -25,9 +25,9 @@
 struct Velocity : Component<Velocity>, entityx::Component<Velocity>
 {
     public:
-        float x, y;
+        double x, y;
         Velocity(): x(0), y(0) {}
-        Velocity(float _x, float _y): x(_x), y(_y) {}
+        Velocity(double _x, double _y): x(_x), y(_y) {}
 
         Velocity FromLua(sol::object ref)
         {

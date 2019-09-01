@@ -24,8 +24,8 @@
 struct Position : Component<Position>, entityx::Component<Position>
 {
     public:
-        float x, y;
-        Position(float _x, float _y): x(_x), y(_y) {}
+        double x, y;
+        Position(double _x, double _y): x(_x), y(_y) {}
         Position(void): x(0), y(0) {}
 
         Position FromLua(sol::object ref)

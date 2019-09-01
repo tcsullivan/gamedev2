@@ -65,7 +65,7 @@ public:
     /**
      * Updates the render system.
      */
-    void update([[maybe_unused]] entityx::EntityManager& entites,
+    void update([[maybe_unused]] entityx::EntityManager& entities,
                 [[maybe_unused]] entityx::EventManager& events,
                 [[maybe_unused]] entityx::TimeDelta dt) final;
 

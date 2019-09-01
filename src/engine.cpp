@@ -27,6 +27,7 @@
 
 #include "components/Script.hpp"
 #include "components/Position.hpp"
+#include "components/Velocity.hpp"
 
 int Engine::init(void)
 {
@@ -42,17 +43,48 @@ int Engine::init(void)
 void Engine::logicLoop(void)
 {
 	using namespace std::chrono_literals;
+    typedef std::chrono::high_resolution_clock mc;
 
-	entityx::TimeDelta dt = 0;
+    entityx::TimeDelta dt = 0; /**< Elapsed milliseconds since each loop */
+    double elapsed = 0;
 
 	while (shouldRun()) {
+
+        auto start = mc::now();
+
+        /***********************
+        *  UPDATE FREQUENTLY  *
+        ***********************/
+        
+        entities.each<Position, Velocity>
+            ([&](entityx::Entity, Position &p, Velocity &v){
+            p.x += (v.x * dt/1000.0);
+            p.y += (v.y * dt/1000.0);
+        });
+
 		systems.update<InputSystem>(dt);
 
-        // All entities with an idle function should be run here
-        entities.each<Scripted>([](entityx::Entity, Scripted &f){
-            f.exec();
-        });
-		std::this_thread::sleep_for(100ms);
+        /*******************
+        *  LOGIC UPDATES  *
+        *******************/
+        
+        // Update 20 times a second
+        if (elapsed > 50) {
+            elapsed = 0;
+            
+            // All entities with an idle function should be run here
+            entities.each<Scripted>([](entityx::Entity, Scripted &f){
+                f.exec();
+            });
+        }
+
+        auto end = mc::now();
+        auto diff = end - start;
+        auto micros = cr::duration_cast<cr::microseconds>(diff);
+        auto msc = micros.count();
+        dt = static_cast<double>(msc)/1000.0;
+        elapsed += dt;
+		std::this_thread::yield();
 	}
 
     // Remove all Lua references from entities

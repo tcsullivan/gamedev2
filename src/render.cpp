@@ -19,6 +19,8 @@
  */
 
 #include <render.hpp>
+#include <components/Render.hpp>
+#include <components/Position.hpp>
 
 void RenderSystem::configure([[maybe_unused]]entityx::EntityManager& entities,
                              [[maybe_unused]]entityx::EventManager& events)
@@ -26,16 +28,10 @@ void RenderSystem::configure([[maybe_unused]]entityx::EntityManager& entities,
     init();
 }
 
-void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entites,
+void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
                           [[maybe_unused]] entityx::EventManager& events,
                           [[maybe_unused]] entityx::TimeDelta dt)
 {
-    static GLfloat tri_data[] = {
-            -1.0, -1.0, 0.0,
-            1.0, -1.0, 0.0,
-            0.0, 1.0, 0.0,
-    };
-    
     GLuint s = worldShader.getProgram();
     GLuint v = worldShader.getUniform("view");
     GLuint p = worldShader.getUniform("projection");
@@ -50,10 +46,18 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entites,
                                  glm::vec3(0.0f, 0.0f, 0.0f),  // Facing
                                  glm::vec3(0.0f, 1.0f, 0.0f)); // Up
 
-    glm::mat4 projection = glm::perspective(45.0f, 
-                                            ((float)width/(float)height), 
-                                            0.01f, 
-                                            2048.0f);
+    //glm::mat4 projection = glm::perspective(45.0f, 
+    //                                        ((float)width/(float)height), 
+    //                                        0.01f, 
+    //                                        2048.0f);
+
+    glm::mat4 projection = glm::ortho(-((float)width/2),    // Left
+                                       ((float)width/2),    // Right
+                                      -((float)height/2),   // Bottom
+                                       ((float)height/2),   // Top
+                                      -10.0f,               // zNear
+                                       10.0f                // zFar
+                                     );
 
     glm::mat4 model = glm::mat4(1.0f);
 
@@ -75,14 +79,25 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entites,
     *  DRAWING  *
     *************/
 
-    GLuint tri_vbo;
-    
-    glGenBuffers(1, &tri_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, tri_vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(tri_data), tri_data, GL_STREAM_DRAW);
 
-    glVertexAttribPointer(a, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    entities.each<Render, Position>(
+            [this, a](entityx::Entity, Render, Position &p){
+
+        GLuint tri_vbo;
+        GLfloat tri_data[] = {
+                (float)p.x-10.0f, (float)p.y-10.0f, 00.0f,
+                (float)p.x+10.0f, (float)p.y-10.0f, 00.0f,
+                (float)p.x+00.0f, (float)p.y+10.0f, 00.0f,
+        };
+
+        glGenBuffers(1, &tri_vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, tri_vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(tri_data), tri_data, GL_STREAM_DRAW);
+
+        glVertexAttribPointer(a, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+    
+    });
     
 
     /*************

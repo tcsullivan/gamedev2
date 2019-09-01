@@ -12,12 +12,12 @@ bird = {
 
 dog = {
     Velocity = {
-        x = 0.01,
-        y = 10.5
+        x = 0.0,
+        y = 0.0
     },
     Position = {
-        x = 6.5,
-        y = 1.3
+        x = 50,
+        y = 0
     },
     Render = {
         texture = "assets/tex.png",
@@ -26,8 +26,11 @@ dog = {
     Init = function(self)
         print(self.Position.x .. "," .. self.Position.y)
     end,
+    counter = 0;
     Idle = function(self)
-        self.Position.x = self.Position.x + 0.01;
+        self.Velocity.x = -100 * math.sin(math.rad(self.counter));
+        self.Velocity.y =  100 * math.cos(math.rad(self.counter));
+        self.counter = self.counter + 5;
     end
 }
 
@@ -41,7 +44,6 @@ animal = {
 birdSpawn = game.spawn(bird);
 
 dogSpawn = game.spawn(dog);
-dogSpawn.Position.x = 37.5
 
 animalSpawn = game.spawn(animal);
 print("Animal pos: " .. animalSpawn.Position.x)
