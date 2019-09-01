@@ -19,12 +19,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef RENDER_HPP_
-#define RENDER_HPP_
+#ifndef SYSTEM_RENDER_HPP_
+#define SYSTEM_RENDER_HPP_
+
+#include "shader.hpp"
 
 #include <entityx/entityx.h>
-
-#include <shader.hpp>
 
 #include <SDL2/SDL.h>
 
@@ -37,37 +37,37 @@
 class RenderSystem : public entityx::System<RenderSystem>
 {
 private:
-	constexpr static const char *title = "gamedev2";
-	constexpr static int width = 640;
-	constexpr static int height = 480;
+    constexpr static const char *title = "gamedev2";
+    constexpr static int width = 640;
+    constexpr static int height = 480;
 
-	std::unique_ptr<SDL_Window, void (*)(SDL_Window *)> window;
-	SDL_GLContext context;
+    std::unique_ptr<SDL_Window, void (*)(SDL_Window *)> window;
+    SDL_GLContext context;
 
     Shader worldShader;
+
 public:
-    RenderSystem(void):
-	    window(nullptr, SDL_DestroyWindow)
-    {}
+    RenderSystem(void) :
+        window(nullptr, SDL_DestroyWindow) {}
 
     ~RenderSystem(void)
     {
-	    SDL_GL_DeleteContext(context);
+        SDL_GL_DeleteContext(context);
         SDL_Quit();
     }
 
     /**
      * Prepares the system for running.
      */
-    void configure([[maybe_unused]]entityx::EntityManager& entities,
-                   [[maybe_unused]]entityx::EventManager& events) final;
+    void configure(entityx::EntityManager& entities,
+                   entityx::EventManager& events) final;
     
     /**
      * Updates the render system.
      */
-    void update([[maybe_unused]] entityx::EntityManager& entities,
-                [[maybe_unused]] entityx::EventManager& events,
-                [[maybe_unused]] entityx::TimeDelta dt) final;
+    void update(entityx::EntityManager& entities,
+                entityx::EventManager& events,
+                entityx::TimeDelta dt) final;
 
     /**
      * Initializes the rendering system
@@ -76,4 +76,5 @@ public:
     int init(void);
 };
 
-#endif//RENDER_HPP_
+#endif // SYSTEM_RENDER_HPP_
+

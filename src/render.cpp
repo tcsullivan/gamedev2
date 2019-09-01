@@ -22,8 +22,8 @@
 #include <components/Render.hpp>
 #include <components/Position.hpp>
 
-void RenderSystem::configure([[maybe_unused]]entityx::EntityManager& entities,
-                             [[maybe_unused]]entityx::EventManager& events)
+void RenderSystem::configure([[maybe_unused]] entityx::EntityManager& entities,
+                             [[maybe_unused]] entityx::EventManager& events)
 {
     init();
 }
@@ -80,7 +80,7 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     *************/
 
     entities.each<Render, Position>(
-            [this, a](entityx::Entity, Render &r, Position &p){
+        [this, a](entityx::Entity, Render &r, Position &p) {
 
         if (!r.visible)
             return;
@@ -174,3 +174,4 @@ int RenderSystem::init(void)
 
     return 0;
 }
+

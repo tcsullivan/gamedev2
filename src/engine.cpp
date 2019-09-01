@@ -32,30 +32,28 @@
 
 int Engine::init(void)
 {
-	systems.add<GameRunSystem>();
-	systems.add<InputSystem>();
-	systems.add<PlayerSystem>();
+    systems.add<GameRunSystem>();
+    systems.add<InputSystem>();
+    systems.add<PlayerSystem>();
     systems.add<RenderSystem>();
     systems.add<ScriptSystem>();
+    systems.configure();
 
-	systems.configure();
+    systems.system<ScriptSystem>()->init();
 
-	systems.system<ScriptSystem>()->init();
-
-	return 0;
+    return 0;
 }
 
 void Engine::logicLoop(void)
 {
-	using namespace std::chrono_literals;
+    using namespace std::chrono_literals;
     namespace cr = std::chrono;
     typedef std::chrono::high_resolution_clock mc;
 
     entityx::TimeDelta dt = 0; /**< Elapsed milliseconds since each loop */
     double elapsed = 0;
 
-	while (shouldRun()) {
-
+    while (shouldRun()) {
         auto start = mc::now();
 
         /***********************
@@ -68,7 +66,7 @@ void Engine::logicLoop(void)
             p.y += (v.y * dt/1000.0);
         });
 
-		systems.update<InputSystem>(dt);
+        systems.update<InputSystem>(dt);
 
         /*******************
         *  LOGIC UPDATES  *
@@ -88,10 +86,10 @@ void Engine::logicLoop(void)
         auto diff = end - start;
         auto micros = cr::duration_cast<cr::microseconds>(diff);
         auto msc = micros.count();
-        dt = static_cast<double>(msc)/1000.0;
+        dt = static_cast<double>(msc) / 1000.0;
         elapsed += dt;
-		std::this_thread::yield();
-	}
+        std::this_thread::yield();
+    }
 
     // Remove all Lua references from entities
     entities.each<Scripted>([](entityx::Entity, Scripted &f){ f.cleanup(); });
@@ -99,29 +97,29 @@ void Engine::logicLoop(void)
 
 void Engine::renderLoop(void)
 {
-	while (shouldRun()) {
-		systems.update<RenderSystem>(0);
-		std::this_thread::yield();
-	}
+    while (shouldRun()) {
+        systems.update<RenderSystem>(0);
+        std::this_thread::yield();
+    }
 }
 
 void Engine::run(void)
 {
-	// Start logic thread
-	logicThread = std::thread([this](void) {
-		logicLoop();
-	});
+    // Start logic thread
+    logicThread = std::thread([this](void) {
+        logicLoop();
+    });
 
-	// Keep render loop on main thread
-	renderLoop();
+    // Keep render loop on main thread
+    renderLoop();
 
-	// Done, bring logic thread back
-	logicThread.join();
+    // Done, bring logic thread back
+    logicThread.join();
 }
 
 bool Engine::shouldRun(void)
 {
-	auto grs = systems.system<GameRunSystem>();
-	return grs ? grs->shouldRun() : true;
+    auto grs = systems.system<GameRunSystem>();
+    return grs ? grs->shouldRun() : true;
 }
 

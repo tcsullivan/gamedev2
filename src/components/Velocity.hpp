@@ -17,31 +17,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef VELOCITY_HPP_
-#define VELOCITY_HPP_
+#ifndef COMPONENT_VELOCITY_HPP_
+#define COMPONENT_VELOCITY_HPP_
 
-#include <components/Component.hpp>
+#include "Component.hpp"
 
 struct Velocity : Component<Velocity>, entityx::Component<Velocity>
 {
-    public:
-        double x, y;
-        Velocity(): x(0), y(0) {}
-        Velocity(double _x, double _y): x(_x), y(_y) {}
+public:
+    double x, y;
 
-        Velocity FromLua(sol::object ref)
-        {
-            if (ref.get_type() == sol::type::table) {
-                sol::table tab = ref;
-                if (tab["x"] != nullptr)
-                    this->x = tab["x"];
-                if (tab["y"] != nullptr)
-                    this->y = tab["y"];
-            } else {
-                throw std::string("Velocity table not formatted properly");
-            }
-            return *this;
+    Velocity(double _x = 0, double _y = 0) :
+        x(_x), y(_y) {}
+
+    Velocity FromLua(sol::object ref)
+    {
+        if (ref.get_type() == sol::type::table) {
+            sol::table tab = ref;
+            if (tab["x"] != nullptr)
+                this->x = tab["x"];
+            if (tab["y"] != nullptr)
+                this->y = tab["y"];
+        } else {
+            throw std::string("Velocity table not formatted properly");
         }
+        return *this;
+    }
 };
 
-#endif//VELOCITY_HPP_
+#endif // COMPONENT_VELOCITY_HPP_
+

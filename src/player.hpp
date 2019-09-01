@@ -18,8 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PLAYERSYSTEM_HPP_
-#define PLAYERSYSTEM_HPP_
+#ifndef SYSTEM_PLAYER_HPP_
+#define SYSTEM_PLAYER_HPP_
 
 #include <SDL2/SDL.h>
 #include <entityx/entityx.h>
@@ -32,49 +32,50 @@
  * Controls player entity movement.
  */
 class PlayerSystem : public entityx::System<PlayerSystem>,
-	public entityx::Receiver<PlayerSystem>
+                     public entityx::Receiver<PlayerSystem>
 {
-    private:
-	/**
-	 * Defines player's horizontal movement velocity.
-	 */
-        constexpr static double GROUND_VELOCITY = 100;
+private:
+    /**
+     * Defines player's horizontal movement velocity.
+     */
+    constexpr static double GROUND_VELOCITY = 100;
 
-	entityx::Entity player;
+    entityx::Entity player;
 
-    public:
-        /**
-         * Prepares the system for running.
-         */
-        void configure([[maybe_unused]] entityx::EntityManager& entities,
-                       entityx::EventManager& events) final;
+public:
+    /**
+     * Prepares the system for running.
+     */
+    void configure(entityx::EntityManager& entities,
+                   entityx::EventManager& events) final;
 
-        /**
-         * Updates the scripting system.
-         */
-        void update([[maybe_unused]] entityx::EntityManager& entites,
-                    [[maybe_unused]] entityx::EventManager& events,
-                    [[maybe_unused]] entityx::TimeDelta dt) final;
+    /**
+     * Updates the scripting system.
+     */
+    void update(entityx::EntityManager& entites,
+                entityx::EventManager& events,
+                entityx::TimeDelta dt) final;
 
-	/**
-	 * Captures the player entity.
-	 */
-	void receive(const entityx::ComponentAddedEvent<Player>& cae);
+    /**
+     * Captures the player entity.
+     */
+    void receive(const entityx::ComponentAddedEvent<Player>& cae);
 
-	/**
-	 * Invalidates the system's player entity (assume player is gone).
-	 */
-	void receive(const entityx::ComponentRemovedEvent<Player>& cre);
+    /**
+     * Invalidates the system's player entity (assume player is gone).
+     */
+    void receive(const entityx::ComponentRemovedEvent<Player>& cre);
 
-	/**
-	 * Applies velocity based on key press.
-	 */
-	void receive(const KeyDownEvent& kue);
+    /**
+     * Applies velocity based on key press.
+     */
+    void receive(const KeyDownEvent& kue);
 
-	/**
-	 * Removes applied velocity
-	 */
-	void receive(const KeyUpEvent& kue);
+    /**
+     * Removes applied velocity
+     */
+    void receive(const KeyUpEvent& kue);
 };
 
-#endif // PLAYERSYSTEM_HPP_
+#endif // SYSTEM_PLAYER_HPP_
+

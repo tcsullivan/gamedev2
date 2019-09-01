@@ -24,14 +24,15 @@
 *  SYSTEM SPECIFIC  *
 *********************/
 
-void ScriptSystem::configure([[maybe_unused]]entityx::EntityManager& entities,
-                             [[maybe_unused]]entityx::EventManager& events)
+void ScriptSystem::configure(entityx::EntityManager& entities,
+                             entityx::EventManager& events)
 {
     this->manager = &entities;
     this->events = &events;
 
     events.subscribe<EntitySpawnEvent>(*this);
 
+    // Init after systems.configure() in engine.cpp
     //init();
 }
 
@@ -39,7 +40,6 @@ void ScriptSystem::update([[maybe_unused]] entityx::EntityManager& entites,
                           [[maybe_unused]] entityx::EventManager& events,
                           [[maybe_unused]] entityx::TimeDelta dt)
 {
-
 }
 
 
@@ -81,9 +81,8 @@ void ScriptSystem::doFile(void)
 #include <components/Script.hpp>
 #include <components/Velocity.hpp>
 
-void ScriptSystem::scriptExport()
+void ScriptSystem::scriptExport(void)
 {
-
     std::function<sol::table(sol::table)> func = 
         [this](sol::table t){ return spawn(t);};
 
@@ -174,3 +173,4 @@ sol::table ScriptSystem::spawn(sol::object param)
 
     return *toRet;
 }
+

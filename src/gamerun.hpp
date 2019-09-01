@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef GAMERUN_HPP_
-#define GAMERUN_HPP_
+#ifndef SYSTEM_GAMERUN_HPP_
+#define SYSTEM_GAMERUN_HPP_
 
 #include "input.hpp"
 
@@ -33,44 +33,48 @@
  * Listens for a key event to tell the game to exit.
  */
 class GameRunSystem : public entityx::System<GameRunSystem>,
-	public entityx::Receiver<GameRunSystem> {
+                      public entityx::Receiver<GameRunSystem>
+{
 private:
-	std::atomic_bool shouldRunFlag;
+    std::atomic_bool shouldRunFlag;
 
 public:
-	/**
-	 * Configures the system to wait for the exit event.
-	 */
-	void configure([[maybe_unused]] entityx::EntityManager& entities,
-		entityx::EventManager& events) {
-		shouldRunFlag.store(true);
+    /**
+     * Configures the system to wait for the exit event.
+     */
+    void configure([[maybe_unused]] entityx::EntityManager& entities,
+                   entityx::EventManager& events)
+    {
+        shouldRunFlag.store(true);
 
-		events.subscribe<KeyUpEvent>(*this);
+        events.subscribe<KeyUpEvent>(*this);
 
-		std::cout << "Press escape to exit." << std::endl;
-	}
+        std::cout << "Press escape to exit." << std::endl;
+    }
 
-	// Unused
-	void update([[maybe_unused]] entityx::EntityManager& entities,
-		[[maybe_unused]] entityx::EventManager& events,
-		[[maybe_unused]] entityx::TimeDelta dt) final {}
+    // Unused
+    void update([[maybe_unused]] entityx::EntityManager& entities,
+                [[maybe_unused]] entityx::EventManager& events,
+                [[maybe_unused]] entityx::TimeDelta dt) final {}
 
-	/**
-	 * Receiver for key release events, used to listen for game exit key.
-	 */
-	void receive(const KeyUpEvent& kue) {
-		if (kue.sym == SDLK_ESCAPE)
-			shouldRunFlag.store(false);
-	}
+    /**
+     * Receiver for key release events, used to listen for game exit key.
+     */
+    void receive(const KeyUpEvent& kue)
+    {
+        if (kue.sym == SDLK_ESCAPE)
+            shouldRunFlag.store(false);
+    }
 
-	/**
-	 * Checks if the game exit key has been pressed.
-	 * @return True if the game should exit
-	 */
-	inline bool shouldRun(void) const {
-		return shouldRunFlag.load();
-	}
+    /**
+     * Checks if the game exit key has been pressed.
+     * @return True if the game should exit
+     */
+    bool shouldRun(void) const
+    {
+        return shouldRunFlag.load();
+    }
 };
 
-#endif // GAMERUN_HPP_
+#endif // SYSTEM_GAMERUN_HPP_
 

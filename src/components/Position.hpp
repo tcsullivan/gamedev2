@@ -16,31 +16,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef POSITION_HPP_
-#define POSITION_HPP_
+#ifndef COMPONENT_POSITION_HPP_
+#define COMPONENT_POSITION_HPP_
 
-#include "components/Component.hpp"
+#include "Component.hpp"
 
 struct Position : Component<Position>, entityx::Component<Position>
 {
-    public:
-        double x, y;
-        Position(double _x, double _y): x(_x), y(_y) {}
-        Position(void): x(0), y(0) {}
+public:
+    double x, y;
 
-        Position FromLua(sol::object ref)
-        {
-            if (ref.get_type() == sol::type::table) {
-                sol::table tab = ref;
-                if (tab["x"] != nullptr)
-                    this->x = tab["x"];
-                if (tab["y"] != nullptr)
-                    this->y = tab["y"];
-            } else {
-                throw std::string("Position table not formatted properly");
-            }
-            return *this;
+    Position(double _x = 0, double _y = 0) :
+        x(_x), y(_y) {}
+
+    Position FromLua(sol::object ref)
+    {
+        if (ref.get_type() == sol::type::table) {
+            sol::table tab = ref;
+            if (tab["x"] != nullptr)
+                this->x = tab["x"];
+            if (tab["y"] != nullptr)
+                this->y = tab["y"];
+        } else {
+            throw std::string("Position table not formatted properly");
         }
+        return *this;
+    }
 };
 
-#endif//POSITION_HPP_
+#endif // COMPONENT_POSITION_HPP_
+

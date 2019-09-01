@@ -15,29 +15,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NAME_HPP_
-#define NAME_HPP_
+#ifndef COMPONENT_NAME_HPP_
+#define COMPONENT_NAME_HPP_
 
-#include "components/Component.hpp"
+#include "Component.hpp"
 #include <string>
 
 struct Name : Component<Name>, entityx::Component<Name>
 {
-    public:
-        std::string name;
-        Name(std::string _name) : name(_name) {}
-        Name(void): name() {};
+public:
+    std::string name;
 
-        Name FromLua(sol::object ref)
-        {
-            if (ref.get_type() == sol::type::string) {
-                this->name = ref.as<std::string>();
-            } else {
-                throw std::string("Name component not formatted properly");
-            }
-            return *this;
-        }
+    Name(std::string _name = std::string()) :
+        name(_name) {}
 
+    Name FromLua(sol::object ref)
+    {
+        if (ref.get_type() == sol::type::string)
+            this->name = ref.as<std::string>();
+        else
+            throw std::string("Name component not formatted properly");
+
+        return *this;
+    }
 };
 
-#endif//NAME_HPP_
+#endif // COMPONENT_NAME_HPP_
+

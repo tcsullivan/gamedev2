@@ -23,53 +23,54 @@
 #include "components/Velocity.hpp"
 
 void PlayerSystem::configure([[maybe_unused]] entityx::EntityManager& entities,
-    entityx::EventManager& events)
+                             entityx::EventManager& events)
 {
-	events.subscribe<entityx::ComponentAddedEvent<Player>>(*this);
-	events.subscribe<entityx::ComponentRemovedEvent<Player>>(*this);
-	events.subscribe<KeyUpEvent>(*this);
-	events.subscribe<KeyDownEvent>(*this);
+    events.subscribe<entityx::ComponentAddedEvent<Player>>(*this);
+    events.subscribe<entityx::ComponentRemovedEvent<Player>>(*this);
+    events.subscribe<KeyUpEvent>(*this);
+    events.subscribe<KeyDownEvent>(*this);
 }
 
 void PlayerSystem::update([[maybe_unused]] entityx::EntityManager& entites,
-    [[maybe_unused]] entityx::EventManager& events,
-    [[maybe_unused]] entityx::TimeDelta dt)
+                          [[maybe_unused]] entityx::EventManager& events,
+                          [[maybe_unused]] entityx::TimeDelta dt)
 {
 }
 
 void PlayerSystem::receive(const entityx::ComponentAddedEvent<Player>& cae)
 {
-	player = cae.entity;
+    player = cae.entity;
 }
 
 void PlayerSystem::receive(const entityx::ComponentRemovedEvent<Player>& cre)
 {
-	if (player == cre.entity)
-		player.invalidate();
+    if (player == cre.entity)
+        player.invalidate();
 }
 
 void PlayerSystem::receive(const KeyDownEvent& kue)
 {
-	if (player.valid()) {
-		if (kue.sym == SDLK_a) {
-			if (auto vel = player.component<Velocity>(); vel)
-				vel->x += GROUND_VELOCITY;
-		} else if (kue.sym == SDLK_d) {
-			if (auto vel = player.component<Velocity>(); vel)
-				vel->x -= GROUND_VELOCITY;
-		}
-	}
+    if (player.valid()) {
+        if (kue.sym == SDLK_a) {
+            if (auto vel = player.component<Velocity>(); vel)
+                vel->x += GROUND_VELOCITY;
+        } else if (kue.sym == SDLK_d) {
+            if (auto vel = player.component<Velocity>(); vel)
+                vel->x -= GROUND_VELOCITY;
+        }
+    }
 }
 
 void PlayerSystem::receive(const KeyUpEvent& kue)
 {
-	if (player.valid()) {
-		if (kue.sym == SDLK_a) {
-			if (auto vel = player.component<Velocity>(); vel)
-				vel->x -= GROUND_VELOCITY;
-		} else if (kue.sym == SDLK_d) {
-			if (auto vel = player.component<Velocity>(); vel)
-				vel->x += GROUND_VELOCITY;
-		}
-	}
+    if (player.valid()) {
+        if (kue.sym == SDLK_a) {
+            if (auto vel = player.component<Velocity>(); vel)
+                vel->x -= GROUND_VELOCITY;
+        } else if (kue.sym == SDLK_d) {
+            if (auto vel = player.component<Velocity>(); vel)
+                vel->x += GROUND_VELOCITY;
+        }
+    }
 }
+

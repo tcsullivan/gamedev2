@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SHADER_HPP
-#define SHADER_HPP
+#ifndef SYSTEM_SHADER_HPP_
+#define SYSTEM_SHADER_HPP_
 
 #include <string>
 #include <unordered_map>
@@ -27,81 +27,87 @@
 
 class Shader
 {
-    private:
-        /**
-         * Reads the contents of a shader file and returns a c++ string
-         * object representing the contents
-         * @param The file path
-         * @return The shader contents
-         */
-        std::string readShader(std::string); 
+private:
+    /**
+     * Reads the contents of a shader file and returns a c++ string
+     * object representing the contents
+     * @param The file path
+     * @return The shader contents
+     */
+    std::string readShader(std::string); 
 
-        /**
-         * Creates a shader from a filename and a shader type
-         * @param The file path containing the shader data
-         * @param What type of shader to create
-         * @return Memory address of shader location
-         */
-        GLuint createShader(std::string, GLenum);
+    /**
+     * Creates a shader from a filename and a shader type
+     * @param The file path containing the shader data
+     * @param What type of shader to create
+     * @return Memory address of shader location
+     */
+    GLuint createShader(std::string, GLenum);
 
-        GLuint program; /**< GPU Memory address of shader program */
+    GLuint program; /**< GPU Memory address of shader program */
 
-        /**
-         * Name of shader attributes and their corresponding memory
-         * locations in which the data exists
-         */
-        std::unordered_map<std::string, GLuint> attributes;
-        
-        /**
-         * Name of shader uniforms in and their corresponding memory
-         * locations in which the data exists
-         */
-        std::unordered_map<std::string, GLuint> uniforms;
-    public:
-        Shader(): program(-1) {}
-        /**
-         * Given the file paths of two shaders, create a shader program.
-         * @param v The file path of the vertex shader file.
-         * @param f The file path of the fragment shader file.
-         * @return The GPU Memory location of the shader program
-         */
-        GLuint createProgram(std::string v, std::string f); 
+    /**
+     * Name of shader attributes and their corresponding memory
+     * locations in which the data exists
+     */
+    std::unordered_map<std::string, GLuint> attributes;
+    
+    /**
+     * Name of shader uniforms in and their corresponding memory
+     * locations in which the data exists
+     */
+    std::unordered_map<std::string, GLuint> uniforms;
 
-        /**
-         * Finds and binds an attribute to the current shader if possible
-         * @param The attribute to bind in the shader
-         * @return The memory address of the new attribute, or -1 if the
-         * attribute doesn't exist in the shader
-         */
-        GLint addAttribute(std::string);
-        /**
-         * Finds and binds a uniform to the current shader if possible
-         * @param The uniform to bind in the shader
-         * @return The memory address of the new uniform, or -1 if the
-         * uniform doesn't exist in the shader
-         */
-        GLint addUniform(std::string);
+public:
+    Shader(void) :
+        program(-1) {}
 
-        /**
-         * Finds the GPU memory address of the given attribute in the shader
-         * program
-         * @param The attribute to find
-         * @return The attribute memory location, or -1 if it doesn't exist
-         */
-        GLint getAttribute(std::string);
-        /**
-         * Finds the GPU memory address of the given uniform in the shader
-         * program
-         * @param The uniform to find
-         * @return The uniform memory location, or -1 if it doesn't exist
-         */
-        GLint getUniform(std::string);
+    /**
+     * Given the file paths of two shaders, create a shader program.
+     * @param v The file path of the vertex shader file.
+     * @param f The file path of the fragment shader file.
+     * @return The GPU Memory location of the shader program
+     */
+    GLuint createProgram(std::string v, std::string f); 
 
-        /**
-         * Gets the memory address of the program stored in this object
-         * @return The GPU memory address of the shader program stored
-         */
-        GLuint getProgram();
+    /**
+     * Finds and binds an attribute to the current shader if possible
+     * @param The attribute to bind in the shader
+     * @return The memory address of the new attribute, or -1 if the
+     * attribute doesn't exist in the shader
+     */
+    GLint addAttribute(std::string);
+
+    /**
+     * Finds and binds a uniform to the current shader if possible
+     * @param The uniform to bind in the shader
+     * @return The memory address of the new uniform, or -1 if the
+     * uniform doesn't exist in the shader
+     */
+    GLint addUniform(std::string);
+
+    /**
+     * Finds the GPU memory address of the given attribute in the shader
+     * program
+     * @param The attribute to find
+     * @return The attribute memory location, or -1 if it doesn't exist
+     */
+    GLint getAttribute(std::string);
+
+    /**
+     * Finds the GPU memory address of the given uniform in the shader
+     * program
+     * @param The uniform to find
+     * @return The uniform memory location, or -1 if it doesn't exist
+     */
+    GLint getUniform(std::string);
+
+    /**
+     * Gets the memory address of the program stored in this object
+     * @return The GPU memory address of the shader program stored
+     */
+    GLuint getProgram();
 };
 
-#endif // SHADER_HPP
+#endif // SYSTEM_SHADER_HPP_
+

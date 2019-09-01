@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef INPUT_HPP_
-#define INPUT_HPP_
+#ifndef SYSTEM_INPUT_HPP_
+#define SYSTEM_INPUT_HPP_
 
 #include <entityx/entityx.h>
 #include <SDL2/SDL.h>
@@ -28,12 +28,13 @@
  * @class KeyUpEvent
  * Stores info regarding key releases.
  */
-struct KeyUpEvent {
-	KeyUpEvent(const SDL_Keysym& keysym) :
-		sym(keysym.sym), mod(keysym.mod) {}
+struct KeyUpEvent
+{
+    SDL_Keycode sym;
+    Uint16 mod;
 
-	SDL_Keycode sym;
-	Uint16 mod;
+    KeyUpEvent(const SDL_Keysym& keysym) :
+        sym(keysym.sym), mod(keysym.mod) {}
 };
 
 /**
@@ -41,48 +42,49 @@ struct KeyUpEvent {
  * Stores info regarding key presses.
  */
 struct KeyDownEvent {
-	KeyDownEvent(const SDL_Keysym& keysym) :
-		sym(keysym.sym), mod(keysym.mod) {}
+    SDL_Keycode sym;
+    Uint16 mod;
 
-	SDL_Keycode sym;
-	Uint16 mod;
+    KeyDownEvent(const SDL_Keysym& keysym) :
+        sym(keysym.sym), mod(keysym.mod) {}
 };
 
 /**
  * @class InputSystem
  * Listens for user input from SDL, and emits input events accordingly.
  */
-class InputSystem : public entityx::System<InputSystem> {
+class InputSystem : public entityx::System<InputSystem>
+{
 public:
-	/**
-	 * Prepares the system for running.
-	 */
-	void configure([[maybe_unused]] entityx::EntityManager& entities,
-		[[maybe_unused]] entityx::EventManager& events) final {
-	}
+    /**
+     * Prepares the system for running.
+     */
+    void configure([[maybe_unused]] entityx::EntityManager& entities,
+                   [[maybe_unused]] entityx::EventManager& events) final {}
 
-	/**
-	 * Updates the system by checking for SDL events.
-	 */
-	void update([[maybe_unused]] entityx::EntityManager& entities,
-		[[maybe_unused]] entityx::EventManager& events,
-		[[maybe_unused]] entityx::TimeDelta dt) final {
-		for (SDL_Event event; SDL_PollEvent(&event);) {
-			switch (event.type) {
-			case SDL_KEYUP:
-				if (auto key = event.key; key.repeat == 0)
-					events.emit<KeyUpEvent>(key.keysym);
-				break;
-			case SDL_KEYDOWN:
-				if (auto key = event.key; key.repeat == 0)
-					events.emit<KeyDownEvent>(key.keysym);
-				break;
-			default:
-				break;
-			}
-		}
-	}
+    /**
+     * Updates the system by checking for SDL events.
+     */
+    void update([[maybe_unused]] entityx::EntityManager& entities,
+                [[maybe_unused]] entityx::EventManager& events,
+                [[maybe_unused]] entityx::TimeDelta dt) final
+    {
+        for (SDL_Event event; SDL_PollEvent(&event);) {
+            switch (event.type) {
+            case SDL_KEYUP:
+                if (auto key = event.key; key.repeat == 0)
+                    events.emit<KeyUpEvent>(key.keysym);
+                break;
+            case SDL_KEYDOWN:
+                if (auto key = event.key; key.repeat == 0)
+                    events.emit<KeyDownEvent>(key.keysym);
+                break;
+            default:
+                break;
+            }
+        }
+    }
 };
 
-#endif // INPUT_HPP_
+#endif // SYSTEM_INPUT_HPP_
 

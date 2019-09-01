@@ -15,38 +15,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef RENDERC_HPP_
-#define RENDERC_HPP_
+#ifndef COMPONENT_RENDER_HPP_
+#define COMPONENT_RENDER_HPP_
 
-#include <components/Component.hpp>
+#include "Component.hpp"
 
 struct Render : Component<Render>, entityx::Component<Render>
 {
-    public:
-        std::string texture;
-        bool visible;
+public:
+    std::string texture;
+    bool visible;
 
-        Render(std::string _file): texture(_file), visible(true) {}
-        Render(): texture(), visible(false) {}
+    Render(std::string _file) :
+        texture(_file), visible(true) {}
+    Render(void) :
+        texture(), visible(false) {}
 
-        Render FromLua(sol::object ref)
-        {
-            if (ref.get_type() == sol::type::table) {
-                sol::table tab = ref;
-                if (tab["visible"].get_type() == sol::type::boolean) {
-                    this->visible = tab["visible"];
-                }
-                if (tab["texture"].get_type() == sol::type::string) {
-                    this->texture = tab["texture"];
-                }
-            } else {
-                throw std::string(
-                    "Render component table formatted incorrectly"
-                );
-            }
-            return *this;
+    Render FromLua(sol::object ref)
+    {
+        if (ref.get_type() == sol::type::table) {
+            sol::table tab = ref;
+            if (tab["visible"].get_type() == sol::type::boolean)
+                this->visible = tab["visible"];
+            if (tab["texture"].get_type() == sol::type::string)
+                this->texture = tab["texture"];
+        } else {
+            throw std::string(
+                "Render component table formatted incorrectly"
+            );
         }
-
+        return *this;
+    }
 };
 
-#endif//RENDERC_HPP_
+#endif // COMPONENT_RENDER_HPP_
+

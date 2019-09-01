@@ -18,17 +18,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PLAYER_HPP_
-#define PLAYER_HPP_
+#ifndef COMPONENT_PLAYER_HPP_
+#define COMPONENT_PLAYER_HPP_
 
 #include "Component.hpp"
 
 struct Player : Component<Player>, entityx::Component<Player>
 {
-        Player FromLua([[maybe_unused]] sol::object ref)
-        {
-		return *this;
-        }
+public:
+    Player FromLua([[maybe_unused]] sol::object ref)
+    {
+        return *this;
+    }
 };
 
-#endif // PLAYER_HPP_
+#endif // COMPONENT_PLAYER_HPP_
+

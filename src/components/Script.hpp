@@ -16,37 +16,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SCRIPT_COMPONENT_HPP_
-#define SCRIPT_COMPONENT_HPP_
+#ifndef COMPONENT_SCRIPT_HPP_
+#define COMPONENT_SCRIPT_HPP_
 
-#include <components/Component.hpp>
+#include "Component.hpp"
 
 struct Scripted : Component<Scripted>, entityx::Component<Scripted>
 {
-    public:
-        sol::table caller;
-        Scripted() {}
-        Scripted(sol::table call): caller(call) {}
+public:
+    sol::table caller;
 
+    Scripted(void) {}
+    Scripted(sol::table call) :
+        caller(call) {}
 
-        ~Scripted()
-        {}
+    ~Scripted() {}
 
-        void cleanup()
-        {
-            caller = sol::nil;
-        }
+    void cleanup(void)
+    {
+        caller = sol::nil;
+    }
 
-        Scripted FromLua(sol::object)
-        {
-            return *this;
-        }
+    Scripted FromLua([[maybe_unused]] sol::object ref)
+    {
+        return *this;
+    }
 
-        void exec() {
-            if (caller["Idle"] == sol::type::function)
-                caller["Idle"](caller); // Call idle function and pass itself
-                                        //  in or to fulfill the 'self' param
-        }
+    void exec(void) {
+        if (caller["Idle"] == sol::type::function)
+            caller["Idle"](caller); // Call idle function and pass itself
+                                    //  in or to fulfill the 'self' param
+    }
 };
 
-#endif//SCRIPT_COMPONENT_HPP_
+#endif // COMPONENT_SCRIPT_HPP_
+

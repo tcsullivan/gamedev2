@@ -26,23 +26,22 @@
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 {
-	// Initialize SDL
-	if (SDL_Init(0) != 0) {
-		std::cerr << "SDL failed to initialize: " << SDL_GetError()
-			<< std::endl;
-		return -1;
-	} else {
-		atexit(SDL_Quit);
-	}
+    // Initialize SDL
+    if (SDL_Init(0) != 0) {
+        std::cerr << "SDL failed to initialize: " << SDL_GetError()
+            << std::endl;
+        return -1;
+    } else {
+        atexit(SDL_Quit);
+    }
 
-    //LuaTest();
+    // Create the engine
+    Engine engine;
+    engine.init();
 
-	// Create the engine
-	Engine engine;
-	engine.init();
+    // Go go go!
+    engine.run();
 
-	// Go go go!
-	engine.run();
-
-	return 0;
+    return 0;
 }
+

@@ -32,33 +32,33 @@
 class Engine
 {
 private:
-	entityx::EventManager events;
-	entityx::EntityManager entities;
-	entityx::SystemManager systems;
+    entityx::EventManager events;
+    entityx::EntityManager entities;
+    entityx::SystemManager systems;
 
-	std::thread logicThread;
+    std::thread logicThread;
 
-	void logicLoop(void);
-	void renderLoop(void);
+    void logicLoop(void);
+    void renderLoop(void);
 
-	bool shouldRun(void);
+    bool shouldRun(void);
 
 public:
-	Engine(void) :
-		entities(events),
-		systems(entities, events) {}
+    Engine(void) :
+        entities(events),
+        systems(entities, events) {}
 
-	/**
-	 * Initializes the game engine.
-	 * @return Zero on success, non-zero otherwise
-	 */
-	int init(void);
+    /**
+     * Initializes the game engine.
+     * @return Zero on success, non-zero otherwise
+     */
+    int init(void);
 
-	/**
-	 * Runs the game engine.
-	 * Function returns when game is told to end/exit.
-	 */
-	void run(void);
+    /**
+     * Runs the game engine.
+     * Function returns when game is told to end/exit.
+     */
+    void run(void);
 };
 
 #endif // ENGINE_HPP_

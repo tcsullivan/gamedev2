@@ -18,85 +18,85 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SCRIPT_HPP_
-#define SCRIPT_HPP_
+#ifndef SYSTEM_SCRIPT_HPP_
+#define SYSTEM_SCRIPT_HPP_
 
 #include <entityx/entityx.h>
 #include <sol/sol.hpp>
 
-struct EntitySpawnEvent {
-    EntitySpawnEvent (sol::object ref)
-        : ref(ref) {}
-
+struct EntitySpawnEvent
+{
     sol::object ref;
+
+    EntitySpawnEvent(sol::object _ref) :
+        ref(_ref) {}
 };
 
 /**
  * @class ScriptSystem
  * Handles all the game's scripting requests
  */
-class ScriptSystem : public entityx::System<ScriptSystem>
-                   , public entityx::Receiver<ScriptSystem>
+class ScriptSystem : public entityx::System<ScriptSystem>,
+                     public entityx::Receiver<ScriptSystem>
 {
-    private:
-        /**
-         * The script systems internal lua state that handles all
-         * interactions between C and Lua
-         */
-        sol::state lua;
+private:
+    /**
+     * The script systems internal lua state that handles all
+     * interactions between C and Lua
+     */
+    sol::state lua;
 
-        entityx::EventManager* events;
-        entityx::EntityManager* manager;
+    entityx::EventManager* events;
+    entityx::EntityManager* manager;
 
-    public:
-        ScriptSystem(void)
-        {}
+public:
+    ScriptSystem(void) {}
 
-        ~ScriptSystem(void)
-        {}
+    ~ScriptSystem(void) {}
 
-        /**
-         * Prepares the system for running.
-         */
-        void configure([[maybe_unused]]entityx::EntityManager& entities,
-                       [[maybe_unused]]entityx::EventManager& events) final;
-        
-        /**
-         * Updates the scripting system.
-         */
-        void update([[maybe_unused]] entityx::EntityManager& entites,
-                    [[maybe_unused]] entityx::EventManager& events,
-                    [[maybe_unused]] entityx::TimeDelta dt) final;
+    /**
+     * Prepares the system for running.
+     */
+    void configure(entityx::EntityManager& entities,
+                   entityx::EventManager& events) final;
+    
+    /**
+     * Updates the scripting system.
+     */
+    void update(entityx::EntityManager& entites,
+                entityx::EventManager& events,
+                entityx::TimeDelta dt) final;
 
-        /**
-         * Receives all entity spawning events and manages the
-         * script counterpart.
-         */
-        void receive (const EntitySpawnEvent &toSpawn);
+    /**
+     * Receives all entity spawning events and manages the
+     * script counterpart.
+     */
+    void receive(const EntitySpawnEvent &toSpawn);
 
-        /**
-         * Initializes the lua states and libraries.
-         * @return Zero on success, non-zero on error
-         */
-        int init(void);
+    /**
+     * Initializes the lua states and libraries.
+     * @return Zero on success, non-zero on error
+     */
+    int init(void);
 
-        /**
-         * Run the initialization file.
-         */
-        void doFile(void);
+    /**
+     * Run the initialization file.
+     */
+    void doFile(void);
 
-        /**
-         * The function called by lua scripts in order to spawn an entity.
-         * @param param The table that must be passed in by Lua. This is a
-         * sol2 object instead of a sol2 table because this allows us to handle
-         * errors easier instead of letting sol2 do the error handling.
-         */
-        sol::table spawn(sol::object param);
+    /**
+     * The function called by lua scripts in order to spawn an entity.
+     * @param param The table that must be passed in by Lua. This is a
+     * sol2 object instead of a sol2 table because this allows us to handle
+     * errors easier instead of letting sol2 do the error handling.
+     */
+    sol::table spawn(sol::object param);
 
-        /**
-         * Contains all calls that export components/functions to lua.
-         */
-        void scriptExport();
+    /**
+     * Contains all calls that export components/functions to lua.
+     */
+    void scriptExport(void);
 };
 
-#endif//SCRIPT_HPP_
+#endif // SYSTEM_SCRIPT_HPP_
+

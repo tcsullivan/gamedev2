@@ -20,13 +20,12 @@
 
 #include <sol/sol.hpp>
 
-template <typename T>
+template<typename T>
 class Component 
 {
-    public:
-    Component(){};
-
+public:
     virtual T FromLua(sol::object) = 0;
 };
 
-#endif//COMPONENT_HPP_
+#endif // COMPONENT_HPP_
+
