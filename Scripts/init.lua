@@ -14,7 +14,7 @@ bird = {
         print("Bird spawn")
     end,
     Render = {
-        texture = "Assets/cat.png",
+        texture = "Assets/player.png",
         visible = true
     },
     Idle = function(self)
@@ -58,7 +58,7 @@ animal = {
         y = 0.0
     },
     Render = {
-        texture = "Assets/cat.png",
+        texture = "Assets/rabbit.png",
         visible = true
     },
     Idle = function(self)
