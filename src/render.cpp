@@ -37,6 +37,9 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     GLuint p = worldShader.getUniform("projection");
     GLuint m = worldShader.getUniform("model");
     GLuint a = worldShader.getAttribute("vertex");
+    GLuint t = worldShader.getAttribute("texc");
+
+    GLuint q = worldShader.getUniform("textu");
 
     /***********
     *  SETUP  *
@@ -74,31 +77,43 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     glEnable(GL_POLYGON_OFFSET_FILL);
 
     glEnableVertexAttribArray(a);
+    glEnableVertexAttribArray(t);
 
     /*************
     *  DRAWING  *
     *************/
 
     entities.each<Render, Position>(
-        [this, a](entityx::Entity, Render &r, Position &p) {
+        [this, a, q, t](entityx::Entity, Render &r, Position &p) {
 
         if (!r.visible)
             return;
 
+        float w = r.texture.width/2.0f;
+        float h = r.texture.height;
+
         GLuint tri_vbo;
         GLfloat tri_data[] = {
-                (float)p.x-10.0f, (float)p.y-10.0f, 00.0f,
-                (float)p.x+10.0f, (float)p.y-10.0f, 00.0f,
-                (float)p.x+00.0f, (float)p.y+10.0f, 00.0f,
+                (float)p.x-w, (float)p.y  , 00.0f, 0.0f, 1.0f,
+                (float)p.x+w, (float)p.y  , 00.0f, 1.0f, 1.0f,
+                (float)p.x-w, (float)p.y+h, 00.0f, 0.0f, 0.0f,
+
+                (float)p.x+w, (float)p.y  , 00.0f, 1.0f, 1.0f,
+                (float)p.x+w, (float)p.y+h, 00.0f, 1.0f, 0.0f,
+                (float)p.x-w, (float)p.y+h, 00.0f, 0.0f, 0.0f,
         };
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, r.texture.tex);
+        glUniform1i(q, 0);
 
         glGenBuffers(1, &tri_vbo);
         glBindBuffer(GL_ARRAY_BUFFER, tri_vbo);
         glBufferData(GL_ARRAY_BUFFER, sizeof(tri_data), tri_data, GL_STREAM_DRAW);
 
-        glVertexAttribPointer(a, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-    
+        glVertexAttribPointer(a, 3, GL_FLOAT, GL_FALSE, 5*sizeof(float), 0);
+        glVertexAttribPointer(t, 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)(3*sizeof(float)));
+        glDrawArrays(GL_TRIANGLES, 0, 6);
     });
     
 
@@ -106,6 +121,7 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     *  CLEANUP  *
     *************/
     glDisableVertexAttribArray(a);
+    glDisableVertexAttribArray(t);
 
     glDisable(GL_POLYGON_OFFSET_FILL);
     glDisable(GL_CULL_FACE);
@@ -163,6 +179,9 @@ int RenderSystem::init(void)
     worldShader.addUniform("model");
 
     worldShader.addAttribute("vertex");
+    worldShader.addAttribute("texc");
+
+    worldShader.addUniform("textu");
 
     glEnableVertexAttribArray(worldShader.getAttribute("vertex"));
     glUseProgram(worldShader.getProgram());

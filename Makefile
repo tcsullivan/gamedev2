@@ -36,12 +36,12 @@ OBJEXT = o
 DEPEXT = d
 
 LIBDIR = lib
-LIBS   = -L$(LIBDIR) -lSDL2 -lpthread -lentityx -ldl -lluajit -lGLEW -lGL -lSDL2_image
+LIBS   = -L$(LIBDIR) -lSDL2 -lpthread -lentityx -ldl -lluajit -lGLEW -lGL -lSDL2_image -lSOIL
 
 CXXFLAGS = -ggdb -std=c++17 -Wall -Wextra -Werror -pedantic
 
 CXXINCS = -Isrc -I$(LIBDIR)/LuaJIT/src -I$(LIBDIR)/entityx \
-		-I$(LIBDIR)/LuaBridge/Source -I$(LIBDIR)/sol2/include
+		-I$(LIBDIR)/LuaBridge/Source -I$(LIBDIR)/sol2/include -I$(LIBDIR)/soil
 
 CXXSRC := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 CXXOBJ := $(patsubst $(SRCDIR)/%,$(OUTDIR)/%,$(CXXSRC:.$(SRCEXT)=.$(OBJEXT)))

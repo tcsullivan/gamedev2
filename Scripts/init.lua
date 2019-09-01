@@ -14,7 +14,7 @@ bird = {
         print("Bird spawn")
     end,
     Render = {
-        texture = "",
+        texture = "Assets/cat.png",
         visible = true
     },
     Idle = function(self)
