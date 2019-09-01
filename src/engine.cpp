@@ -22,8 +22,8 @@
 #include "engine.hpp"
 #include "gamerun.hpp"
 #include "input.hpp"
-#include "window.hpp"
 #include "script.hpp"
+#include "render.hpp"
 
 #include "components/Script.hpp"
 #include "components/Position.hpp"
@@ -32,7 +32,7 @@ int Engine::init(void)
 {
 	systems.add<GameRunSystem>();
 	systems.add<InputSystem>();
-	systems.add<WindowSystem>();
+    systems.add<RenderSystem>();
     systems.add<ScriptSystem>();
 
 	systems.configure();
@@ -62,7 +62,7 @@ void Engine::logicLoop(void)
 void Engine::renderLoop(void)
 {
 	while (shouldRun()) {
-		systems.update<WindowSystem>(0);
+		systems.update<RenderSystem>(0);
 		std::this_thread::yield();
 	}
 }
