@@ -53,10 +53,10 @@ void PlayerSystem::receive(const KeyDownEvent& kue)
     if (player.valid()) {
         if (kue.sym == SDLK_a) {
             if (auto vel = player.component<Velocity>(); vel)
-                vel->x += GROUND_VELOCITY;
+                vel->x -= GROUND_VELOCITY;
         } else if (kue.sym == SDLK_d) {
             if (auto vel = player.component<Velocity>(); vel)
-                vel->x -= GROUND_VELOCITY;
+                vel->x += GROUND_VELOCITY;
         }
     }
 }
@@ -66,10 +66,10 @@ void PlayerSystem::receive(const KeyUpEvent& kue)
     if (player.valid()) {
         if (kue.sym == SDLK_a) {
             if (auto vel = player.component<Velocity>(); vel)
-                vel->x -= GROUND_VELOCITY;
+                vel->x += GROUND_VELOCITY;
         } else if (kue.sym == SDLK_d) {
             if (auto vel = player.component<Velocity>(); vel)
-                vel->x += GROUND_VELOCITY;
+                vel->x -= GROUND_VELOCITY;
         }
     }
 }
