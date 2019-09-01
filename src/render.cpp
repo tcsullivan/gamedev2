@@ -79,9 +79,11 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     *  DRAWING  *
     *************/
 
-
     entities.each<Render, Position>(
-            [this, a](entityx::Entity, Render, Position &p){
+            [this, a](entityx::Entity, Render &r, Position &p){
+
+        if (!r.visible)
+            return;
 
         GLuint tri_vbo;
         GLfloat tri_data[] = {

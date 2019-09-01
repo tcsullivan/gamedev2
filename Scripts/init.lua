@@ -1,16 +1,28 @@
 bird = {
     Position = {
-        x = 1.2,
-        y = 3.4
+        x = 150,
+        y = 75
     },
     Name = "bord",
     Init = function(self)
         print(self.Position.x .. "," .. self.Position.y)
         print("Bird spawn")
-    end
+    end,
+    Render = {
+        texture = "",
+        visible = true
+    },
+    Idle = function(self)
+        if (self.visibleTick >= 20) then
+            self.Render.visible = not self.Render.visible
+            self.visibleTick = 0
+        end
+        self.visibleTick = self.visibleTick + 1
+    end,
+    visibleTick = 0
 }
 
-dog = {
+cat = {
     Velocity = {
         x = 0.0,
         y = 0.0
@@ -20,7 +32,7 @@ dog = {
         y = 0
     },
     Render = {
-        texture = "assets/tex.png",
+        texture = "Assets/cat.png",
         visible = true
     },
     Init = function(self)
@@ -35,15 +47,25 @@ dog = {
 }
 
 animal = {
+    Name = "animal",
+    Velocity = { -- This will automatically assign position to (0,0)
+        x = 0.0,
+        y = 0.0
+    },
     Render = {
-        texture = "assets/anim.png",
-        visible = false
-    }
+        texture = "Assets/cat.png",
+        visible = true
+    },
+    Idle = function(self)
+        self.Velocity.x = -200 * math.sin(math.rad(self.counter));
+        self.Velocity.y =  100 * math.cos(math.rad(self.counter*5));
+        self.counter = self.counter + 5;
+    end,
+    counter = 0;
 }
 
 birdSpawn = game.spawn(bird);
 
-dogSpawn = game.spawn(dog);
+dogSpawn = game.spawn(cat);
 
 animalSpawn = game.spawn(animal);
-print("Animal pos: " .. animalSpawn.Position.x)

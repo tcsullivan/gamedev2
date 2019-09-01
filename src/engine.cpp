@@ -43,6 +43,7 @@ int Engine::init(void)
 void Engine::logicLoop(void)
 {
 	using namespace std::chrono_literals;
+    namespace cr = std::chrono;
     typedef std::chrono::high_resolution_clock mc;
 
     entityx::TimeDelta dt = 0; /**< Elapsed milliseconds since each loop */
