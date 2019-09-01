@@ -36,7 +36,7 @@ OBJEXT = o
 DEPEXT = d
 
 LIBDIR = lib
-LIBS   = -L$(LIBDIR) -lSDL2 -lpthread -lentityx -ldl -lluajit
+LIBS   = -L$(LIBDIR) -lSDL2 -lpthread -lentityx -ldl -lluajit -lGLEW -lGL
 
 CXXFLAGS = -ggdb -std=c++17 -Wall -Wextra -Werror -pedantic
 
@@ -63,7 +63,7 @@ clean:
 	@$(RM) -rf $(OUTDIR)
 
 cleaner: clean
-	@$(RM) -rf $(EXECDIR)
+#@$(RM) -rf $(EXECDIR)
 
 $(EXEC): $(CXXOBJ)
 	@echo "  CXX   " $(EXEC)
