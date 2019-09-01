@@ -34,6 +34,8 @@
 #include "entityx/Event.h"
 #include "entityx/help/NonCopyable.h"
 
+class Archive;
+
 namespace entityx {
 
 typedef std::uint32_t uint32_t;
@@ -242,6 +244,8 @@ struct BaseComponent {
   void operator delete([[maybe_unused]] void *p) { fail(); }
   void operator delete[]([[maybe_unused]] void *p) { fail(); }
 
+  virtual void save([[maybe_unused]] Archive& ar) {}
+  virtual void load([[maybe_unused]] Archive& ar) {}
 
  protected:
   static void fail() {
@@ -341,6 +345,7 @@ public:
   virtual ~BaseComponentHelper() {}
   virtual void remove_component(Entity e) = 0;
   virtual void copy_component_to(Entity source, Entity target) = 0;
+  virtual BaseComponent *get_component(Entity e) = 0;
 };
 
 template <typename C>
@@ -351,6 +356,9 @@ public:
   }
   void copy_component_to(Entity source, Entity target) override {
     target.assign_from_copy<C>(*(source.component<C>().get()));
+  }
+  BaseComponent *get_component(Entity e) override {
+    return e.component<C>().get();
   }
 };
 
@@ -739,6 +747,20 @@ class EntityManager : entityx::help::NonCopyable {
   template <typename ... Components>
   std::tuple<ComponentHandle<const Components, const EntityManager>...> components(Entity::Id id) const {
     return std::make_tuple(component<const Components>(id)...);
+  }
+
+  /**
+   * EDIT by tcsullivan
+   * Iterates through all components of a given Entity.
+   */
+  void entity_each_component(Entity entity, std::function<void(BaseComponent*)> f)
+  {
+    auto mask = entity.component_mask();
+    for (size_t i = 0; i < component_helpers_.size(); i++) {
+      BaseComponentHelper *helper = component_helpers_[i];
+      if (helper && mask.test(i))
+        f(helper->get_component(entity));
+    }
   }
 
   /**
