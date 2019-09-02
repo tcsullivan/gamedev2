@@ -55,11 +55,15 @@ public:
     }
 
     void serialize(cereal::JSONOutputArchive& ar) final {
-        ar(visible, flipX);
+        ar(CEREAL_NVP(visible), CEREAL_NVP(flipX));
     }
 
     void serialize(cereal::JSONInputArchive& ar) final {
-        ar(visible, flipX);
+        ar(CEREAL_NVP(visible), CEREAL_NVP(flipX));
+    }
+
+    std::string serializeName(void) const final {
+        return "Render";
     }
 };
 

@@ -243,6 +243,7 @@ struct BaseComponent {
   void operator delete[]([[maybe_unused]] void *p) { fail(); }
 
   virtual void internal_serialize(bool save, void *ar) = 0;
+  virtual std::string serializeName(void) const = 0;
 
  protected:
   static void fail() {
@@ -757,8 +758,11 @@ class EntityManager : entityx::help::NonCopyable {
     for (size_t i = 0; i < component_helpers_.size(); i++) {
       BaseComponentHelper *helper = component_helpers_[i];
       if (helper && mask.test(i)) {
-        helper->get_component(entity)->internal_serialize(save,
-          static_cast<void*>(&ar));
+        auto* c = helper->get_component(entity);
+        ar.setNextName(c->serializeName().c_str());
+        ar.startNode();
+        c->internal_serialize(save, static_cast<void*>(&ar));
+        ar.finishNode();
       }
     }
   }

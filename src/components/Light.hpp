@@ -51,11 +51,15 @@ public:
     }
 
     void serialize(cereal::JSONOutputArchive& ar) final {
-        ar(r, g, b, strength);
+        ar(CEREAL_NVP(r), CEREAL_NVP(g), CEREAL_NVP(b), CEREAL_NVP(strength));
     }
 
     void serialize(cereal::JSONInputArchive& ar) final {
-        ar(r, g, b, strength);
+        ar(CEREAL_NVP(r), CEREAL_NVP(g), CEREAL_NVP(b), CEREAL_NVP(strength));
+    }
+
+    std::string serializeName(void) const final {
+        return "Light";
     }
 };
 

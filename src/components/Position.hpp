@@ -44,11 +44,15 @@ public:
     }
 
     void serialize(cereal::JSONOutputArchive& ar) final {
-        ar(x, y);
+        ar(CEREAL_NVP(x), CEREAL_NVP(y));
     }
 
     void serialize(cereal::JSONInputArchive& ar) final {
-        ar(x, y);
+        ar(CEREAL_NVP(x), CEREAL_NVP(y));
+    }
+
+    std::string serializeName(void) const final {
+        return "Position";
     }
 };
 

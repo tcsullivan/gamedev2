@@ -63,6 +63,10 @@ public:
 
     void serialize([[maybe_unused]] cereal::JSONOutputArchive& ar) final {}
     void serialize([[maybe_unused]] cereal::JSONInputArchive& ar) final {}
+
+    std::string serializeName(void) const final {
+        return "Scripted";
+    }
 };
 
 #endif // COMPONENT_SCRIPT_HPP_

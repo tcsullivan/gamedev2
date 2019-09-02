@@ -126,6 +126,7 @@ void Engine::run(void)
         entities.entity_serialize(e, true, archive);
         archive.finishNode();
     }
+    std::cout << std::endl;
 }
 
 bool Engine::shouldRun(void)

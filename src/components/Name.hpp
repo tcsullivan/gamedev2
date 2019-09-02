@@ -40,11 +40,15 @@ public:
     }
 
     void serialize(cereal::JSONOutputArchive& ar) final {
-        ar(name);
+        ar(CEREAL_NVP(name));
     }
 
     void serialize(cereal::JSONInputArchive& ar) final {
-        ar(name);
+        ar(CEREAL_NVP(name));
+    }
+
+    std::string serializeName(void) const final {
+        return "Name";
     }
 };
 
