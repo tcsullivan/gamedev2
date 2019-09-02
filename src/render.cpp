@@ -22,6 +22,7 @@
 #include <components/Render.hpp>
 #include <components/Position.hpp>
 #include <components/Light.hpp>
+#include <components/Script.hpp>
 
 void RenderSystem::configure([[maybe_unused]] entityx::EntityManager& entities,
                              [[maybe_unused]] entityx::EventManager& events)
@@ -84,8 +85,8 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     glEnableVertexAttribArray(a);
     glEnableVertexAttribArray(t);
 
+    // Ambient light, for now this is static
     GLfloat amb[4] = {1.0f, 1.0f, 1.0f, 0.0f};
-
     glUniform4fv(b, 1, amb);
 
     /**************
@@ -97,8 +98,7 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     std::vector<glm::vec4> lightColor;
     int lightNum = 0;
 
-    entities.each<Light, Position>(
-        [&]
+    entities.each<Light, Position>([&]
         (entityx::Entity, Light &l, Position &p){
 
         lightPos.push_back(glm::vec3(p.x, p.y,-10.0));
@@ -118,12 +118,17 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     *  DRAWING  *
     *************/
 
-
     entities.each<Render, Position>(
         [this, a, q, t, n](entityx::Entity, Render &r, Position &p) {
 
         if (!r.visible)
             return;
+
+        // If our component was created via script, call the entity's
+        //  RenderIdle function
+        //if (e.has_component<Scripted>()) {
+        //    e.component<Scripted>()->updateRender();
+        //}
 
         float w = r.texture.width/2.0f;
         float h = r.texture.height;

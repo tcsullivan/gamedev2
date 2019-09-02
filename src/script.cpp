@@ -42,7 +42,7 @@ void ScriptSystem::update([[maybe_unused]] entityx::EntityManager& entities,
                           [[maybe_unused]] entityx::TimeDelta dt)
 {
     entities.each<Scripted>([](entityx::Entity, Scripted &s){
-        s.update();
+        s.updatePhysics();
     });
 }
 

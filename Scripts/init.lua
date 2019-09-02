@@ -26,7 +26,7 @@ bird = {
         --end
         --self.visibleTick = self.visibleTick + 1
     end,
-    Update = function(self)
+    PhysicsIdle = function(self)
         if self.Velocity.x < 0 then
             self.Render.flipx = true
         elseif self.Velocity.x > 0 then
@@ -56,7 +56,7 @@ cat = {
         self.Velocity.y =  100 * math.cos(math.rad(self.counter));
         self.counter = self.counter + 5;
     end,
-    Update = function(self)
+    PhysicsIdle = function(self)
         if self.Velocity.x < 0 then
             self.Render.flipx = true
         elseif self.Velocity.x > 0 then
