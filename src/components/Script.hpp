@@ -42,10 +42,23 @@ public:
         return *this;
     }
 
-    void exec(void) {
+    void exec(void)
+    {
         if (caller["Idle"] == sol::type::function)
             caller["Idle"](caller); // Call idle function and pass itself
                                     //  in or to fulfill the 'self' param
+    }
+
+    void updatePhysics(void)
+    {
+        if (caller["PhysicsIdle"] == sol::type::function)
+            caller["PhysicsIdle"](caller);
+    }
+
+    void updateRender(void)
+    {
+        if (caller["RenderIdle"] == sol::type::function)
+            caller["RenderIdle"](caller);
     }
 };
 

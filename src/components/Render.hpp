@@ -19,12 +19,15 @@
 #define COMPONENT_RENDER_HPP_
 
 #include "Component.hpp"
+#include "texture.hpp"
 
 struct Render : Component<Render>, entityx::Component<Render>
 {
 public:
-    std::string texture;
+    Texture texture;
+    Texture normal;
     bool visible;
+    bool flipX = false;
 
     Render(std::string _file) :
         texture(_file), visible(true) {}
@@ -38,7 +41,11 @@ public:
             if (tab["visible"].get_type() == sol::type::boolean)
                 this->visible = tab["visible"];
             if (tab["texture"].get_type() == sol::type::string)
-                this->texture = tab["texture"];
+                this->texture = Texture(static_cast<std::string>(tab["texture"]));
+            if (tab["normal"].get_type() == sol::type::string)
+                this->normal = Texture(static_cast<std::string>(tab["normal"]));
+            if (tab["flipx"].get_type() == sol::type::boolean)
+                this->flipX = tab["flipx"];
         } else {
             throw std::string(
                 "Render component table formatted incorrectly"

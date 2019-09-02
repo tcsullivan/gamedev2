@@ -38,8 +38,8 @@ class RenderSystem : public entityx::System<RenderSystem>
 {
 private:
     constexpr static const char *title = "gamedev2";
-    constexpr static int width = 640;
-    constexpr static int height = 480;
+    constexpr static int width = 1280;
+    constexpr static int height = 720;
 
     std::unique_ptr<SDL_Window, void (*)(SDL_Window *)> window;
     SDL_GLContext context;

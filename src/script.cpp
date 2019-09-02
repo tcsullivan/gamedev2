@@ -36,10 +36,14 @@ void ScriptSystem::configure(entityx::EntityManager& entities,
     //init();
 }
 
-void ScriptSystem::update([[maybe_unused]] entityx::EntityManager& entites,
+#include <components/Script.hpp>
+void ScriptSystem::update([[maybe_unused]] entityx::EntityManager& entities,
                           [[maybe_unused]] entityx::EventManager& events,
                           [[maybe_unused]] entityx::TimeDelta dt)
 {
+    entities.each<Scripted>([](entityx::Entity, Scripted &s){
+        s.updatePhysics();
+    });
 }
 
 
@@ -80,6 +84,7 @@ void ScriptSystem::doFile(void)
 #include <components/Render.hpp>
 #include <components/Script.hpp>
 #include <components/Velocity.hpp>
+#include <components/Light.hpp>
 
 void ScriptSystem::scriptExport(void)
 {
@@ -98,7 +103,8 @@ void ScriptSystem::scriptExport(void)
     lua.new_usertype<Render>("Render",
             sol::constructors<Render(std::string), Render()>(),
             "visible", &Render::visible,
-            "texture", &Render::texture);
+            "texture", &Render::texture,
+            "flipx", &Render::flipX);
 
     lua.new_usertype<Velocity>("Velocity",
             sol::constructors<Velocity(double, double), Velocity()>(),
@@ -107,6 +113,13 @@ void ScriptSystem::scriptExport(void)
 
     lua.new_usertype<Player>("Player",
             sol::constructors<Player(void), Player()>());
+
+    lua.new_usertype<Light>("Light",
+            sol::constructors<Light(float, float, float, float)>(),
+            "r", &Light::r,
+            "g", &Light::g,
+            "b", &Light::b,
+            "strength", &Light::strength);
 
     auto gamespace = lua["game"].get_or_create<sol::table>();
     gamespace.set_function("spawn", func);
@@ -160,6 +173,11 @@ sol::table ScriptSystem::spawn(sol::object param)
 
         if (tab["Player"] != nullptr) {
             (*toRet)["Player"] = e.assign<Player>().get();
+        }
+
+        if (tab["Light"] != nullptr) {
+            (*toRet)["Light"] = 
+                e.assign<Light>(Light().FromLua(tab["Light"])).get();
         }
 
     } else {

@@ -30,6 +30,10 @@
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"
 
+using namespace std::chrono_literals;
+namespace cr = std::chrono;
+typedef std::chrono::high_resolution_clock mc;
+
 int Engine::init(void)
 {
     systems.add<GameRunSystem>();
@@ -46,10 +50,6 @@ int Engine::init(void)
 
 void Engine::logicLoop(void)
 {
-    using namespace std::chrono_literals;
-    namespace cr = std::chrono;
-    typedef std::chrono::high_resolution_clock mc;
-
     entityx::TimeDelta dt = 0; /**< Elapsed milliseconds since each loop */
     double elapsed = 0;
 
@@ -67,6 +67,7 @@ void Engine::logicLoop(void)
         });
 
         systems.update<InputSystem>(dt);
+        systems.update<ScriptSystem>(dt);
 
         /*******************
         *  LOGIC UPDATES  *
@@ -97,9 +98,9 @@ void Engine::logicLoop(void)
 
 void Engine::renderLoop(void)
 {
+    entityx::TimeDelta dt = 0; /**< Elapsed milliseconds since each loop */
     while (shouldRun()) {
-        systems.update<RenderSystem>(0);
-        std::this_thread::yield();
+        systems.update<RenderSystem>(dt);
     }
 }
 
