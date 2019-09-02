@@ -17,6 +17,7 @@ uniform vec3 LightPos[32];
 uniform vec4 LightColor[32];
 uniform int LightNum;
 uniform vec4 AmbientLight;
+uniform int Flipped;
 
 void main()
 {
@@ -33,6 +34,8 @@ void main()
 
     for (int i = 0; i < LightNum; i++) {
         vec3 LightDir = vec3(LightPos[i].xy - fragCoord.xy, LightPos[i].z);
+        if (Flipped == 1)
+            LightDir.x = -LightDir.x;
 
         float D = length(LightDir);
 

@@ -45,6 +45,7 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     GLuint q = worldShader.getUniform("textu");
     GLuint n = worldShader.getUniform("normu");
     GLuint b = worldShader.getUniform("AmbientLight");
+    GLuint f = worldShader.getUniform("Flipped");
 
     /***********
     *  SETUP  *
@@ -119,7 +120,7 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     *************/
 
     entities.each<Render, Position>(
-        [this, a, q, t, n](entityx::Entity, Render &r, Position &p) {
+        [this, a, q, t, n, f](entityx::Entity, Render &r, Position &p) {
 
         if (!r.visible)
             return;
@@ -144,6 +145,8 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
                 (float)p.x-w, (float)p.y+h, 00.0f, 0.0f, 0.0f,
         };
 
+        bool flipped = false;
+
         // TODO flip nicely (aka model transformations)
         if (r.flipX) {
             std::swap(tri_data[3], tri_data[8]);
@@ -151,7 +154,11 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
 
             std::swap(tri_data[23], tri_data[28]);
             tri_data[18] = tri_data[23];
+
+            flipped = true;
         }
+
+        glUniform1i(f, flipped ? 1 : 0);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, r.texture.tex);
@@ -244,6 +251,7 @@ int RenderSystem::init(void)
     worldShader.addUniform("LightColor");
     worldShader.addUniform("LightNum");
     worldShader.addUniform("AmbientLight");
+    worldShader.addUniform("Flipped");
 
     glEnableVertexAttribArray(worldShader.getAttribute("vertex"));
     glUseProgram(worldShader.getProgram());
