@@ -9,9 +9,11 @@ uniform mat4 view;
 uniform mat4 model;
 
 out vec2 texCoord;
+out vec4 fragCoord;
 
 void main()
 {
     texCoord = texc;
-    gl_Position = projection * view * model * vec4(vertex, 1.0f);
+    fragCoord = vec4(vertex, 1.0f);
+    gl_Position = projection * view * model * fragCoord;
 }

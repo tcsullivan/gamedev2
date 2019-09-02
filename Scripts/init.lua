@@ -17,6 +17,12 @@ bird = {
         texture = "Assets/player.png",
         visible = true
     },
+    Light = {
+        r = 1.0,
+        g = 1.0,
+        b = 1.0,
+        strength = 1.0
+    },
     Idle = function(self)
         --if (self.visibleTick >= 20) then
         --    self.Render.visible = not self.Render.visible
@@ -38,6 +44,7 @@ cat = {
     },
     Render = {
         texture = "Assets/cat.png",
+        normal = "Assets/cat_normal.png",
         visible = true
     },
     Init = function(self)
@@ -61,6 +68,12 @@ animal = {
         texture = "Assets/rabbit.png",
         visible = true
     },
+    Light = {
+        r = 0.0,
+        b = 1.0,
+        g = 0.2,
+        strength = 2.0
+    },
     Idle = function(self)
         self.Velocity.x = -200 * math.sin(math.rad(self.counter));
         self.Velocity.y =  500 * math.cos(math.rad(self.counter*5));
@@ -69,8 +82,40 @@ animal = {
     counter = 0;
 }
 
+wall = {
+    Position = {
+        y = -100
+    },
+    Render = {
+        texture = "Assets/rock.png",
+        normal = "Assets/rock_normal.png",
+        visible = true
+    }
+}
+
 birdSpawn = game.spawn(bird);
 
 dogSpawn = game.spawn(cat);
 
 animalSpawn = game.spawn(animal);
+
+wallSpawn = game.spawn(wall);
+
+game.spawn({
+    Velocity = {
+        x = 0,
+        y = 0
+    },
+    Light = {
+        r = 0.8,
+        g = 0.1,
+        b = 0.2,
+        strength = 0.75
+    },
+    counter = 0;
+    Idle = function(self)
+        self.Velocity.x = -100 * math.sin(math.rad(self.counter));
+        self.Velocity.y =  100 * math.cos(math.rad(self.counter));
+        self.counter = self.counter + 5;
+    end
+});

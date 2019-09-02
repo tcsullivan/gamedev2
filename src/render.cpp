@@ -21,6 +21,7 @@
 #include <render.hpp>
 #include <components/Render.hpp>
 #include <components/Position.hpp>
+#include <components/Light.hpp>
 
 void RenderSystem::configure([[maybe_unused]] entityx::EntityManager& entities,
                              [[maybe_unused]] entityx::EventManager& events)
@@ -40,6 +41,7 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     GLuint t = worldShader.getAttribute("texc");
 
     GLuint q = worldShader.getUniform("textu");
+    GLuint n = worldShader.getUniform("normu");
 
     /***********
     *  SETUP  *
@@ -84,8 +86,29 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     *  DRAWING  *
     *************/
 
+    std::vector<glm::vec3> lightPos;
+    std::vector<glm::vec4> lightColor;
+    int lightNum = 0;
+
+    entities.each<Light, Position>(
+        [&]
+        (entityx::Entity, Light &l, Position &p){
+
+        lightPos.push_back(glm::vec3(p.x, p.y, 0.0));
+        lightColor.push_back(glm::vec4(l.r, l.g, l.b, l.strength));
+        lightNum++;
+    });
+
+    glUniform1i(worldShader.getUniform("LightNum"), lightNum);
+    glUniform3fv(worldShader.getUniform("LightPos"), 
+                 lightPos.size(),
+                 reinterpret_cast<GLfloat*>(lightPos.data()));
+    glUniform4fv(worldShader.getUniform("LightColor"),
+                 lightColor.size(),
+                 reinterpret_cast<GLfloat*>(lightColor.data()));
+
     entities.each<Render, Position>(
-        [this, a, q, t](entityx::Entity, Render &r, Position &p) {
+        [this, a, q, t, n](entityx::Entity, Render &r, Position &p) {
 
         if (!r.visible)
             return;
@@ -107,6 +130,10 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, r.texture.tex);
         glUniform1i(q, 0);
+
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, r.normal.tex);
+        glUniform1i(n, 1);
 
         glGenBuffers(1, &tri_vbo);
         glBindBuffer(GL_ARRAY_BUFFER, tri_vbo);
@@ -183,6 +210,11 @@ int RenderSystem::init(void)
     worldShader.addAttribute("texc");
 
     worldShader.addUniform("textu");
+    worldShader.addUniform("normu");
+
+    worldShader.addUniform("LightPos");
+    worldShader.addUniform("LightColor");
+    worldShader.addUniform("LightNum");
 
     glEnableVertexAttribArray(worldShader.getAttribute("vertex"));
     glUseProgram(worldShader.getProgram());
@@ -190,7 +222,7 @@ int RenderSystem::init(void)
     // TODO
     //glPolygonOffset(1.0, 1.0);
 
-    glClearColor(0.6, 0.8, 1.0, 0.0);
+    //glClearColor(0.6, 0.8, 1.0, 0.0);
 
     return 0;
 }
