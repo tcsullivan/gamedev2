@@ -19,8 +19,6 @@ uniform int LightNum;
 
 void main()
 {
-    //vec3 LightPos = vec3(0.0, 0.0, 0.0);
-    //vec4 LightColor = vec4(1.0, 1.0, 1.0, 1.0);
     vec3 Falloff = vec3(0.1, 0.2, 0.0);
 
     vec4 DiffuseColor = texture2D(textu, texCoord);

@@ -94,7 +94,7 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
         [&]
         (entityx::Entity, Light &l, Position &p){
 
-        lightPos.push_back(glm::vec3(p.x, p.y, 0.0));
+        lightPos.push_back(glm::vec3(p.x, p.y,-10.0));
         lightColor.push_back(glm::vec4(l.r, l.g, l.b, l.strength));
         lightNum++;
     });

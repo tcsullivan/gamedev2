@@ -9,10 +9,6 @@ bird = {
         y = 0.0
     },
     Name = "bord",
-    Init = function(self)
-        print(self.Position.x .. "," .. self.Position.y)
-        print("Bird spawn")
-    end,
     Render = {
         texture = "Assets/player.png",
         visible = true
@@ -47,9 +43,6 @@ cat = {
         normal = "Assets/cat_normal.png",
         visible = true
     },
-    Init = function(self)
-        print(self.Position.x .. "," .. self.Position.y)
-    end,
     counter = 0;
     Idle = function(self)
         self.Velocity.x = -100 * math.sin(math.rad(self.counter));
