@@ -22,7 +22,7 @@
 
 #include "Component.hpp"
 
-struct Light : Component<Light>, entityx::Component<Light>
+struct Light : Component<Light>
 {
 public:
     float r, g, b;
@@ -48,6 +48,14 @@ public:
             throw std::string("Light component must be a table");
         }
         return *this;
+    }
+
+    void serialize(cereal::JSONOutputArchive& ar) final {
+        ar(r, g, b, strength);
+    }
+
+    void serialize(cereal::JSONInputArchive& ar) final {
+        ar(r, g, b, strength);
     }
 };
 

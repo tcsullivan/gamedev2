@@ -34,8 +34,6 @@
 #include "entityx/Event.h"
 #include "entityx/help/NonCopyable.h"
 
-class Archive;
-
 namespace entityx {
 
 typedef std::uint32_t uint32_t;
@@ -244,8 +242,7 @@ struct BaseComponent {
   void operator delete([[maybe_unused]] void *p) { fail(); }
   void operator delete[]([[maybe_unused]] void *p) { fail(); }
 
-  virtual void save([[maybe_unused]] Archive& ar) {}
-  virtual void load([[maybe_unused]] Archive& ar) {}
+  virtual void internal_serialize(bool save, void *ar) = 0;
 
  protected:
   static void fail() {
@@ -753,13 +750,16 @@ class EntityManager : entityx::help::NonCopyable {
    * EDIT by tcsullivan
    * Iterates through all components of a given Entity.
    */
-  void entity_each_component(Entity entity, std::function<void(BaseComponent*)> f)
+  template<class Archive>
+  void entity_serialize(Entity entity, bool save, Archive& ar)
   {
-    auto mask = entity.component_mask();
+    auto mask = component_mask(entity.id());
     for (size_t i = 0; i < component_helpers_.size(); i++) {
       BaseComponentHelper *helper = component_helpers_[i];
-      if (helper && mask.test(i))
-        f(helper->get_component(entity));
+      if (helper && mask.test(i)) {
+        helper->get_component(entity)->internal_serialize(save,
+          static_cast<void*>(&ar));
+      }
     }
   }
 

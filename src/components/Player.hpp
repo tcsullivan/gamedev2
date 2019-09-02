@@ -23,13 +23,18 @@
 
 #include "Component.hpp"
 
-struct Player : Component<Player>, entityx::Component<Player>
+struct Player : Component<Player>
 {
 public:
+    char _unused;
+
     Player FromLua([[maybe_unused]] sol::object ref)
     {
         return *this;
     }
+
+    void serialize([[maybe_unused]] cereal::JSONOutputArchive& ar) final {}
+    void serialize([[maybe_unused]] cereal::JSONInputArchive& ar) final {}
 };
 
 #endif // COMPONENT_PLAYER_HPP_

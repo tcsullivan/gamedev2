@@ -18,13 +18,27 @@
 #ifndef COMPONENT_HPP_
 #define COMPONENT_HPP_
 
+#include <cereal/cereal.hpp>
+#include <cereal/archives/json.hpp>
+
+#include <entityx/entityx.h>
 #include <sol/sol.hpp>
 
 template<typename T>
-class Component 
+class Component : public entityx::Component<T>
 {
 public:
     virtual T FromLua(sol::object) = 0;
+
+    virtual void serialize(cereal::JSONOutputArchive& ar) = 0;
+    virtual void serialize(cereal::JSONInputArchive& ar) = 0;
+
+    void internal_serialize(bool save, void *ar) final {
+        if (save)
+            serialize(*reinterpret_cast<cereal::JSONOutputArchive*>(ar));
+        else
+            serialize(*reinterpret_cast<cereal::JSONInputArchive*>(ar));
+    }
 };
 
 #endif // COMPONENT_HPP_

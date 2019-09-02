@@ -116,6 +116,16 @@ void Engine::run(void)
 
     // Done, bring logic thread back
     logicThread.join();
+
+    cereal::JSONOutputArchive archive (std::cout);
+    std::string name ("entity");
+    int i = 0;
+    for (entityx::Entity e : entities.entities_for_debugging()) {
+        archive.setNextName((name + std::to_string(i++)).c_str());
+        archive.startNode();
+        entities.entity_serialize(e, true, archive);
+        archive.finishNode();
+    }
 }
 
 bool Engine::shouldRun(void)
