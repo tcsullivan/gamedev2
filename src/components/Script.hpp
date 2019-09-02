@@ -47,6 +47,12 @@ public:
             caller["Idle"](caller); // Call idle function and pass itself
                                     //  in or to fulfill the 'self' param
     }
+
+    void update(void)
+    {
+        if (caller["Update"] == sol::type::function)
+            caller["Update"](caller);
+    }
 };
 
 #endif // COMPONENT_SCRIPT_HPP_

@@ -36,10 +36,14 @@ void ScriptSystem::configure(entityx::EntityManager& entities,
     //init();
 }
 
-void ScriptSystem::update([[maybe_unused]] entityx::EntityManager& entites,
+#include <components/Script.hpp>
+void ScriptSystem::update([[maybe_unused]] entityx::EntityManager& entities,
                           [[maybe_unused]] entityx::EventManager& events,
                           [[maybe_unused]] entityx::TimeDelta dt)
 {
+    entities.each<Scripted>([](entityx::Entity, Scripted &s){
+        s.update();
+    });
 }
 
 
@@ -99,7 +103,8 @@ void ScriptSystem::scriptExport(void)
     lua.new_usertype<Render>("Render",
             sol::constructors<Render(std::string), Render()>(),
             "visible", &Render::visible,
-            "texture", &Render::texture);
+            "texture", &Render::texture,
+            "flipx", &Render::flipX);
 
     lua.new_usertype<Velocity>("Velocity",
             sol::constructors<Velocity(double, double), Velocity()>(),

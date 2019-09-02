@@ -26,6 +26,13 @@ bird = {
         --end
         --self.visibleTick = self.visibleTick + 1
     end,
+    Update = function(self)
+        if self.Velocity.x < 0 then
+            self.Render.flipx = true
+        elseif self.Velocity.x > 0 then
+            self.Render.flipx = false
+        end
+    end,
     visibleTick = 0
 }
 
@@ -48,6 +55,13 @@ cat = {
         self.Velocity.x = -100 * math.sin(math.rad(self.counter));
         self.Velocity.y =  100 * math.cos(math.rad(self.counter));
         self.counter = self.counter + 5;
+    end,
+    Update = function(self)
+        if self.Velocity.x < 0 then
+            self.Render.flipx = true
+        elseif self.Velocity.x > 0 then
+            self.Render.flipx = false
+        end
     end
 }
 
@@ -65,7 +79,7 @@ animal = {
         r = 0.0,
         b = 1.0,
         g = 0.2,
-        strength = 2.0
+        strength = 1.0
     },
     Idle = function(self)
         self.Velocity.x = -200 * math.sin(math.rad(self.counter));

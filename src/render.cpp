@@ -33,6 +33,7 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
                           [[maybe_unused]] entityx::EventManager& events,
                           [[maybe_unused]] entityx::TimeDelta dt)
 {
+    // TODO move these to only happen once to speed up rendering
     GLuint s = worldShader.getProgram();
     GLuint v = worldShader.getUniform("view");
     GLuint p = worldShader.getUniform("projection");
@@ -42,6 +43,7 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
 
     GLuint q = worldShader.getUniform("textu");
     GLuint n = worldShader.getUniform("normu");
+    GLuint b = worldShader.getUniform("AmbientLight");
 
     /***********
     *  SETUP  *
@@ -82,9 +84,14 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     glEnableVertexAttribArray(a);
     glEnableVertexAttribArray(t);
 
-    /*************
-    *  DRAWING  *
-    *************/
+    GLfloat amb[4] = {1.0f, 1.0f, 1.0f, 0.0f};
+
+    glUniform4fv(b, 1, amb);
+
+    /**************
+    *  LIGHTING  *
+    **************/
+    
 
     std::vector<glm::vec3> lightPos;
     std::vector<glm::vec4> lightColor;
@@ -107,6 +114,11 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
                  lightColor.size(),
                  reinterpret_cast<GLfloat*>(lightColor.data()));
 
+    /*************
+    *  DRAWING  *
+    *************/
+
+
     entities.each<Render, Position>(
         [this, a, q, t, n](entityx::Entity, Render &r, Position &p) {
 
@@ -127,6 +139,15 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
                 (float)p.x-w, (float)p.y+h, 00.0f, 0.0f, 0.0f,
         };
 
+        // TODO flip nicely (aka model transformations)
+        if (r.flipX) {
+            std::swap(tri_data[3], tri_data[8]);
+            tri_data[13] = tri_data[3];
+
+            std::swap(tri_data[23], tri_data[28]);
+            tri_data[18] = tri_data[23];
+        }
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, r.texture.tex);
         glUniform1i(q, 0);
@@ -139,8 +160,10 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
         glBindBuffer(GL_ARRAY_BUFFER, tri_vbo);
         glBufferData(GL_ARRAY_BUFFER, sizeof(tri_data), tri_data, GL_STREAM_DRAW);
 
-        glVertexAttribPointer(a, 3, GL_FLOAT, GL_FALSE, 5*sizeof(float), 0);
-        glVertexAttribPointer(t, 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)(3*sizeof(float)));
+        glVertexAttribPointer(a, 3, GL_FLOAT, GL_FALSE,
+                              5*sizeof(float), 0);
+        glVertexAttribPointer(t, 2, GL_FLOAT, GL_FALSE, 
+                              5*sizeof(float), (void*)(3*sizeof(float)));
         glDrawArrays(GL_TRIANGLES, 0, 6);
     });
     
@@ -215,6 +238,7 @@ int RenderSystem::init(void)
     worldShader.addUniform("LightPos");
     worldShader.addUniform("LightColor");
     worldShader.addUniform("LightNum");
+    worldShader.addUniform("AmbientLight");
 
     glEnableVertexAttribArray(worldShader.getAttribute("vertex"));
     glUseProgram(worldShader.getProgram());
