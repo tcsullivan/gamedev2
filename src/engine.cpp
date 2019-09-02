@@ -67,7 +67,7 @@ void Engine::logicLoop(void)
         });
 
         systems.update<InputSystem>(dt);
-        systems.update<ScriptSystem>(dt);
+        //systems.update<ScriptSystem>(dt);
 
         /*******************
         *  LOGIC UPDATES  *
