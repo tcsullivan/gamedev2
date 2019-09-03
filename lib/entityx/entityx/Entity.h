@@ -242,6 +242,8 @@ struct BaseComponent {
   void operator delete([[maybe_unused]] void *p) { fail(); }
   void operator delete[]([[maybe_unused]] void *p) { fail(); }
 
+  virtual void internal_serialize(bool save, void *ar) = 0;
+  virtual std::string serializeName(void) const = 0;
 
  protected:
   static void fail() {
@@ -341,6 +343,7 @@ public:
   virtual ~BaseComponentHelper() {}
   virtual void remove_component(Entity e) = 0;
   virtual void copy_component_to(Entity source, Entity target) = 0;
+  virtual BaseComponent *get_component(Entity e) = 0;
 };
 
 template <typename C>
@@ -351,6 +354,9 @@ public:
   }
   void copy_component_to(Entity source, Entity target) override {
     target.assign_from_copy<C>(*(source.component<C>().get()));
+  }
+  BaseComponent *get_component(Entity e) override {
+    return e.component<C>().get();
   }
 };
 
@@ -739,6 +745,26 @@ class EntityManager : entityx::help::NonCopyable {
   template <typename ... Components>
   std::tuple<ComponentHandle<const Components, const EntityManager>...> components(Entity::Id id) const {
     return std::make_tuple(component<const Components>(id)...);
+  }
+
+  /**
+   * EDIT by tcsullivan
+   * Iterates through all components of a given Entity.
+   */
+  template<class Archive>
+  void entity_serialize(Entity entity, bool save, Archive& ar)
+  {
+    auto mask = component_mask(entity.id());
+    for (size_t i = 0; i < component_helpers_.size(); i++) {
+      BaseComponentHelper *helper = component_helpers_[i];
+      if (helper && mask.test(i)) {
+        auto* c = helper->get_component(entity);
+        ar.setNextName(c->serializeName().c_str());
+        ar.startNode();
+        c->internal_serialize(save, static_cast<void*>(&ar));
+        ar.finishNode();
+      }
+    }
   }
 
   /**

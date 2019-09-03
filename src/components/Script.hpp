@@ -21,7 +21,7 @@
 
 #include "Component.hpp"
 
-struct Scripted : Component<Scripted>, entityx::Component<Scripted>
+struct Scripted : Component<Scripted>
 {
 public:
     sol::table caller;
@@ -59,6 +59,13 @@ public:
     {
         if (caller["RenderIdle"] == sol::type::function)
             caller["RenderIdle"](caller);
+    }
+
+    void serialize([[maybe_unused]] cereal::JSONOutputArchive& ar) final {}
+    void serialize([[maybe_unused]] cereal::JSONInputArchive& ar) final {}
+
+    std::string serializeName(void) const final {
+        return "Scripted";
     }
 };
 

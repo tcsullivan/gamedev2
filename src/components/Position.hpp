@@ -21,7 +21,7 @@
 
 #include "Component.hpp"
 
-struct Position : Component<Position>, entityx::Component<Position>
+struct Position : Component<Position>
 {
 public:
     double x, y;
@@ -41,6 +41,18 @@ public:
             throw std::string("Position table not formatted properly");
         }
         return *this;
+    }
+
+    void serialize(cereal::JSONOutputArchive& ar) final {
+        ar(CEREAL_NVP(x), CEREAL_NVP(y));
+    }
+
+    void serialize(cereal::JSONInputArchive& ar) final {
+        ar(CEREAL_NVP(x), CEREAL_NVP(y));
+    }
+
+    std::string serializeName(void) const final {
+        return "Position";
     }
 };
 

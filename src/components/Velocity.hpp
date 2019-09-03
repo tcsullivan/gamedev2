@@ -22,7 +22,7 @@
 
 #include "Component.hpp"
 
-struct Velocity : Component<Velocity>, entityx::Component<Velocity>
+struct Velocity : Component<Velocity>
 {
 public:
     double x, y;
@@ -42,6 +42,18 @@ public:
             throw std::string("Velocity table not formatted properly");
         }
         return *this;
+    }
+
+    void serialize(cereal::JSONOutputArchive& ar) final {
+        ar(CEREAL_NVP(x), CEREAL_NVP(y));
+    }
+
+    void serialize(cereal::JSONInputArchive& ar) final {
+        ar(CEREAL_NVP(x), CEREAL_NVP(y));
+    }
+
+    std::string serializeName(void) const final {
+        return "Velocity";
     }
 };
 

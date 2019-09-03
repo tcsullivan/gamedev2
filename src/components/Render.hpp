@@ -21,7 +21,7 @@
 #include "Component.hpp"
 #include "texture.hpp"
 
-struct Render : Component<Render>, entityx::Component<Render>
+struct Render : Component<Render>
 {
 public:
     Texture texture;
@@ -52,6 +52,18 @@ public:
             );
         }
         return *this;
+    }
+
+    void serialize(cereal::JSONOutputArchive& ar) final {
+        ar(CEREAL_NVP(visible), CEREAL_NVP(flipX));
+    }
+
+    void serialize(cereal::JSONInputArchive& ar) final {
+        ar(CEREAL_NVP(visible), CEREAL_NVP(flipX));
+    }
+
+    std::string serializeName(void) const final {
+        return "Render";
     }
 };
 

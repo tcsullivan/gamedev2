@@ -57,7 +57,7 @@ void ScriptSystem::receive([[maybe_unused]] const EntitySpawnEvent &toSpawn)
 
 int ScriptSystem::init(void)
 {
-    lua.open_libraries(sol::lib::base, sol::lib::math);
+    lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string);
 
     scriptExport();
     doFile();
@@ -176,6 +176,8 @@ sol::table ScriptSystem::spawn(sol::object param)
         }
 
         if (tab["Light"] != nullptr) {
+            if (!e.has_component<Position>()) // Position must exist for vel.
+                (*toRet)["Position"] = e.assign<Position>().get();
             (*toRet)["Light"] = 
                 e.assign<Light>(Light().FromLua(tab["Light"])).get();
         }

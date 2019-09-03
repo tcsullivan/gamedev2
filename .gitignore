@@ -3,4 +3,5 @@ out
 .*.swp
 .*.swo
 *.o
+*.json
 

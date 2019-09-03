@@ -86,7 +86,10 @@ animal = {
         self.Velocity.y =  500 * math.cos(math.rad(self.counter*5));
         self.counter = self.counter + 5;
     end,
-    counter = 0;
+    counter = 0,
+    TestMe = function(self)
+        print("Light: rgb("..self.Light.r..","..self.Light.g..","..self.Light.b..")")
+    end
 }
 
 wall = {
@@ -126,3 +129,37 @@ game.spawn({
         self.counter = self.counter + 5;
     end
 });
+
+-------------------
+--  SERIALIZING  --
+-------------------
+
+function serial (before_ser)
+    binary = string.dump(before_ser)
+    formatted_binary = ""
+    for i = 1, string.len(binary) do
+        dec, _ = ("\\%3d"):format(binary:sub(i, i):byte()):gsub(' ', '0')
+        formatted_binary = formatted_binary .. dec
+    end
+    return formatted_binary
+end
+
+function hello(herro)
+    print("Hello world ".. herro)
+end
+
+--print(serial(hello))
+
+local ser = string.dump(hello)
+f2 = (loadstring or load)(ser)
+f2("shite")
+
+local testPut = string.dump(animalSpawn.TestMe)
+testRun = (loadstring or load)(testPut)
+testRun(animalSpawn)
+
+--blah = load(serial(hello))
+--blah()
+
+--draw = loadstring("\027\076\074\001\000\009\064\109\097\105\110\046\108\117\097\084\000\000\004\000\004\000\008\009\002\002\052\000\000\000\055\000\001\000\055\000\002\000\037\001\003\000\039\002\010\000\039\003\010\000\062\000\004\001\071\000\001\000\017\104\101\108\108\111\044\032\119\111\114\108\100\010\112\114\105\110\116\013\103\114\097\112\104\105\099\115\009\108\111\118\101\001\001\001\001\001\001\001\002\000\000")
+--draw()

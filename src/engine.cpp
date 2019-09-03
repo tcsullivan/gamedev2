@@ -20,6 +20,7 @@
  */
 
 #include "engine.hpp"
+#include "gamestate.hpp"
 #include "gamerun.hpp"
 #include "input.hpp"
 #include "player.hpp"
@@ -29,6 +30,8 @@
 #include "components/Script.hpp"
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"
+
+#include <fstream>
 
 using namespace std::chrono_literals;
 namespace cr = std::chrono;
@@ -43,7 +46,12 @@ int Engine::init(void)
     systems.add<ScriptSystem>();
     systems.configure();
 
+    // Load game script and entity data
     systems.system<ScriptSystem>()->init();
+    if (GameState::load("save.json", entities)) {
+        std::cout << "Loaded from save.json. Delete the file if you don't want "
+                     "it." << std::endl;
+    }
 
     return 0;
 }
@@ -116,6 +124,9 @@ void Engine::run(void)
 
     // Done, bring logic thread back
     logicThread.join();
+
+    // Save the entities' data
+    GameState::save("save.json", entities);
 }
 
 bool Engine::shouldRun(void)

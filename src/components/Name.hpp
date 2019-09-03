@@ -21,7 +21,7 @@
 #include "Component.hpp"
 #include <string>
 
-struct Name : Component<Name>, entityx::Component<Name>
+struct Name : Component<Name>
 {
 public:
     std::string name;
@@ -37,6 +37,18 @@ public:
             throw std::string("Name component not formatted properly");
 
         return *this;
+    }
+
+    void serialize(cereal::JSONOutputArchive& ar) final {
+        ar(CEREAL_NVP(name));
+    }
+
+    void serialize(cereal::JSONInputArchive& ar) final {
+        ar(CEREAL_NVP(name));
+    }
+
+    std::string serializeName(void) const final {
+        return "Name";
     }
 };
 
