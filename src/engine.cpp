@@ -48,7 +48,10 @@ int Engine::init(void)
 
     // Load game script and entity data
     systems.system<ScriptSystem>()->init();
-    GameState::load("save.json", entities);
+    if (GameState::load("save.json", entities)) {
+        std::cout << "Loaded from save.json. Delete the file if you don't want "
+                     "it." << std::endl;
+    }
 
     return 0;
 }

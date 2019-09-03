@@ -43,13 +43,19 @@ public:
      *
      * @param file The file to load from
      * @param entities The entity manager to load into
+     * @return True if successful load
      */
-    static void load(const std::string& file, entityx::EntityManager &entities)
+    static bool load(const std::string& file, entityx::EntityManager &entities)
     {
-        if (std::ifstream saveFile (file); saveFile.good()) {
+        std::ifstream saveFile (file);
+        bool opened = saveFile.good();
+
+        if (opened) {
             cereal::JSONInputArchive archive (saveFile);
-	    serializeEntities(archive, false, entities);
+            serializeEntities(archive, false, entities);
         }
+
+        return opened;
     }
 
     /**
@@ -58,13 +64,19 @@ public:
      *
      * @param file The file to load from
      * @param entities The entity manager to get entity data from
+     * @return True if successful save
      */
-    static void save(const std::string& file, entityx::EntityManager &entities)
+    static bool save(const std::string& file, entityx::EntityManager &entities)
     {
-        if (std::ofstream saveFile (file); saveFile.good()) {
+        std::ofstream saveFile (file);
+        bool opened = saveFile.good();
+
+        if (opened) {
             cereal::JSONOutputArchive archive (saveFile);
-	    serializeEntities(archive, true, entities);
+            serializeEntities(archive, true, entities);
         }
+
+        return opened;
     }
 
 private:
