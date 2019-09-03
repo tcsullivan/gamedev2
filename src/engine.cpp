@@ -20,6 +20,7 @@
  */
 
 #include "engine.hpp"
+#include "gamestate.hpp"
 #include "gamerun.hpp"
 #include "input.hpp"
 #include "player.hpp"
@@ -45,7 +46,9 @@ int Engine::init(void)
     systems.add<ScriptSystem>();
     systems.configure();
 
+    // Load game script and entity data
     systems.system<ScriptSystem>()->init();
+    GameState::load("save.json", entities);
 
     return 0;
 }
@@ -119,16 +122,8 @@ void Engine::run(void)
     // Done, bring logic thread back
     logicThread.join();
 
-    std::ofstream saveFile ("save.json");
-    cereal::JSONOutputArchive archive (saveFile);
-    std::string name ("entity");
-    int i = 0;
-    for (entityx::Entity e : entities.entities_for_debugging()) {
-        archive.setNextName((name + std::to_string(i++)).c_str());
-        archive.startNode();
-        entities.entity_serialize(e, true, archive);
-        archive.finishNode();
-    }
+    // Save the entities' data
+    GameState::save("save.json", entities);
 }
 
 bool Engine::shouldRun(void)
