@@ -41,9 +41,9 @@ public:
             if (tab["visible"].get_type() == sol::type::boolean)
                 this->visible = tab["visible"];
             if (tab["texture"].get_type() == sol::type::string)
-                this->texture = Texture(static_cast<std::string>(tab["texture"]));
+                this->texture = Texture(tab.get<std::string>("texture"));
             if (tab["normal"].get_type() == sol::type::string)
-                this->normal = Texture(static_cast<std::string>(tab["normal"]));
+                this->normal = Texture(tab.get<std::string>("normal"));
             if (tab["flipx"].get_type() == sol::type::boolean)
                 this->flipX = tab["flipx"];
         } else {
