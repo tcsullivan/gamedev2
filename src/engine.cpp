@@ -30,6 +30,8 @@
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"
 
+#include <fstream>
+
 using namespace std::chrono_literals;
 namespace cr = std::chrono;
 typedef std::chrono::high_resolution_clock mc;
@@ -117,7 +119,8 @@ void Engine::run(void)
     // Done, bring logic thread back
     logicThread.join();
 
-    cereal::JSONOutputArchive archive (std::cout);
+    std::ofstream saveFile ("save.json");
+    cereal::JSONOutputArchive archive (saveFile);
     std::string name ("entity");
     int i = 0;
     for (entityx::Entity e : entities.entities_for_debugging()) {
@@ -126,7 +129,6 @@ void Engine::run(void)
         entities.entity_serialize(e, true, archive);
         archive.finishNode();
     }
-    std::cout << std::endl;
 }
 
 bool Engine::shouldRun(void)
