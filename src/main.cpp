@@ -18,6 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#define SOL_ALL_SAFETIES_ON = 1
+
 #include "engine.hpp"
 
 #include <SDL2/SDL.h>

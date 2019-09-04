@@ -100,11 +100,6 @@ void Engine::logicLoop(void)
         elapsed += dt;
         std::this_thread::yield();
     }
-
-    // Remove all Lua references from entities
-    entities.each<Scripted>([](entityx::Entity, Scripted &f){ f.cleanup(); });
-    entities.each<EventListener>([](entityx::Entity, EventListener &f){
-        f.cleanup(); });
 }
 
 void Engine::renderLoop(void)
@@ -130,6 +125,11 @@ void Engine::run(void)
 
     // Save the entities' data
     GameState::save("save.json", entities);
+
+    // Remove all Lua references from entities
+    entities.each<Scripted>([](entityx::Entity, Scripted &f){ f.cleanup(); });
+    entities.each<EventListener>([](entityx::Entity, EventListener &f){
+        f.cleanup(); });
 }
 
 bool Engine::shouldRun(void)

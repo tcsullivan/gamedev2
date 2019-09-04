@@ -20,6 +20,8 @@
 #define COMPONENT_SCRIPT_HPP_
 
 #include "Component.hpp"
+#include <cereal/types/vector.hpp>
+#include <cereal/types/tuple.hpp>
 
 struct Scripted : Component<Scripted>
 {
@@ -61,8 +63,58 @@ public:
             caller["RenderIdle"](caller);
     }
 
-    void serialize([[maybe_unused]] cereal::JSONOutputArchive& ar) final {}
-    void serialize([[maybe_unused]] cereal::JSONInputArchive& ar) final {}
+    void serialize(cereal::JSONOutputArchive& ar) final {
+        std::vector<std::tuple<std::string, std::string>> table_components;
+        caller.for_each([&table_components](sol::object key, sol::object value){
+            if (value.get_type() == sol::type::string)
+                table_components.push_back(std::make_tuple(
+                    key.as<std::string>(),
+                    std::string("return \"" + value.as<std::string>() + "\"")
+                ));
+            else if (value.get_type() == sol::type::number)
+                table_components.push_back(std::make_tuple(
+                    key.as<std::string>(),
+                    std::string("return " + value.as<std::string>())
+                ));
+            else if (value.get_type() == sol::type::boolean)
+                table_components.push_back(std::make_tuple(
+                    key.as<std::string>(),
+                    std::string("return " + value.as<std::string>())
+                ));
+            //else if (value.get_type() == sol::type::function) {
+            //    sol::state lua;
+            //    lua.open_libraries(sol::lib::base, sol::lib::string);
+
+            //    sol::function dump = lua.script("return string.dump");
+
+            //    sol::function f = value;
+            //    std::string gg = dump(f);
+            //    table_components.push_back(std::make_tuple(
+            //        key.as<std::string>(),
+            //        std::string("return (loadstring or load)(" + 
+            //                    gg + ")")
+            //    ));
+            //}
+        });
+        
+        ar(CEREAL_NVP(table_components));
+    }
+
+    void serialize(cereal::JSONInputArchive& ar) final {
+        sol::state lua;
+        lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string);
+
+        std::vector<std::tuple<std::string, std::string>> table_components;
+        ar(CEREAL_NVP(table_components));
+
+        for (auto &s : table_components) {
+            std::string key = std::get<0>(s);
+            std::string value = std::get<1>(s);
+            sol::object ret = lua.script(value);
+            caller[key.c_str()] = ret;
+        }
+
+    }
 
     std::string serializeName(void) const final {
         return "Scripted";
