@@ -76,11 +76,14 @@ public:
                     key.as<std::string>(),
                     std::string("return " + value.as<std::string>())
                 ));
-            else if (value.get_type() == sol::type::boolean)
+            else if (value.get_type() == sol::type::boolean) {
                 table_components.push_back(std::make_tuple(
                     key.as<std::string>(),
-                    std::string("return " + value.as<std::string>())
+                    std::string("return " + 
+                        std::string(value.as<bool>() ? "true" : "false")
+                    )
                 ));
+            }
             //else if (value.get_type() == sol::type::function) {
             //    sol::state lua;
             //    lua.open_libraries(sol::lib::base, sol::lib::string);

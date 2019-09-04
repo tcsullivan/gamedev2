@@ -25,6 +25,8 @@ bird = {
         y = 0.0
     },
     Name = "bord",
+    hellotrue = true,
+    hellofalse = false,
     Render = {
         texture = "Assets/player.png",
         visible = true
