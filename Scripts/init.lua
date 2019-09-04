@@ -3,12 +3,14 @@ bird = {
     EventListeners = {
         MoveLeftPressed = function(self)
             self.Velocity.x = self.Velocity.x - 100
+            self.Render.flipx = true;
         end,
         MoveLeftReleased = function(self)
             self.Velocity.x = self.Velocity.x + 100
         end,
         MoveRightPressed = function(self)
             self.Velocity.x = self.Velocity.x + 100
+            self.Render.flipx = false;
         end,
         MoveRightReleased = function(self)
             self.Velocity.x = self.Velocity.x - 100
