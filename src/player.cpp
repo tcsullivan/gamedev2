@@ -20,6 +20,8 @@
 
 #include "player.hpp"
 
+#include "components/EventListener.hpp"
+#include "components/Script.hpp"
 #include "components/Velocity.hpp"
 
 void PlayerSystem::configure([[maybe_unused]] entityx::EntityManager& entities,
@@ -52,11 +54,19 @@ void PlayerSystem::receive(const KeyDownEvent& kue)
 {
     if (player.valid()) {
         if (kue.sym == SDLK_a) {
-            if (auto vel = player.component<Velocity>(); vel)
-                vel->x -= GROUND_VELOCITY;
+            entities.each<EventListener>([&]([[maybe_unused]] entityx::Entity e,
+                                             EventListener& el)
+            {
+                    el.tryListener("MoveLeftPressed",
+                                   e.component<Scripted>()->caller);
+            });
         } else if (kue.sym == SDLK_d) {
-            if (auto vel = player.component<Velocity>(); vel)
-                vel->x += GROUND_VELOCITY;
+            entities.each<EventListener>([&]([[maybe_unused]] entityx::Entity e,
+                                             EventListener& el)
+            {
+                    el.tryListener("MoveRightPressed",
+                                   e.component<Scripted>()->caller);
+            });
         }
     }
 }
@@ -65,11 +75,19 @@ void PlayerSystem::receive(const KeyUpEvent& kue)
 {
     if (player.valid()) {
         if (kue.sym == SDLK_a) {
-            if (auto vel = player.component<Velocity>(); vel)
-                vel->x += GROUND_VELOCITY;
+            entities.each<EventListener>([&]([[maybe_unused]] entityx::Entity e,
+                                             EventListener& el)
+            {
+                    el.tryListener("MoveLeftReleased",
+                                   e.component<Scripted>()->caller);
+            });
         } else if (kue.sym == SDLK_d) {
-            if (auto vel = player.component<Velocity>(); vel)
-                vel->x -= GROUND_VELOCITY;
+            entities.each<EventListener>([&]([[maybe_unused]] entityx::Entity e,
+                                             EventListener& el)
+            {
+                    el.tryListener("MoveRightReleased",
+                                   e.component<Scripted>()->caller);
+            });
         }
     }
 }

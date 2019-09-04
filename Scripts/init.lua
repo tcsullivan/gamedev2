@@ -1,5 +1,19 @@
 bird = {
     Player = 0,
+    EventListeners = {
+        MoveLeftPressed = function(self)
+            self.Velocity.x = self.Velocity.x - 100
+        end,
+        MoveLeftReleased = function(self)
+            self.Velocity.x = self.Velocity.x + 100
+        end,
+        MoveRightPressed = function(self)
+            self.Velocity.x = self.Velocity.x + 100
+        end,
+        MoveRightReleased = function(self)
+            self.Velocity.x = self.Velocity.x - 100
+        end
+    },
     Position = {
         x = 150,
         y = 75

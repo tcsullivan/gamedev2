@@ -40,9 +40,13 @@ private:
      */
     constexpr static double GROUND_VELOCITY = 100;
 
+    entityx::EntityManager& entities;
     entityx::Entity player;
 
 public:
+    PlayerSystem(entityx::EntityManager& _entities) :
+        entities(_entities) {}
+
     /**
      * Prepares the system for running.
      */

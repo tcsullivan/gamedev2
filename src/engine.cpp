@@ -27,6 +27,7 @@
 #include "script.hpp"
 #include "render.hpp"
 
+#include "components/EventListener.hpp"
 #include "components/Script.hpp"
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"
@@ -41,7 +42,7 @@ int Engine::init(void)
 {
     systems.add<GameRunSystem>();
     systems.add<InputSystem>();
-    systems.add<PlayerSystem>();
+    systems.add<PlayerSystem>(entities);
     systems.add<RenderSystem>();
     systems.add<ScriptSystem>();
     systems.configure();
@@ -102,6 +103,8 @@ void Engine::logicLoop(void)
 
     // Remove all Lua references from entities
     entities.each<Scripted>([](entityx::Entity, Scripted &f){ f.cleanup(); });
+    entities.each<EventListener>([](entityx::Entity, EventListener &f){
+        f.cleanup(); });
 }
 
 void Engine::renderLoop(void)

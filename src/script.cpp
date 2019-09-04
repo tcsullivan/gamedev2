@@ -78,6 +78,7 @@ void ScriptSystem::doFile(void)
 /********************
 *  SCRIPT PARSING  *
 ********************/
+#include <components/EventListener.hpp>
 #include <components/Position.hpp>
 #include <components/Player.hpp>
 #include <components/Name.hpp>
@@ -180,6 +181,12 @@ sol::table ScriptSystem::spawn(sol::object param)
                 (*toRet)["Position"] = e.assign<Position>().get();
             (*toRet)["Light"] = 
                 e.assign<Light>(Light().FromLua(tab["Light"])).get();
+        }
+
+        // Probably should be last
+        if (tab["EventListeners"] != nullptr) {
+            sol::table listeners = tab["EventListeners"];
+            e.assign<EventListener>(listeners);
         }
 
     } else {
