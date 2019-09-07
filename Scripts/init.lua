@@ -14,6 +14,13 @@ bird = {
         end,
         MoveRightReleased = function(self)
             self.Velocity.x = self.Velocity.x - 100
+        end,
+        JumpKeyPressed = function(self)
+            if self.Physics.standing == true then
+                self.Velocity.y = self.Velocity.y + 210
+            end
+        end,
+        JumpKeyReleased = function(self)
         end
     },
     Position = {
@@ -24,6 +31,7 @@ bird = {
         x = 0.0,
         y = 0.0
     },
+    Physics = 0,
     Name = "bord",
     hellotrue = true,
     hellofalse = false,
