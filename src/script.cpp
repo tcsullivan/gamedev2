@@ -24,12 +24,9 @@
 *  SYSTEM SPECIFIC  *
 *********************/
 
-void ScriptSystem::configure(entityx::EntityManager& entities,
-                             entityx::EventManager& events)
+void ScriptSystem::configure([[maybe_unused]] entityx::EntityManager& entities,
+                             [[maybe_unused]] entityx::EventManager& events)
 {
-    this->manager = &entities;
-    this->events = &events;
-
     events.subscribe<EntitySpawnEvent>(*this);
 
     // Init after systems.configure() in engine.cpp
@@ -137,7 +134,7 @@ sol::table ScriptSystem::spawn(sol::object param)
     if (param.get_type() == sol::type::table) {
         sol::table tab = param; // Cast the generic parameter to a table
 
-        entityx::Entity e = manager->create(); // Create a new entity
+        entityx::Entity e = manager.create(); // Create a new entity
         auto d = e.assign<Scripted>().get(); // Since this entity was created
                                              //  via Lua, assign the Scripted
                                              //  component.

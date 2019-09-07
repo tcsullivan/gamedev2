@@ -46,11 +46,11 @@ private:
      */
     sol::state lua;
 
-    entityx::EventManager* events;
-    entityx::EntityManager* manager;
+    entityx::EntityManager& manager;
 
 public:
-    ScriptSystem(void) {}
+    ScriptSystem(entityx::EntityManager& _manager):
+        manager(_manager) {}
 
     ~ScriptSystem(void) {}
 
