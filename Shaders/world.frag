@@ -34,13 +34,13 @@ void main()
 
     for (int i = 0; i < LightNum; i++) {
         vec3 LightDir = vec3(LightPos[i].xy - fragCoord.xy, LightPos[i].z);
-        if (Flipped == 1)
-            LightDir.x = -LightDir.x;
 
         float D = length(LightDir);
 
         vec3 N = normalize(NormalMap * 2.0 - 1.0);
         vec3 L = normalize(LightDir);
+        if (Flipped == 1)
+            N.x = -N.x;
 
         vec3 Diffuse = 
             (LightColor[i].rgb * LightColor[i].a) * max(dot(N, L), 0.0);
