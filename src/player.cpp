@@ -67,6 +67,13 @@ void PlayerSystem::receive(const KeyDownEvent& kue)
                     el.tryListener("MoveRightPressed",
                                    e.component<Scripted>()->caller);
             });
+        } else if (kue.sym == SDLK_SPACE) {
+            entities.each<EventListener>([&]([[maybe_unused]] entityx::Entity e,
+                                             EventListener& el)
+            {
+                    el.tryListener("JumpKeyPressed",
+                                   e.component<Scripted>()->caller);
+            });
         }
     }
 }
@@ -86,6 +93,13 @@ void PlayerSystem::receive(const KeyUpEvent& kue)
                                              EventListener& el)
             {
                     el.tryListener("MoveRightReleased",
+                                   e.component<Scripted>()->caller);
+            });
+        } else if (kue.sym == SDLK_SPACE) {
+            entities.each<EventListener>([&]([[maybe_unused]] entityx::Entity e,
+                                             EventListener& el)
+            {
+                    el.tryListener("JumpKeyReleased",
                                    e.component<Scripted>()->caller);
             });
         }
