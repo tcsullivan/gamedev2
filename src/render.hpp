@@ -45,6 +45,7 @@ private:
     SDL_GLContext context;
 
     Shader worldShader;
+    glm::vec3 camPos;
 
 public:
     RenderSystem(void) :

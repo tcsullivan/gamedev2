@@ -51,7 +51,7 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     *  SETUP  *
     ***********/
     
-    glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 5.0f),  // Pos
+    glm::mat4 view = glm::lookAt(camPos,                       // Pos
                                  glm::vec3(0.0f, 0.0f, 0.0f),  // Facing
                                  glm::vec3(0.0f, 1.0f, 0.0f)); // Up
 
@@ -260,6 +260,8 @@ int RenderSystem::init(void)
     //glPolygonOffset(1.0, 1.0);
 
     //glClearColor(0.6, 0.8, 1.0, 0.0);
+    
+    camPos = glm::vec3(0.0f, 0.0f, 0.5f);
 
     return 0;
 }
