@@ -26,6 +26,7 @@
 #include "player.hpp"
 #include "script.hpp"
 #include "render.hpp"
+#include "physics.hpp"
 
 #include "components/EventListener.hpp"
 #include "components/Script.hpp"
@@ -45,6 +46,7 @@ int Engine::init(void)
     systems.add<PlayerSystem>(entities);
     systems.add<RenderSystem>();
     systems.add<ScriptSystem>();
+    systems.add<PhysicsSystem>();
     systems.configure();
 
     // Load game script and entity data
@@ -65,16 +67,6 @@ void Engine::logicLoop(void)
     while (shouldRun()) {
         auto start = mc::now();
 
-        /***********************
-        *  UPDATE FREQUENTLY  *
-        ***********************/
-        
-        entities.each<Position, Velocity>
-            ([&](entityx::Entity, Position &p, Velocity &v){
-            p.x += (v.x * dt/1000.0);
-            p.y += (v.y * dt/1000.0);
-        });
-
         systems.update<InputSystem>(dt);
         //systems.update<ScriptSystem>(dt);
 
@@ -92,14 +84,36 @@ void Engine::logicLoop(void)
             });
         }
 
+        std::this_thread::yield();
+
         auto end = mc::now();
         auto diff = end - start;
         auto micros = cr::duration_cast<cr::microseconds>(diff);
         auto msc = micros.count();
         dt = static_cast<double>(msc) / 1000.0;
         elapsed += dt;
-        std::this_thread::yield();
     }
+}
+
+void Engine::physicsLoop(void)
+{
+    entityx::TimeDelta dt = 0; /**< Elapsed milliseconds since each loop */
+
+    while (shouldRun()) {
+        auto start = mc::now();
+
+        // Update the entities physics/position
+        systems.update<PhysicsSystem>(dt);
+
+        std::this_thread::yield();
+
+        auto end = mc::now();
+        auto diff = end - start;
+        auto micros = cr::duration_cast<cr::microseconds>(diff);
+        auto msc = micros.count();
+        dt = static_cast<double>(msc) / 1000.0;
+    }
+    std::cout << std::endl;
 }
 
 void Engine::renderLoop(void)
@@ -117,11 +131,16 @@ void Engine::run(void)
         logicLoop();
     });
 
+    physicsThread = std::thread([this](void) {
+        physicsLoop();
+    });
+
     // Keep render loop on main thread
     renderLoop();
 
     // Done, bring logic thread back
     logicThread.join();
+    physicsThread.join();
 
     // Save the entities' data
     GameState::save("save.json", entities);

@@ -37,8 +37,10 @@ private:
     entityx::SystemManager systems;
 
     std::thread logicThread;
+    std::thread physicsThread;
 
     void logicLoop(void);
+    void physicsLoop(void);
     void renderLoop(void);
 
     bool shouldRun(void);
