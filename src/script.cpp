@@ -86,6 +86,7 @@ void ScriptSystem::doFile(void)
 #include <components/Script.hpp>
 #include <components/Velocity.hpp>
 #include <components/Light.hpp>
+#include <components/Physics.hpp>
 
 void ScriptSystem::scriptExport(void)
 {
@@ -121,6 +122,10 @@ void ScriptSystem::scriptExport(void)
             "g", &Light::g,
             "b", &Light::b,
             "strength", &Light::strength);
+
+    lua.new_usertype<Physics>("Physics",
+            sol::constructors<Physics(void), Physics()>(),
+            "standing", &Physics::standing);
 
     auto gamespace = lua["game"].get_or_create<sol::table>();
     gamespace.set_function("spawn", func);
@@ -174,6 +179,15 @@ sol::table ScriptSystem::spawn(sol::object param)
 
         if (tab["Player"] != nullptr) {
             (*toRet)["Player"] = e.assign<Player>().get();
+        }
+
+        if (tab["Physics"] != nullptr) {
+            if (!e.has_component<Position>()) // Position must exist for phys.
+                (*toRet)["Position"] = e.assign<Position>().get();
+            if (!e.has_component<Velocity>()) // Velocity must exist for phys.
+                (*toRet)["Velocity"] = e.assign<Velocity>().get();
+
+            (*toRet)["Physics"] = e.assign<Physics>().get();
         }
 
         if (tab["Light"] != nullptr) {
