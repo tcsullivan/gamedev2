@@ -129,6 +129,9 @@ wall = {
     }
 }
 
+-- Create the world
+dofile("Scripts/world.lua")
+
 birdSpawn = game.spawn(bird);
 
 dogSpawn = game.spawn(cat);
@@ -155,8 +158,6 @@ game.spawn({
         self.counter = self.counter + 5;
     end
 });
-
-dofile("Scripts/world.lua")
 
 -------------------
 --  SERIALIZING  --

@@ -21,7 +21,10 @@
 #define TEXTURE_HPP_
 
 #include <soil/SOIL.h>
+
+#include <GL/glew.h>
 #include <SDL2/SDL_opengl.h>
+
 #include <string>
 
 class Texture

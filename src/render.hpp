@@ -22,17 +22,19 @@
 #ifndef SYSTEM_RENDER_HPP_
 #define SYSTEM_RENDER_HPP_
 
-#include "shader.hpp"
-
 #include <entityx/entityx.h>
 
+#include <GL/glew.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_opengl.h>
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/noise.hpp>
+
+#include "shader.hpp"
 
 class RenderSystem : public entityx::System<RenderSystem>
 {
