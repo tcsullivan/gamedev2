@@ -1,27 +1,36 @@
 world = {
     Registry = {
+        grass = {
+            id = 0,
+            texture = "Assets/grass.png",
+            normal = "Assets/grass_normal"
+        },
         dirt = {
-            id = "world0:dirt",
+            id = 1,
             texture = "Assets/dirt.png",
             normal = "Assets/dirt_normal.png"
         },
         stone = {
-            id = "world0:stone",
+            id = 2,
             texture = "Assets/stone.png",
             normal = "Assets/dirt_normal.png"
         }
     },
     Seed = 5345345,
-    Layers = 3,
+    Layers = 2,
     Generate = function(self)
+        math.randomseed(self.Seed)
         self.data = {}
-        for Z = 0,2 do
+        for Z = 0,self.Layers do
             self.data[Z] = {}
             for X = 0,250 do
                 self.data[Z][X] = {}
                 YGen = math.floor(6*math.sin(X/20) + Z) + 64
+                YDepth = math.random(2,5)
                 for Y = 0,128 do
                     if Y == YGen then
+                        self.data[Z][X][Y] = 0
+                    elseif Y < YGen and Y > (YGen - YDepth) then
                         self.data[Z][X][Y] = 1
                     elseif Y < YGen then
                         self.data[Z][X][Y] = 2
