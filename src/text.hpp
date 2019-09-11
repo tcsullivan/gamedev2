@@ -22,7 +22,15 @@
 #define SYSTEM_TEXT_HPP_
 
 #include <entityx/entityx.h>
-#include <sol/sol.hpp>
+#include <ft2build.h>
+#include <freetype/freetype.h>
+
+#include <map>
+#include <string>
+#include <vector>
+
+struct FT_Info;
+struct vec2 { float x; float y; };
 
 /**
  * @class PhysicsSystem
@@ -43,6 +51,13 @@ public:
     void update(entityx::EntityManager& entites,
                 entityx::EventManager& events,
                 entityx::TimeDelta dt) final;
+
+    void loadFont(const std::string& name, const std::string& file, int size);
+
+private:
+    FT_Library freetype;
+    std::map<std::string, FT_Face> fonts;
+    std::map<std::string, std::vector<FT_Info>> fontData;
 };
 
 #endif // SYSTEM_TEXT_HPP_
