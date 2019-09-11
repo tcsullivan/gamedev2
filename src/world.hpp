@@ -1,6 +1,6 @@
 /**
- * @file position.hpp
- * Manages all entity movements
+ * @file world.hpp
+ * Manages the world systems
  *
  * Copyright (C) 2019  Belle-Isle, Andrew <drumsetmonkey@gmail.com>
  *
@@ -18,23 +18,47 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SYSTEM_PHYSICS_HPP_
-#define SYSTEM_PHYSICS_HPP_
+#ifndef SYSTEM_WORLD_HPP_
+#define SYSTEM_WORLD_HPP_
+
+#include <vector>
 
 #include <entityx/entityx.h>
 #include <sol/sol.hpp>
 
-/**
- * @class PhysicsSystem
- * Handles the position and velocity updating of all entities
- */
-class PhysicsSystem : public entityx::System<PhysicsSystem>
+#include "texture.hpp"
+
+struct WorldMaterial
+{
+    Texture texture;
+    Texture normal;
+};
+
+class World
 {
 private:
+    std::vector<unsigned int> registry;
+    std::vector<std::vector<unsigned int>> worldData;
 public:
-    PhysicsSystem(void) {}
+    World(sol::object ref);
+    ~World() {}
+};
 
-    ~PhysicsSystem(void) {}
+/**
+ * @class WorldSystem
+ * Handles the game's world system
+ */
+class WorldSystem : public entityx::System<WorldSystem>
+{
+private:
+    std::vector<World> worlds;
+    //World& currentWorld;
+public:
+    WorldSystem(void) {}
+
+    ~WorldSystem(void) {}
+
+    unsigned int addWorld(sol::object);
 
     /**
      * Prepares the system for running.
@@ -43,13 +67,12 @@ public:
                    entityx::EventManager& events) final;
     
     /**
-     * Updates the position of all entites, and if they have a physics component
-     * then we update their velocities accordingly.
+     * Updates the world ticks (entity spawns and world events)
      */
     void update(entityx::EntityManager& entites,
                 entityx::EventManager& events,
                 entityx::TimeDelta dt) final;
 };
 
-#endif // SYSTEM_PHYSICS_HPP_
+#endif // SYSTEM_WORLD_HPP_
 

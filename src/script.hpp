@@ -24,6 +24,8 @@
 #include <entityx/entityx.h>
 #include <sol/sol.hpp>
 
+#include "world.hpp"
+
 struct EntitySpawnEvent
 {
     sol::object ref;
@@ -47,10 +49,12 @@ private:
     sol::state lua;
 
     entityx::EntityManager& manager;
+    
+    WorldSystem &worldSystem;
 
 public:
-    ScriptSystem(entityx::EntityManager& _manager):
-        manager(_manager) {}
+    ScriptSystem(entityx::EntityManager& _mg, WorldSystem& _ws):
+        manager(_mg), worldSystem(_ws) {}
 
     ~ScriptSystem(void) {}
 

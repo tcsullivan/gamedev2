@@ -32,4 +32,5 @@ world = {
     end
 }
 
-world:Generate()
+--world:Generate()
+game.worldRegister(world)
