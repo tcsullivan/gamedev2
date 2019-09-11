@@ -52,13 +52,14 @@ class WorldSystem : public entityx::System<WorldSystem>
 {
 private:
     std::vector<World> worlds;
-    //World& currentWorld;
+    World* currentWorld;
 public:
-    WorldSystem(void) {}
+    WorldSystem(void):
+        currentWorld(nullptr) {}
 
     ~WorldSystem(void) {}
 
-    unsigned int addWorld(sol::object);
+    World* addWorld(sol::object);
 
     /**
      * Prepares the system for running.

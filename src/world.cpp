@@ -38,10 +38,12 @@ World::World(sol::object ref)
 *  WORLD SYSTEM  *
 ******************/
 
-unsigned int WorldSystem::addWorld(sol::object t)
+World* WorldSystem::addWorld(sol::object t)
 {
     worlds.push_back(World(t));
-    return worlds.size()-1;
+    if (currentWorld == nullptr)
+        currentWorld = &(worlds.back());
+    return &(worlds.back());
 }
 
 void WorldSystem::configure([[maybe_unused]]entityx::EntityManager& entities,

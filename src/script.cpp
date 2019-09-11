@@ -90,7 +90,7 @@ void ScriptSystem::scriptExport(void)
     std::function<sol::table(sol::table)> entitySpawn = 
         [this](sol::table t){ return spawn(t);};
 
-    std::function<unsigned int(sol::object)> worldRegister =
+    std::function<World* (sol::object)> worldRegister =
         [this](sol::object t){ return worldSystem.addWorld(t); };
 
     lua.new_usertype<Position>("Position",
