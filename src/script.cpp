@@ -127,6 +127,14 @@ void ScriptSystem::scriptExport(void)
             sol::constructors<Physics(void), Physics()>(),
             "standing", &Physics::standing);
 
+    lua.new_usertype<World>("World",
+            sol::constructors<World(sol::object), World(void)>(),
+            "generate", &World::generate,
+            "Seed", sol::property(&World::setSeed, &World::getSeed),
+            "Layers", sol::property(&World::setLayers, &World::getLayers),
+            "setData", &World::setData);
+
+
     auto gamespace = lua["game"].get_or_create<sol::table>();
     gamespace.set_function("spawn", entitySpawn);
     gamespace.set_function("worldRegister", worldRegister);

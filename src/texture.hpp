@@ -31,7 +31,7 @@ class Texture
 {
 private:
 public:
-    GLuint tex;
+    GLuint tex = 0;
     int width;
     int height;
     Texture() {};

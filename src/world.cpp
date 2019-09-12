@@ -26,11 +26,34 @@
 World::World(sol::object ref)
 {
     if (ref.get_type() == sol::type::table) {
-
+        sol::table tab = ref;
+        if (tab["Seed"] == sol::type::number) {
+            seed = tab["Seed"];
+        }
+        if (tab["Layers"] == sol::type::number) {
+            layers = tab["Layers"];
+        }
+        if (tab["Generate"] == sol::type::function) {
+            generate = tab["Generate"];
+        }
     } else {
         // TODO better logging
         std::cerr << "World paramaters must be stored in a table" << std::endl;
     }
+    generate(this);
+}
+
+void World::setData(unsigned int x,
+                    unsigned int y,
+                    unsigned int z,
+                    unsigned int d)
+{
+    (void)x;
+    (void)y;
+    (void)z;
+    (void)d;
+
+    // TODO actually do stuff here
 }
 
 

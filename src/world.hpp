@@ -37,11 +37,39 @@ struct WorldMaterial
 class World
 {
 private:
+    unsigned int seed;
+    unsigned int layers;
+
+    std::vector<std::vector<std::vector<unsigned int>>> data;
     std::vector<unsigned int> registry;
-    std::vector<std::vector<unsigned int>> worldData;
 public:
+    World() {}
     World(sol::object ref);
-    ~World() {}
+    ~World() {
+        generate = sol::nil;
+        registry.clear();
+        data.clear();
+    }
+
+    sol::function generate;
+
+    /* SEED */
+    unsigned int getSeed() {return seed;}
+    void setSeed(unsigned int s) {seed = s;}
+
+    /* LAYERS */
+    unsigned int getLayers() {return layers;}
+    // If we change the amount of layers, we have to regenerate the world
+    void setLayers(unsigned int l) {
+        layers = l;
+        generate();
+    }
+
+    /* DATA */
+    void setData(unsigned int x, 
+                 unsigned int y,
+                 unsigned int z,
+                 unsigned int d);
 };
 
 /**
@@ -57,9 +85,16 @@ public:
     WorldSystem(void):
         currentWorld(nullptr) {}
 
-    ~WorldSystem(void) {}
+    ~WorldSystem(void) {
+        currentWorld = nullptr;
+        worlds.clear();
+    }
 
     World* addWorld(sol::object);
+    void cleanup()
+    {
+        worlds.clear();
+    }
 
     /**
      * Prepares the system for running.

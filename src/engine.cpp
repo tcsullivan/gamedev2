@@ -147,9 +147,11 @@ void Engine::run(void)
     GameState::save("save.json", entities);
 
     // Remove all Lua references from entities
-    entities.each<Scripted>([](entityx::Entity, Scripted &f){ f.cleanup(); });
-    entities.each<EventListener>([](entityx::Entity, EventListener &f){
+    entities.each<Scripted>([](entityx::Entity, Scripted &f) { 
         f.cleanup(); });
+    entities.each<EventListener>([](entityx::Entity, EventListener &f) {
+        f.cleanup(); });
+    systems.system<WorldSystem>()->cleanup();
 }
 
 bool Engine::shouldRun(void)
