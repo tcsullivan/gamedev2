@@ -26,20 +26,22 @@
 struct Text : Component<Text>
 {
 public:
-    // TODO include font info?
-
+    std::string font;
     std::string text;
     double offsetX, offsetY;
 
-    Text(const std::string& _text) :
-        text(_text), offsetX(0), offsetY(0) {}
-    Text(const std::string& _text, double _x, double _y) :
-        text(_text), x(_x), y(_y) {}
+    Text(const std::string& _font, const std::string& _text) :
+        font(_font), text(_text), offsetX(0), offsetY(0) {}
+    Text(const std::string& _font, const std::string& _text,
+         double _x, double _y) :
+        font(_font), text(_text), x(_x), y(_y) {}
 
     Text FromLua(sol::object ref)
     {
         if (ref.get_type() == sol::type::table) {
             sol::table tab = ref;
+            if (tab["font"] != nullptr)
+                this->font = tab["font"];
             if (tab["text"] != nullptr)
                 this->text = tab["text"];
             if (tab["x"] != nullptr)
@@ -53,11 +55,11 @@ public:
     }
 
     void serialize(cereal::JSONOutputArchive& ar) final {
-        ar(CEREAL_NVP(text), CEREAL_NVP(x), CEREAL_NVP(y));
+        ar(CEREAL_NVP(font), CEREAL_NVP(text), CEREAL_NVP(x), CEREAL_NVP(y));
     }
 
     void serialize(cereal::JSONInputArchive& ar) final {
-        ar(CEREAL_NVP(text), CEREAL_NVP(x), CEREAL_NVP(y));
+        ar(CEREAL_NVP(font), CEREAL_NVP(text), CEREAL_NVP(x), CEREAL_NVP(y));
     }
 
     std::string serializeName(void) const final {
