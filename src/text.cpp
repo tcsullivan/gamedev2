@@ -2,10 +2,12 @@
 
 #include <SDL2/SDL_opengl.h>
 
+#include <tuple>
+
 struct FT_Info {
-	vec2 wh;
-	vec2 bl;
-	vec2 ad;
+    std::pair<float, float> wh;
+    std::pair<float, float> bl;
+    std::pair<float, float> ad;
 	GLuint tex;
 
 	FT_Info(void)
@@ -69,12 +71,9 @@ void TextSystem::loadFont(const std::string& name,
         for (auto j = buf.size(); j--;)
             buf[j] |= g->bitmap.buffer[j] << 24;
 
-        d.wh.x = g->bitmap.width;
-        d.wh.y = g->bitmap.rows;
-        d.bl.x = g->bitmap_left;
-        d.bl.y = g->bitmap_top;
-        d.ad.x = g->advance.x >> 6;
-        d.ad.y = g->advance.y >> 6;
+        d.wh = { g->bitmap.width, g->bitmap.rows };
+        d.bl = { g->bitmap_left, g->bitmap_top };
+        d.ad = { g->advance.x >> 6, g->advance.y >> 6 };
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, g->bitmap.width, g->bitmap.rows,
             0, GL_RGBA, GL_UNSIGNED_BYTE, buf.data());
     }

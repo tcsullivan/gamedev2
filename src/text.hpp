@@ -30,7 +30,6 @@
 #include <vector>
 
 struct FT_Info;
-struct vec2 { float x; float y; };
 
 /**
  * @class PhysicsSystem
