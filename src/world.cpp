@@ -2,7 +2,6 @@
  * @file world.cpp
  *
  * Copyright (C) 2019  Belle-Isle, Andrew <drumsetmonkey@gmail.com>
- * Author: Belle-Isle, Andrew <drumsetmonkey@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,30 +22,37 @@
 /*****************
 *  WORLD CLASS  *
 *****************/
-World::World(sol::object ref)
+World::World(sol::object param)
 {
-    if (ref.get_type() == sol::type::table) {
-        sol::table tab = ref;
+    if (param.get_type() == sol::type::table) {
+        sol::table tab = param;
+
         if (tab["Seed"] == sol::type::number) {
             seed = tab["Seed"];
         }
         if (tab["Layers"] == sol::type::number) {
             layers = tab["Layers"];
         }
+        if (tab["Register"] == sol::type::function) {
+            registerMat = tab["Register"];
+        }
         if (tab["Generate"] == sol::type::function) {
             generate = tab["Generate"];
         }
+
     } else {
         // TODO better logging
         std::cerr << "World paramaters must be stored in a table" << std::endl;
     }
+
+    registerMat(this);
     generate(this);
 }
 
 void World::setData(unsigned int x,
                     unsigned int y,
                     unsigned int z,
-                    unsigned int d)
+                    std::string d)
 {
     (void)x;
     (void)y;
@@ -54,6 +60,27 @@ void World::setData(unsigned int x,
     (void)d;
 
     // TODO actually do stuff here
+}
+
+void World::registerMaterial(std::string name, sol::object data)
+{
+    if (data.get_type() == sol::type::table) {
+        sol::table tab = data;
+
+        // Make sure this material has not been registered before
+        auto it = string_registry.find(name);
+        if (it == string_registry.end()) {
+            string_registry.emplace(name, registry.size());
+            registry.push_back(WorldMaterial(tab));
+        } else {
+            std::cerr << "Material: " << name 
+                      << " was already registered" << std::endl;
+        }
+
+    } else {
+        // TODO better logging
+        std::cerr << "Material registration must have a table" << std::endl;
+    }
 }
 
 

@@ -1,23 +1,29 @@
 world = {
-    Registry = {
-        grass = {
-            id = 0,
-            texture = "Assets/grass.png",
-            normal = "Assets/grass_normal"
-        },
-        dirt = {
-            id = 1,
-            texture = "Assets/dirt.png",
-            normal = "Assets/dirt_normal.png"
-        },
-        stone = {
-            id = 2,
-            texture = "Assets/stone.png",
-            normal = "Assets/dirt_normal.png"
-        }
-    },
     Seed = 5345345,
     Layers = 2,
+
+    -- This is run when the world is registered and not after,
+    -- although it is possible to register materials later
+    Register = function(self)
+        self:registerMaterial("grass", {
+            texture = "Assets/grass.png",
+            normal = "Assets/grass_normal"
+        });
+        self:registerMaterial("dirt", {
+            texture = "Assets/dirt.png",
+            normal = "Assets/dirt_normal.png"
+        });
+        self:registerMaterial("stone", {
+            texture = "Assets/stone.png",
+            normal = "Assets/dirt_normal.png"
+        });
+        self:registerMaterial("flower", {
+            texture = "Assets/flower.png",
+            normal = "Assets/flower_normal.png",
+            passable = true
+        });
+    end,
+
     Generate = function(self)
         math.randomseed(self.Seed)
         --self.data = {}
@@ -30,13 +36,13 @@ world = {
                 for Y = 0,128 do
                     if Y == YGen then
                         --self.data[Z][X][Y] = 0
-                        self:setData(X, Y, Z, 0);
+                        self:setData(X, Y, Z, "grass");
                     elseif Y < YGen and Y > (YGen - YDepth) then
                         --self.data[Z][X][Y] = 1
-                        self:setData(X, Y, Z, 1);
+                        self:setData(X, Y, Z, "dirt");
                     elseif Y < YGen then
                         --self.data[Z][X][Y] = 2
-                        self:setData(X, Y, Z, 2);
+                        self:setData(X, Y, Z, "stone");
                     end
                     --print(X..","..Y..","..Z);
                 end

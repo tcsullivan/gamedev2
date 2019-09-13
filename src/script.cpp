@@ -129,10 +129,11 @@ void ScriptSystem::scriptExport(void)
 
     lua.new_usertype<World>("World",
             sol::constructors<World(sol::object), World(void)>(),
-            "generate", &World::generate,
+            "Generate", &World::generate,
             "Seed", sol::property(&World::setSeed, &World::getSeed),
             "Layers", sol::property(&World::setLayers, &World::getLayers),
-            "setData", &World::setData);
+            "setData", &World::setData,
+            "registerMaterial", &World::registerMaterial);
 
 
     auto gamespace = lua["game"].get_or_create<sol::table>();

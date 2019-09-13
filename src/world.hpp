@@ -30,8 +30,25 @@
 
 struct WorldMaterial
 {
+    bool passable = false;
+
     Texture texture;
     Texture normal;
+
+    WorldMaterial(sol::table tab) {
+        if (tab["texture"] == sol::type::string) {
+            std::string tex = tab["texture"];
+            texture = Texture(tex);
+        }
+        if (tab["normal"] == sol::type::string) {
+            std::string nor = tab["normal"];
+            normal = Texture(nor);
+        }
+
+        if (tab["passable"] == sol::type::boolean) {
+            passable = tab["passable"];
+        }
+    }
 };
 
 class World
@@ -41,17 +58,22 @@ private:
     unsigned int layers;
 
     std::vector<std::vector<std::vector<unsigned int>>> data;
-    std::vector<unsigned int> registry;
+
+    std::unordered_map<std::string, unsigned int> string_registry;
+    std::vector<WorldMaterial> registry;
+
 public:
     World() {}
     World(sol::object ref);
     ~World() {
+        registerMat = sol::nil;
         generate = sol::nil;
         registry.clear();
         data.clear();
     }
 
     sol::function generate;
+    sol::function registerMat;
 
     /* SEED */
     unsigned int getSeed() {return seed;}
@@ -66,10 +88,10 @@ public:
     }
 
     /* DATA */
-    void setData(unsigned int x, 
-                 unsigned int y,
-                 unsigned int z,
-                 unsigned int d);
+    void setData(unsigned int, unsigned int, unsigned int, std::string);
+
+    /* REGISTRY */
+    void registerMaterial(std::string, sol::object);
 };
 
 /**
@@ -111,4 +133,3 @@ public:
 };
 
 #endif // SYSTEM_WORLD_HPP_
-
