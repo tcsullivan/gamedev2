@@ -24,6 +24,7 @@
 
 #include <GL/glew.h>
 #include <SDL2/SDL_opengl.h>
+#include <glm/glm.hpp>
 
 #include <string>
 
@@ -34,6 +35,10 @@ public:
     GLuint tex = 0;
     int width;
     int height;
+
+    glm::vec2 offset = glm::vec2(0);
+    glm::vec2 offsetSize = glm::vec2(1);
+
     Texture() {};
     Texture(std::string);
 };
