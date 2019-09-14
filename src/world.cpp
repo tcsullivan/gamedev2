@@ -46,10 +46,16 @@ World::World(sol::object param)
         std::cerr << "World paramaters must be stored in a table" << std::endl;
     }
 
+    // If there is a register function, we should call it here
     if (registerMat != sol::nil)
         registerMat(this);
+
+    // If a generate function is defined, call it
     if (generate != sol::nil)
         generate(this);
+
+    // Generate our mesh
+    generateMesh();
 }
 
 /* REGISTRY */
@@ -105,9 +111,9 @@ World::setSize(unsigned int x, unsigned int y, unsigned int z)
     height = y;
     layers = z;
 
-    data = std::vector<std::vector<std::vector<unsigned int>>>
-        (z, std::vector<std::vector<unsigned int>>
-            (x,std::vector<unsigned int>
+    data = std::vector<std::vector<std::vector<int>>>
+        (z, std::vector<std::vector<int>>
+            (x,std::vector<int>
                 (y, -1)
             )
         );
@@ -124,11 +130,32 @@ World::getSize()
 /* RENDERING */
 void World::generateMesh()
 {
-    const unsigned int coordLength = 3 + // x, y, z
-                                     2 + // texture coords
-                                     1;  // transparency
+    //const unsigned int voxelLength = 6; // 2 triangles @ 3 points each
 
-    (void)coordLength;
+    // Preallocate size of vertexes
+    mesh = std::basic_string<WorldMeshData>();
+    for (float Z = 0; Z < data.size(); Z++) {
+        for (float X = 0; X < data.at(Z).size(); X++) {
+            for (float Y = 0; Y < data.at(Z).at(X).size(); Y++) {
+                int d = data.at(Z).at(X).at(Y);
+
+                if (d == -1) // Don't make a mesh for air of course
+                    continue;
+
+                Texture &t = registry.at(d).texture;
+                glm::vec2& to = t.offset;
+                glm::vec2& ts = t.offsetSize;
+
+                mesh += {X  , Y  , Z, to.x     , to.y+ts.y, 1.0};
+                mesh += {X+1, Y  , Z, to.x+ts.x, to.y+ts.y, 1.0};
+                mesh += {X  , Y+1, Z, to.x     , to.y     , 1.0};
+
+                mesh += {X+1, Y  , Z, to.x+ts.x, to.y+ts.y, 1.0};
+                mesh += {X+1, Y+1, Z, to.x+ts.x, to.y     , 1.0};
+                mesh += {X  , Y+1, Z, to.x     , to.y     , 1.0};
+            }
+        }
+    }
 }
 
 /* SEED */

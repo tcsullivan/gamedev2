@@ -28,6 +28,13 @@
 
 #include "texture.hpp"
 
+struct WorldMeshData
+{
+    float posX, posY, posZ;
+    float texX, texY;
+    float transparency;
+};
+
 struct WorldMaterial
 {
     bool passable = false;
@@ -59,12 +66,12 @@ private:
     unsigned int height;
     unsigned int width;
 
-    std::vector<std::vector<std::vector<unsigned int>>> data;
+    std::vector<std::vector<std::vector<int>>> data;
 
-    std::unordered_map<std::string, unsigned int> string_registry;
+    std::unordered_map<std::string, int> string_registry;
     std::vector<WorldMaterial> registry;
 
-    std::vector<float> mesh;
+    std::basic_string<WorldMeshData> mesh;
 public:
     /* VARS */
     sol::function generate;
@@ -78,10 +85,6 @@ public:
         registry.clear();
         data.clear();
     }
-
-    /* SEED */
-    unsigned int getSeed();
-    unsigned int setSeed(unsigned int);
 
     /* REGISTRY */
     void registerMaterial(std::string, sol::object);
@@ -97,6 +100,10 @@ public:
 
     /* RENDERING */
     void generateMesh();
+
+    /* SEED */
+    unsigned int getSeed();
+    unsigned int setSeed(unsigned int);
 };
 
 /**
