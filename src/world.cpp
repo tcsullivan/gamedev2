@@ -22,6 +22,7 @@
 /*****************
 *  WORLD CLASS  *
 *****************/
+/* CONSTRUCTORS */
 World::World(sol::object param)
 {
     if (param.get_type() == sol::type::table) {
@@ -45,23 +46,13 @@ World::World(sol::object param)
         std::cerr << "World paramaters must be stored in a table" << std::endl;
     }
 
-    registerMat(this);
-    generate(this);
+    if (registerMat != sol::nil)
+        registerMat(this);
+    if (generate != sol::nil)
+        generate(this);
 }
 
-void World::setData(unsigned int x,
-                    unsigned int y,
-                    unsigned int z,
-                    std::string d)
-{
-    (void)x;
-    (void)y;
-    (void)z;
-    (void)d;
-
-    // TODO actually do stuff here
-}
-
+/* REGISTRY */
 void World::registerMaterial(std::string name, sol::object data)
 {
     if (data.get_type() == sol::type::table) {
@@ -81,6 +72,75 @@ void World::registerMaterial(std::string name, sol::object data)
         // TODO better logging
         std::cerr << "Material registration must have a table" << std::endl;
     }
+}
+
+/* DATA */
+void World::setData(unsigned int x,
+                    unsigned int y,
+                    unsigned int z,
+                    std::string d)
+{
+    unsigned int discovered = -1;
+
+    auto found = string_registry.find(d);
+    if (found != string_registry.end())
+        discovered = found->second;
+
+    try {
+        data.at(z).at(x).at(y) = discovered;
+    } catch (std::out_of_range &oor) {
+    // Make sure any assignments that are outsize specified world size are
+    //  caught to avoid any seg faults
+        std::cerr << "Unable to set data at: "
+                  << x << "," << y << "," << z
+                  << " Exception: " << oor.what() << std::endl;
+    }
+}
+
+/* SIZE */
+std::tuple<unsigned int, unsigned int, unsigned int>
+World::setSize(unsigned int x, unsigned int y, unsigned int z)
+{
+    width = x;
+    height = y;
+    layers = z;
+
+    data = std::vector<std::vector<std::vector<unsigned int>>>
+        (z, std::vector<std::vector<unsigned int>>
+            (x,std::vector<unsigned int>
+                (y, -1)
+            )
+        );
+
+    return {width, height, layers};
+}
+
+std::tuple<unsigned int, unsigned int, unsigned int>
+World::getSize()
+{
+    return {width, height, layers};
+}
+
+/* RENDERING */
+void World::generateMesh()
+{
+    const unsigned int coordLength = 3 + // x, y, z
+                                     2 + // texture coords
+                                     1;  // transparency
+
+    (void)coordLength;
+}
+
+/* SEED */
+unsigned int World::getSeed()
+{
+    return seed;
+}
+
+unsigned int World::setSeed(unsigned int s)
+{
+    seed = s;
+    return seed;
 }
 
 

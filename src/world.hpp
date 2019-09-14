@@ -44,7 +44,6 @@ struct WorldMaterial
             std::string nor = tab["normal"];
             normal = Texture(nor);
         }
-
         if (tab["passable"] == sol::type::boolean) {
             passable = tab["passable"];
         }
@@ -57,12 +56,20 @@ private:
     unsigned int seed;
     unsigned int layers;
 
+    unsigned int height;
+    unsigned int width;
+
     std::vector<std::vector<std::vector<unsigned int>>> data;
 
     std::unordered_map<std::string, unsigned int> string_registry;
     std::vector<WorldMaterial> registry;
 
+    std::vector<float> mesh;
 public:
+    /* VARS */
+    sol::function generate;
+    sol::function registerMat;
+
     World() {}
     World(sol::object ref);
     ~World() {
@@ -72,26 +79,24 @@ public:
         data.clear();
     }
 
-    sol::function generate;
-    sol::function registerMat;
-
     /* SEED */
-    unsigned int getSeed() {return seed;}
-    void setSeed(unsigned int s) {seed = s;}
+    unsigned int getSeed();
+    unsigned int setSeed(unsigned int);
 
-    /* LAYERS */
-    unsigned int getLayers() {return layers;}
-    // If we change the amount of layers, we have to regenerate the world
-    void setLayers(unsigned int l) {
-        layers = l;
-        generate();
-    }
+    /* REGISTRY */
+    void registerMaterial(std::string, sol::object);
 
     /* DATA */
     void setData(unsigned int, unsigned int, unsigned int, std::string);
 
-    /* REGISTRY */
-    void registerMaterial(std::string, sol::object);
+    /* SIZE */
+    std::tuple<unsigned int, unsigned int, unsigned int> setSize(unsigned int,
+                                                                 unsigned int,
+                                                                 unsigned int);
+    std::tuple<unsigned int, unsigned int, unsigned int> getSize();
+
+    /* RENDERING */
+    void generateMesh();
 };
 
 /**

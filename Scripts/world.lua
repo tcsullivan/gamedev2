@@ -26,14 +26,15 @@ world = {
 
     Generate = function(self)
         math.randomseed(self.Seed)
+        xsize, ysize, zsize = self:setSize(250, 128, 3)
         --self.data = {}
-        for Z = 0,self.Layers do
+        for Z = 0,zsize-1 do
             --self.data[Z] = {}
-            for X = 0,250 do
+            for X = 0,xsize-1 do
                 --self.data[Z][X] = {}
                 YGen = math.floor(6*math.sin(X/20) + Z) + 64
                 YDepth = math.random(2,5)
-                for Y = 0,128 do
+                for Y = 0,ysize-1 do
                     if Y == YGen then
                         --self.data[Z][X][Y] = 0
                         self:setData(X, Y, Z, "grass");
@@ -48,6 +49,7 @@ world = {
                 end
             end
         end
+        self:setData(1000, 1345, 5, "grass"); -- Test error checking
         print("Done with world gen");
     end
 }

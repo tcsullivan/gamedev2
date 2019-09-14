@@ -131,9 +131,10 @@ void ScriptSystem::scriptExport(void)
             sol::constructors<World(sol::object), World(void)>(),
             "Generate", &World::generate,
             "Seed", sol::property(&World::setSeed, &World::getSeed),
-            "Layers", sol::property(&World::setLayers, &World::getLayers),
             "setData", &World::setData,
-            "registerMaterial", &World::registerMaterial);
+            "registerMaterial", &World::registerMaterial,
+            "setSize", &World::setSize,
+            "getSize", &World::getSize);
 
 
     auto gamespace = lua["game"].get_or_create<sol::table>();
