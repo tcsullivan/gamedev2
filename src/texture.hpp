@@ -22,6 +22,8 @@
 
 #include <soil/SOIL.h>
 
+#include <sol/sol.hpp>
+
 #include <GL/glew.h>
 #include <SDL2/SDL_opengl.h>
 #include <glm/glm.hpp>
@@ -31,16 +33,19 @@
 class Texture
 {
 private:
+    void loadFromString(std::string);
 public:
     GLuint tex = 0;
+
+    glm::vec2 offset = glm::vec2(0);
+    glm::vec2 size = glm::vec2(1);
+
     int width;
     int height;
 
-    glm::vec2 offset = glm::vec2(0);
-    glm::vec2 offsetSize = glm::vec2(1);
-
     Texture() {};
     Texture(std::string);
+    Texture(sol::object);
 };
 
 #endif//TEXTURE_HPP_
