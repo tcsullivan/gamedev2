@@ -35,6 +35,7 @@
 #include <glm/gtc/noise.hpp>
 
 #include "shader.hpp"
+#include "world.hpp"
 
 class RenderSystem : public entityx::System<RenderSystem>
 {
@@ -48,10 +49,12 @@ private:
 
     Shader worldShader;
     glm::vec3 camPos;
+    GLuint world_vbo;
 
+    WorldSystem &worldSystem;
 public:
-    RenderSystem(void) :
-        window(nullptr, SDL_DestroyWindow) {}
+    RenderSystem(WorldSystem & _ws) :
+        window(nullptr, SDL_DestroyWindow), worldSystem(_ws) {}
 
     ~RenderSystem(void)
     {

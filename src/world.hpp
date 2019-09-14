@@ -33,7 +33,7 @@ struct WorldMeshData
     float posX, posY, posZ;
     float texX, texY;
     float transparency;
-};
+}__attribute__((packed));
 
 struct WorldMaterial
 {
@@ -100,6 +100,9 @@ public:
 
     /* RENDERING */
     void generateMesh();
+    std::basic_string<WorldMeshData>& getMesh() {return mesh;}
+    GLuint getTexture() {return registry.at(0).texture.tex;}
+    GLuint getNormal() {return registry.at(0).normal.tex;};
 
     /* SEED */
     unsigned int getSeed();
@@ -125,6 +128,7 @@ public:
     }
 
     World* addWorld(sol::object);
+    World* current() {return currentWorld;};
     void cleanup()
     {
         worlds.clear();

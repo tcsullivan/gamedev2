@@ -72,13 +72,10 @@ world = {
                 YDepth = math.random(2,5)
                 for Y = 0,ysize-1 do
                     if Y == YGen then
-                        --self.data[Z][X][Y] = 0
                         self:setData(X, Y, Z, "grass");
                     elseif Y < YGen and Y > (YGen - YDepth) then
-                        --self.data[Z][X][Y] = 1
                         self:setData(X, Y, Z, "dirt");
                     elseif Y < YGen then
-                        --self.data[Z][X][Y] = 2
                         self:setData(X, Y, Z, "stone");
                     end
                     --print(X..","..Y..","..Z);

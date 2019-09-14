@@ -50,6 +50,8 @@ private:
 
     entityx::EntityManager& manager;
     
+    // TODO possibly emit events to spawn worlds instead of passing the
+    //  world system around like a toy
     WorldSystem &worldSystem;
 
 public:

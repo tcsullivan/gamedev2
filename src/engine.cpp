@@ -44,8 +44,8 @@ int Engine::init(void)
     systems.add<GameRunSystem>();
     systems.add<InputSystem>();
     systems.add<PlayerSystem>(entities);
-    systems.add<RenderSystem>();
     systems.add<WorldSystem>();
+    systems.add<RenderSystem>(*(systems.system<WorldSystem>().get()));
     systems.add<ScriptSystem>(entities, *(systems.system<WorldSystem>().get()));
     systems.add<PhysicsSystem>();
     systems.configure();
