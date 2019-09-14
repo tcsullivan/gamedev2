@@ -43,13 +43,13 @@ struct WorldMaterial
     Texture normal;
 
     WorldMaterial(sol::table tab) {
-        if (tab["texture"] == sol::type::string) {
-            std::string tex = tab["texture"];
-            texture = Texture(tex);
+        if (tab["texture"] != nullptr) {
+            sol::object t = tab["texture"];
+            texture = Texture(t);
         }
-        if (tab["normal"] == sol::type::string) {
-            std::string nor = tab["normal"];
-            normal = Texture(nor);
+        if (tab["normal"] != nullptr) {
+            sol::object n = tab["normal"];
+            normal = Texture(n);
         }
         if (tab["passable"] == sol::type::boolean) {
             passable = tab["passable"];

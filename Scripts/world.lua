@@ -5,21 +5,57 @@ world = {
     -- This is run when the world is registered and not after,
     -- although it is possible to register materials later
     Register = function(self)
+
+        -- TODO make world have global textures to speed up rendering
+
         self:registerMaterial("grass", {
-            texture = "Assets/grass.png",
-            normal = "Assets/grass_normal"
+            -- TODO combine both of these into 1
+            texture = {
+                file = "Assets/world.png",
+                offset = { x = 0, y = 0 },
+                size = { x = 8, y = 8 }
+            },
+            normal = {
+                file = "Assets/world_normal.png",
+                offset = { x = 0, y = 0 },
+                size = { x = 8, y = 8 }
+            }
         });
         self:registerMaterial("dirt", {
-            texture = "Assets/dirt.png",
-            normal = "Assets/dirt_normal.png"
+            texture = {
+                file = "Assets/world.png",
+                offset = { x = 8, y = 0 },
+                size = { x = 8, y = 8 }
+            },
+            normal = {
+                file = "Assets/world_normal.png",
+                offset = { x = 8, y = 0 },
+                size = { x = 8, y = 8 }
+            }
         });
         self:registerMaterial("stone", {
-            texture = "Assets/stone.png",
-            normal = "Assets/dirt_normal.png"
+            texture = {
+                file = "Assets/world.png",
+                offset = { x = 16, y = 0 },
+                size = { x = 8, y = 8 }
+            },
+            normal = {
+                file = "Assets/world_normal.png",
+                offset = { x = 16, y = 0 },
+                size = { x = 8, y = 8 }
+            }
         });
         self:registerMaterial("flower", {
-            texture = "Assets/flower.png",
-            normal = "Assets/flower_normal.png",
+            texture = {
+                file = "Assets/world.png",
+                offset = { x = 24, y = 0 },
+                size = { x = 8, y = 8 }
+            },
+            normal = {
+                file = "Assets/world_normal.png",
+                offset = { x = 24, y = 0 },
+                size = { x = 8, y = 8 }
+            },
             passable = true
         });
     end,

@@ -144,7 +144,7 @@ void World::generateMesh()
 
                 Texture &t = registry.at(d).texture;
                 glm::vec2& to = t.offset;
-                glm::vec2& ts = t.offsetSize;
+                glm::vec2& ts = t.size;
 
                 mesh += {X  , Y  , Z, to.x     , to.y+ts.y, 1.0};
                 mesh += {X+1, Y  , Z, to.x+ts.x, to.y+ts.y, 1.0};
