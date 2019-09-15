@@ -76,7 +76,8 @@ world = {
                     elseif Y < YGen and Y > (YGen - YDepth) then
                         self:setData(X, Y, Z, "dirt");
                     elseif Y < YGen then
-                        self:setData(X, Y, Z, "stone");
+                        --self:setData(X, Y, Z, "stone");
+                        self:setData(X, Y, Z, "grass");
                     end
                     --print(X..","..Y..","..Z);
                 end

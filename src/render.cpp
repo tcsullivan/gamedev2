@@ -69,7 +69,7 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
                                      );
 
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::scale(model, glm::vec3(8.0f));
+    model = glm::scale(model, glm::vec3(20.0f, 20.0f, 1.0f));
 
     glUseProgram(s);
 
@@ -282,7 +282,7 @@ int RenderSystem::init(void)
 
     //glClearColor(0.6, 0.8, 1.0, 0.0);
     
-    camPos = glm::vec3(0.0f, 0.0f, 0.5f);
+    camPos = glm::vec3(0.0f, 0.0f, 5.0f);
     glGenBuffers(1, &world_vbo);
 
     return 0;

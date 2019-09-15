@@ -18,6 +18,7 @@
  */
 
 #include "world.hpp"
+#include "events/world.hpp"
 
 /*****************
 *  WORLD CLASS  *
@@ -193,5 +194,9 @@ void WorldSystem::update([[maybe_unused]]entityx::EntityManager& entities,
                          [[maybe_unused]]entityx::EventManager& events,
                          [[maybe_unused]]entityx::TimeDelta dt)
 {
-
+    if (currentWorld == nullptr) {
+        currentWorld = &(worlds.front());
+        events.emit<WorldChangeEvent>(currentWorld);
+        std::cout << "Emitted" << std::endl;
+    }
 }

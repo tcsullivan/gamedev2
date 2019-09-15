@@ -78,6 +78,8 @@ void Engine::logicLoop(void)
         // Update 20 times a second
         if (elapsed > 50) {
             elapsed = 0;
+
+            systems.update<WorldSystem>(dt);
             
             // All entities with an idle function should be run here
             entities.each<Scripted>([](entityx::Entity, Scripted &f){
