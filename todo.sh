@@ -7,7 +7,7 @@ TODO_COUNT=0
 rm -f TODOS
 touch TODOS
 
-for file in src/*.cpp
+for file in $(find {src,Shaders,Scripts} -type f -name '*' -print)
 do
 	echo "########################################" >> TODOS
 	echo $file >> TODOS
