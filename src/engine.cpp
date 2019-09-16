@@ -45,7 +45,7 @@ int Engine::init(void)
     systems.add<InputSystem>();
     systems.add<PlayerSystem>(entities);
     systems.add<WorldSystem>();
-    systems.add<RenderSystem>(*(systems.system<WorldSystem>().get()));
+    systems.add<RenderSystem>();
     systems.add<ScriptSystem>(entities, *(systems.system<WorldSystem>().get()));
     systems.add<PhysicsSystem>();
     systems.configure();
@@ -57,13 +57,19 @@ int Engine::init(void)
                      "it." << std::endl;
     }
 
+    // Initially update the world to send all systems world data
+    systems.update<WorldSystem>(0);
     return 0;
 }
 
 void Engine::logicLoop(void)
 {
     entityx::TimeDelta dt = 0; /**< Elapsed milliseconds since each loop */
-    double elapsed = 0;
+    double elapsed = 1000;     /**< Time elapsed since last logic loop. This
+                                    should be initialized to something larger
+                                    than our logic loop period (50ms), so
+                                    the logic loop is run during our first
+                                    loop. */
 
     while (shouldRun()) {
         auto start = mc::now();

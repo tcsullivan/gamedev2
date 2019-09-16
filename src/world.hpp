@@ -59,6 +59,7 @@ struct WorldMaterial
 
 class World
 {
+    friend class WorldSystem;
 private:
     unsigned int seed;
     unsigned int layers;
@@ -71,7 +72,11 @@ private:
     std::unordered_map<std::string, int> string_registry;
     std::vector<WorldMaterial> registry;
 
+protected:
+    // RENDER
     std::basic_string<WorldMeshData> mesh;
+    GLuint worldVBO;
+    bool meshUpdated = false;
 public:
     /* VARS */
     sol::function generate;

@@ -36,8 +36,10 @@
 
 #include "shader.hpp"
 #include "world.hpp"
+#include "events/world.hpp"
 
-class RenderSystem : public entityx::System<RenderSystem>
+class RenderSystem : public entityx::System<RenderSystem>,
+                     public entityx::Receiver<RenderSystem>
 {
 private:
     constexpr static const char *title = "gamedev2";
@@ -49,12 +51,14 @@ private:
 
     Shader worldShader;
     glm::vec3 camPos;
-    GLuint world_vbo;
 
-    WorldSystem &worldSystem;
+    GLuint worldVBO = 0;
+    unsigned int worldVertex = 0;
+    GLuint worldTexture = 0;
+    GLuint worldNormal = 0;
 public:
-    RenderSystem(WorldSystem & _ws) :
-        window(nullptr, SDL_DestroyWindow), worldSystem(_ws) {}
+    RenderSystem() :
+        window(nullptr, SDL_DestroyWindow) {}
 
     ~RenderSystem(void)
     {
@@ -80,6 +84,12 @@ public:
      * @return Zero on success, non-zero on error
      */
     int init(void);
+
+    /************
+    *  EVENTS  *
+    ************/
+    void receive(const WorldMeshUpdateEvent &wmu);
+    
 };
 
 #endif // SYSTEM_RENDER_HPP_

@@ -55,6 +55,8 @@ World::World(sol::object param)
     if (generate != sol::nil)
         generate(this);
 
+    // Create our world VBO
+    glGenBuffers(1, &worldVBO);
     // Generate our mesh
     generateMesh();
 }
@@ -74,7 +76,6 @@ void World::registerMaterial(std::string name, sol::object data)
             std::cerr << "Material: " << name 
                       << " was already registered" << std::endl;
         }
-
     } else {
         // TODO better logging
         std::cerr << "Material registration must have a table" << std::endl;
@@ -157,6 +158,14 @@ void World::generateMesh()
             }
         }
     }
+
+    glBindBuffer(GL_ARRAY_BUFFER, worldVBO);
+    glBufferData(GL_ARRAY_BUFFER, 
+                 mesh.size() * sizeof(mesh), 
+                 &mesh.front(), 
+                 GL_STREAM_DRAW);
+
+    meshUpdated = true;
 }
 
 /* SEED */
@@ -198,5 +207,14 @@ void WorldSystem::update([[maybe_unused]]entityx::EntityManager& entities,
         currentWorld = &(worlds.front());
         events.emit<WorldChangeEvent>(currentWorld);
         std::cout << "Emitted" << std::endl;
+    }
+
+    if (currentWorld->meshUpdated) {
+        events.emit<WorldMeshUpdateEvent>(
+            currentWorld->worldVBO, 
+            currentWorld->mesh.size(),
+            currentWorld->getTexture(),
+            currentWorld->getNormal()
+        );
     }
 }
