@@ -1,3 +1,5 @@
+game.loadFont("freepixel16", "Assets/FreePixel.ttf", 16)
+
 bird = {
     Player = 0,
     EventListeners = {

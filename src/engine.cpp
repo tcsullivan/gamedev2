@@ -27,6 +27,7 @@
 #include "script.hpp"
 #include "render.hpp"
 #include "physics.hpp"
+#include "text.hpp"
 
 #include "components/EventListener.hpp"
 #include "components/Script.hpp"
@@ -47,10 +48,18 @@ int Engine::init(void)
     systems.add<RenderSystem>();
     systems.add<ScriptSystem>(entities);
     systems.add<PhysicsSystem>();
+    systems.add<TextSystem>();
     systems.configure();
 
     // Load game script and entity data
-    systems.system<ScriptSystem>()->init();
+    auto* script = systems.system<ScriptSystem>().get();
+    script->addToGameNamespace("loadFont",
+    [this](std::string name, std::string file, int size) {
+        systems.system<TextSystem>().get()->loadFont(name, file, size);
+    });
+    script->init();
+    
+
     if (GameState::load("save.json", entities)) {
         std::cout << "Loaded from save.json. Delete the file if you don't want "
                      "it." << std::endl;

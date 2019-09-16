@@ -31,6 +31,9 @@ void ScriptSystem::configure([[maybe_unused]] entityx::EntityManager& entities,
 
     // Init after systems.configure() in engine.cpp
     //init();
+    lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string);
+
+    scriptExport();
 }
 
 #include <components/Script.hpp>
@@ -54,9 +57,6 @@ void ScriptSystem::receive([[maybe_unused]] const EntitySpawnEvent &toSpawn)
 
 int ScriptSystem::init(void)
 {
-    lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string);
-
-    scriptExport();
     doFile();
 
     return 0;
@@ -87,9 +87,6 @@ void ScriptSystem::doFile(void)
 
 void ScriptSystem::scriptExport(void)
 {
-    std::function<sol::table(sol::table)> func = 
-        [this](sol::table t){ return spawn(t);};
-
     lua.new_usertype<Position>("Position",
             sol::constructors<Position(double x, double y), Position()>(),
             "x", &Position::x,
@@ -124,8 +121,8 @@ void ScriptSystem::scriptExport(void)
             sol::constructors<Physics(void), Physics()>(),
             "standing", &Physics::standing);
 
-    auto gamespace = lua["game"].get_or_create<sol::table>();
-    gamespace.set_function("spawn", func);
+    game = lua["game"].get_or_create<sol::table>();
+    game.set_function("spawn", [this](sol::table t) { return spawn(t); });
 }
 
 sol::table ScriptSystem::spawn(sol::object param)

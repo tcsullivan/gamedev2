@@ -24,12 +24,23 @@
 #include <entityx/entityx.h>
 #include <ft2build.h>
 #include <freetype/freetype.h>
+#include <SDL2/SDL_opengl.h>
+
 
 #include <map>
 #include <string>
+#include <tuple>
 #include <vector>
 
-struct FT_Info;
+struct FT_Info {
+    std::pair<float, float> wh;
+    std::pair<float, float> bl;
+    std::pair<float, float> ad;
+	GLuint tex;
+
+	FT_Info(void)
+		: tex(0) {}
+};
 
 /**
  * @class PhysicsSystem

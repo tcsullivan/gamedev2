@@ -1,18 +1,6 @@
 #include "text.hpp"
 
-#include <SDL2/SDL_opengl.h>
-
-#include <tuple>
-
-struct FT_Info {
-    std::pair<float, float> wh;
-    std::pair<float, float> bl;
-    std::pair<float, float> ad;
-	GLuint tex;
-
-	FT_Info(void)
-		: tex(0) {}
-};
+#include <iostream>
 
 //FT_Library freetype;
 //std::map<std::string, FT_Face> fonts;
@@ -41,15 +29,15 @@ void TextSystem::loadFont(const std::string& name,
                           int size)
 {
 
-    if (fonts.find(name) == fonts.end()) {
+    if (fonts.find(file) == fonts.end()) {
         FT_Face face;
         if (FT_New_Face(freetype, file.c_str(), 0, &face)) {
             // TODO handle this error
         }
-        fonts.emplace(name, face);
+        fonts.emplace(file, face);
     }
 
-    auto& face = fonts[name];
+    auto& face = fonts[file];
     FT_Set_Pixel_Sizes(face, 0, size);
     fontData.try_emplace(name, 95);
 
@@ -77,5 +65,8 @@ void TextSystem::loadFont(const std::string& name,
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, g->bitmap.width, g->bitmap.rows,
             0, GL_RGBA, GL_UNSIGNED_BYTE, buf.data());
     }
+
+    std::cout << "Loaded font: " << file << " (size: " << size << ')'
+              << std::endl;
 }
 
