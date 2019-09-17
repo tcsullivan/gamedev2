@@ -67,6 +67,7 @@ private:
 
     // Map of VBOs and their render data
     std::map<GLuint, RenderData> renders;
+
 public:
     RenderSystem() :
         window(nullptr, SDL_DestroyWindow) {}

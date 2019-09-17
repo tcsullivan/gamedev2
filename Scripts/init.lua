@@ -1,4 +1,4 @@
-game.loadFont("freepixel16", "Assets/FreePixel.ttf", 16)
+game.loadFont("default", "Assets/FreePixel.ttf", 16)
 
 bird = {
     Player = 0,
@@ -9,6 +9,7 @@ bird = {
         end,
         MoveLeftReleased = function(self)
             self.Velocity.x = self.Velocity.x + 100
+            game.puts("default", self.Position.x, self.Position.y, "Hey.")
         end,
         MoveRightPressed = function(self)
             self.Velocity.x = self.Velocity.x + 100

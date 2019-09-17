@@ -58,6 +58,10 @@ int Engine::init(void)
     [this](std::string name, std::string file, int size) {
         systems.system<TextSystem>().get()->loadFont(name, file, size);
     });
+    script->addToGameNamespace("puts",
+    [this](std::string name, float x, float y, std::string text) {
+        systems.system<TextSystem>().get()->put(name, x, y, text);
+    });
     script->init();
     
 
@@ -138,6 +142,7 @@ void Engine::renderLoop(void)
 {
     entityx::TimeDelta dt = 0; /**< Elapsed milliseconds since each loop */
     while (shouldRun()) {
+        systems.update<TextSystem>(dt);
         systems.update<RenderSystem>(dt);
     }
 }

@@ -91,6 +91,7 @@ private:
     FT_Library freetype;
     std::map<std::string, FT_Face> fonts;
     std::map<std::string, Font> fontData;
+    bool shouldUpdateVBOs;
 
     void updateVBOs(void);
 };

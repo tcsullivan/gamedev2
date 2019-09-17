@@ -1,5 +1,7 @@
 #include "text.hpp"
 
+#include "events/render.hpp"
+
 #include <iostream>
 
 void TextSystem::configure([[maybe_unused]] entityx::EntityManager& entities,
@@ -8,16 +10,30 @@ void TextSystem::configure([[maybe_unused]] entityx::EntityManager& entities,
     if (FT_Init_FreeType(&freetype) != 0) {
         // TODO handle error
     }
+
+    shouldUpdateVBOs = false;
 }
     
 /**
  * Draws the text for all entities.
  */
 void TextSystem::update([[maybe_unused]] entityx::EntityManager& entites,
-                        [[maybe_unused]] entityx::EventManager& events,
+                        entityx::EventManager& events,
                         [[maybe_unused]] entityx::TimeDelta dt)
 {
-    // TODO render each Text component's text
+    if (shouldUpdateVBOs) {
+        shouldUpdateVBOs = false;
+        updateVBOs();
+
+        for (auto& data : fontData) {
+            auto& d = data.second;
+            if (d.text.size() == 0)
+                continue;
+
+            // TODO make normal
+            events.emit<NewRenderEvent>(d.vbo, d.tex, 0, d.buffer.size());
+        }
+    }
 }
 
 void TextSystem::loadFont(const std::string& name,
@@ -105,7 +121,8 @@ void TextSystem::put(const std::string& font,
     if (fontData.find(font) == fontData.end())
         return;
 
-    fontData[font].text.emplace_back(text, x, y);
+    fontData[font].text.emplace_back(text, x, y, -9.0f);
+    shouldUpdateVBOs = true;
 }
 
 void TextSystem::updateVBOs(void)
