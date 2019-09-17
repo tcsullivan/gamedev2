@@ -24,28 +24,46 @@
 #include <entityx/entityx.h>
 #include <ft2build.h>
 #include <freetype/freetype.h>
+#include <GL/glew.h>
 #include <SDL2/SDL_opengl.h>
-
 
 #include <map>
 #include <string>
 #include <tuple>
 #include <vector>
 
-struct FT_Info {
-    std::pair<float, float> wh;
-    std::pair<float, float> bl;
-    std::pair<float, float> ad;
-	GLuint tex;
+struct TextMeshData
+{
+    float posX, posY, posZ;
+    float texX, texY;
+    float transparency;
+} __attribute__ ((packed));
 
-	FT_Info(void)
-		: tex(0) {}
+struct FT_Info {
+    std::pair<float, float> offset;
+    std::pair<float, float> dim;
+    std::pair<float, float> bitmap;
+    std::pair<float, float> advance;
 };
 
-/**
- * @class PhysicsSystem
- * Handles the position and velocity updating of all entities
- */
+struct Text {
+    std::string text;
+    float x;
+    float y;
+    float z;
+};
+
+// Stores texture and placement data for a font at a size.
+struct Font {
+    GLuint tex;
+    GLuint vbo;
+
+    std::array<FT_Info, 96> data;
+    // Stores currently shown text at given index into VBO?
+    std::vector<Text> text;
+    std::basic_string<TextMeshData> buffer;
+};
+
 class TextSystem : public entityx::System<TextSystem>
 {
 public:
@@ -67,7 +85,9 @@ public:
 private:
     FT_Library freetype;
     std::map<std::string, FT_Face> fonts;
-    std::map<std::string, std::vector<FT_Info>> fontData;
+    std::map<std::string, Font> fontData;
+
+    void updateVBOs(void);
 };
 
 #endif // SYSTEM_TEXT_HPP_

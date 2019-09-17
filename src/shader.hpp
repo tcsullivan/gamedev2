@@ -24,6 +24,7 @@
 #include <unordered_map>
 
 #include <GL/glew.h>
+#include <SDL2/SDL_opengl.h>
 
 class Shader
 {

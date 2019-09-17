@@ -33,7 +33,8 @@ The libraries used to develop gamedev2 are as follows:
 * [sol2](https://github.com/ThePhD/sol2)
 * [EntityX](https://github.com/alecthomas/entityx)
 * [FreeType 2](https://www.freetype.org/)
-
+* [SOIL](https://lonesock.net/soil.html)
+* [cereal](https://uscilab.github.io/cereal/)
 
 ## Building gamedev2
 ### Build Requirements

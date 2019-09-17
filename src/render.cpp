@@ -27,6 +27,7 @@
 void RenderSystem::configure([[maybe_unused]] entityx::EntityManager& entities,
                              [[maybe_unused]] entityx::EventManager& events)
 {
+    events.subscribe<WorldMeshUpdateEvent>(*this);
     init();
 }
 
@@ -69,7 +70,7 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
                                      );
 
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::scale(model, glm::vec3(2.0f));
+    model = glm::scale(model, glm::vec3(20.0f, 20.0f, 1.0f));
 
     glUseProgram(s);
 
@@ -178,7 +179,29 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
                               5*sizeof(float), (void*)(3*sizeof(float)));
         glDrawArrays(GL_TRIANGLES, 0, 6);
     });
-    
+
+    // If we were given a world VBO render it
+    if (worldVBO) {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, worldTexture);
+        glUniform1i(q, 0);
+
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, worldNormal);
+        glUniform1i(n, 1);
+
+        glBindBuffer(GL_ARRAY_BUFFER, worldVBO);
+        //glBufferData(GL_ARRAY_BUFFER, 
+        //             wm.size() * sizeof(WorldMeshData), 
+        //             &wm.front(), 
+        //             GL_STREAM_DRAW);
+
+        glVertexAttribPointer(a, 3, GL_FLOAT, GL_FALSE,
+                              6*sizeof(float), 0);
+        glVertexAttribPointer(t, 2, GL_FLOAT, GL_FALSE, 
+                              6*sizeof(float), (void*)(3*sizeof(float)));
+        glDrawArrays(GL_TRIANGLES, 0, worldVertex);
+    }
 
     /*************
     *  CLEANUP  *
@@ -261,8 +284,18 @@ int RenderSystem::init(void)
 
     //glClearColor(0.6, 0.8, 1.0, 0.0);
     
-    camPos = glm::vec3(0.0f, 0.0f, 0.5f);
+    camPos = glm::vec3(0.0f, 0.0f, 5.0f);
 
     return 0;
 }
 
+/************
+*  EVENTS  *
+************/
+void RenderSystem::receive(const WorldMeshUpdateEvent &wmu)
+{
+    worldVBO = wmu.worldVBO;
+    worldVertex = wmu.numVertex;
+    worldTexture = wmu.worldTexture;
+    worldNormal = wmu.worldNormal;
+}

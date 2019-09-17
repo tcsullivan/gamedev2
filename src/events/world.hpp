@@ -1,6 +1,4 @@
-/**
- * @file texture.hpp
- *
+/*
  * Copyright (C) 2019  Belle-Isle, Andrew <drumsetmonkey@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,35 +15,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TEXTURE_HPP_
-#define TEXTURE_HPP_
+#ifndef EVENTS_WORLD_HPP_
+#define EVENTS_WORLD_HPP_
 
-#include <soil/SOIL.h>
+#include "world.hpp"
 
-#include <sol/sol.hpp>
-
-#include <GL/glew.h>
-#include <SDL2/SDL_opengl.h>
-#include <glm/glm.hpp>
-
-#include <string>
-
-class Texture
+struct WorldChangeEvent
 {
-private:
-    void loadFromString(std::string);
-public:
-    GLuint tex = 0;
+    World* newWorld;
 
-    glm::vec2 offset = glm::vec2(0);
-    glm::vec2 size = glm::vec2(1);
-
-    int width;
-    int height;
-
-    Texture() {};
-    Texture(std::string);
-    Texture(sol::object);
+    WorldChangeEvent(World* w) :
+        newWorld(w) {}
 };
 
-#endif//TEXTURE_HPP_
+struct WorldMeshUpdateEvent
+{
+    GLuint worldVBO;
+    unsigned int numVertex;
+    GLuint worldTexture;
+    GLuint worldNormal;
+
+    WorldMeshUpdateEvent(GLuint v, unsigned int p,
+                         GLuint t, GLuint n) :
+        worldVBO(v), numVertex(p), worldTexture(t), worldNormal(n) {}
+};
+
+#endif//EVENTS_WORLD_HPP

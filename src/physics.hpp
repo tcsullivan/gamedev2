@@ -1,6 +1,6 @@
 /**
  * @file position.hpp
- * Manages all Lua scripts.
+ * Manages all entity movements
  *
  * Copyright (C) 2019  Belle-Isle, Andrew <drumsetmonkey@gmail.com>
  *
