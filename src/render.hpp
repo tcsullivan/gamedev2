@@ -36,7 +36,20 @@
 
 #include "shader.hpp"
 #include "world.hpp"
+#include "events/render.hpp"
 #include "events/world.hpp"
+
+#include <map>
+
+struct RenderData
+{
+    GLuint tex;
+    GLuint normal;
+    unsigned int vertex;
+
+    RenderData(GLuint _tex, GLuint _normal, unsigned int _vertex) :
+        tex(_tex), normal(_normal), vertex(_vertex) {}
+};
 
 class RenderSystem : public entityx::System<RenderSystem>,
                      public entityx::Receiver<RenderSystem>
@@ -52,10 +65,8 @@ private:
     Shader worldShader;
     glm::vec3 camPos;
 
-    GLuint worldVBO = 0;
-    unsigned int worldVertex = 0;
-    GLuint worldTexture = 0;
-    GLuint worldNormal = 0;
+    // Map of VBOs and their render data
+    std::map<GLuint, RenderData> renders;
 public:
     RenderSystem() :
         window(nullptr, SDL_DestroyWindow) {}
@@ -88,8 +99,9 @@ public:
     /************
     *  EVENTS  *
     ************/
-    void receive(const WorldMeshUpdateEvent &wmu);
+    //void receive(const WorldMeshUpdateEvent &wmu);
     
+    void receive(const NewRenderEvent &nre);
 };
 
 #endif // SYSTEM_RENDER_HPP_

@@ -51,6 +51,9 @@ struct Text {
     float x;
     float y;
     float z;
+
+    Text(std::string _text, float _x, float _y, float _z = 0.0f) :
+        text(_text), x(_x), y(_y), z(_z) {}
 };
 
 // Stores texture and placement data for a font at a size.
@@ -79,6 +82,8 @@ public:
     void update(entityx::EntityManager& entites,
                 entityx::EventManager& events,
                 entityx::TimeDelta dt) final;
+
+    void put(const std::string& font, float x, float y, const std::string& text);
 
     void loadFont(const std::string& name, const std::string& file, int size);
 

@@ -97,6 +97,17 @@ void TextSystem::loadFont(const std::string& name,
               << font.tex << ")" << std::endl;
 }
 
+void TextSystem::put(const std::string& font,
+                     float x,
+                     float y,
+                     const std::string& text)
+{
+    if (fontData.find(font) == fontData.end())
+        return;
+
+    fontData[font].text.emplace_back(text, x, y);
+}
+
 void TextSystem::updateVBOs(void)
 {
     for (auto& data : fontData) {

@@ -18,6 +18,7 @@
  */
 
 #include "world.hpp"
+#include "events/render.hpp"
 #include "events/world.hpp"
 
 /*****************
@@ -210,11 +211,11 @@ void WorldSystem::update([[maybe_unused]]entityx::EntityManager& entities,
     }
 
     if (currentWorld->meshUpdated) {
-        events.emit<WorldMeshUpdateEvent>(
+        events.emit<NewRenderEvent>(
             currentWorld->worldVBO, 
-            currentWorld->mesh.size(),
             currentWorld->getTexture(),
-            currentWorld->getNormal()
+            currentWorld->getNormal(),
+            currentWorld->mesh.size()
         );
     }
 }

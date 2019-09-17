@@ -27,7 +27,7 @@
 void RenderSystem::configure([[maybe_unused]] entityx::EntityManager& entities,
                              [[maybe_unused]] entityx::EventManager& events)
 {
-    events.subscribe<WorldMeshUpdateEvent>(*this);
+    events.subscribe<NewRenderEvent>(*this);
     init();
 }
 
@@ -180,27 +180,25 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
         glDrawArrays(GL_TRIANGLES, 0, 6);
     });
 
-    // If we were given a world VBO render it
-    if (worldVBO) {
+    // Update all given VBOs
+    for (auto& r : renders) {
+        auto& render = r.second;
+
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, worldTexture);
+        glBindTexture(GL_TEXTURE_2D, render.tex);
         glUniform1i(q, 0);
 
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, worldNormal);
+        glBindTexture(GL_TEXTURE_2D, render.normal);
         glUniform1i(n, 1);
 
-        glBindBuffer(GL_ARRAY_BUFFER, worldVBO);
-        //glBufferData(GL_ARRAY_BUFFER, 
-        //             wm.size() * sizeof(WorldMeshData), 
-        //             &wm.front(), 
-        //             GL_STREAM_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, r.first);
 
         glVertexAttribPointer(a, 3, GL_FLOAT, GL_FALSE,
                               6*sizeof(float), 0);
         glVertexAttribPointer(t, 2, GL_FLOAT, GL_FALSE, 
                               6*sizeof(float), (void*)(3*sizeof(float)));
-        glDrawArrays(GL_TRIANGLES, 0, worldVertex);
+        glDrawArrays(GL_TRIANGLES, 0, render.vertex);
     }
 
     /*************
@@ -292,10 +290,10 @@ int RenderSystem::init(void)
 /************
 *  EVENTS  *
 ************/
-void RenderSystem::receive(const WorldMeshUpdateEvent &wmu)
+
+void RenderSystem::receive(const NewRenderEvent &nre)
 {
-    worldVBO = wmu.worldVBO;
-    worldVertex = wmu.numVertex;
-    worldTexture = wmu.worldTexture;
-    worldNormal = wmu.worldNormal;
+    renders.insert_or_assign(nre.vbo,
+                             RenderData(nre.tex, nre.normal, nre.vertex));
 }
+
