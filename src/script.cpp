@@ -188,10 +188,6 @@ sol::table ScriptSystem::spawn(sol::object param)
                 e.assign<Velocity>(Velocity().FromLua(tab["Velocity"])).get();
         }
 
-        if (tab["Player"] != nullptr) {
-            (*toRet)["Player"] = e.assign<Player>().get();
-        }
-
         if (tab["Physics"] != nullptr) {
             if (!e.has_component<Position>()) // Position must exist for phys.
                 (*toRet)["Position"] = e.assign<Position>().get();
@@ -212,6 +208,10 @@ sol::table ScriptSystem::spawn(sol::object param)
         if (tab["EventListeners"] != nullptr) {
             sol::table listeners = tab["EventListeners"];
             e.assign<EventListener>(listeners);
+        }
+
+        if (tab["Player"] != nullptr) {
+            (*toRet)["Player"] = e.assign<Player>().get();
         }
 
     } else {

@@ -22,7 +22,7 @@ uniform int Flipped;
 void main()
 {
     // Quadratic light falloff
-    vec3 Falloff = vec3(0.1, 0.2, 0.0);
+    vec3 Falloff = vec3(0.4, 0.1, 0.002);
 
     vec4 DiffuseColor = texture2D(textu, texCoord);
 
@@ -33,7 +33,8 @@ void main()
     vec3 SumLight = vec3(0.0);
 
     for (int i = 0; i < LightNum; i++) {
-        vec3 LightDir = vec3(LightPos[i].xy - fragCoord.xy, LightPos[i].z);
+        vec3 LightDir = vec3(LightPos[i].xy - fragCoord.xy, 
+                             (LightPos[i].z - fragCoord.z)*2);
 
         float D = length(LightDir);
 

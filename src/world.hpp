@@ -112,6 +112,9 @@ public:
     /* SEED */
     unsigned int getSeed();
     unsigned int setSeed(unsigned int);
+
+    /* PHYSICS */
+    double getHeight(double x, double y, double z);
 };
 
 /**

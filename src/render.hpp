@@ -38,6 +38,8 @@
 #include "world.hpp"
 #include "events/world.hpp"
 
+#include "components/Player.hpp"
+
 class RenderSystem : public entityx::System<RenderSystem>,
                      public entityx::Receiver<RenderSystem>
 {
@@ -56,6 +58,7 @@ private:
     unsigned int worldVertex = 0;
     GLuint worldTexture = 0;
     GLuint worldNormal = 0;
+    entityx::Entity player; // Save the player so we can track the camera
 public:
     RenderSystem() :
         window(nullptr, SDL_DestroyWindow) {}
@@ -89,6 +92,7 @@ public:
     *  EVENTS  *
     ************/
     void receive(const WorldMeshUpdateEvent &wmu);
+    void receive(const entityx::ComponentAddedEvent<Player> &cae);
     
 };
 

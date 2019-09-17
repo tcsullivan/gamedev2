@@ -28,6 +28,7 @@ void RenderSystem::configure([[maybe_unused]] entityx::EntityManager& entities,
                              [[maybe_unused]] entityx::EventManager& events)
 {
     events.subscribe<WorldMeshUpdateEvent>(*this);
+    events.subscribe<entityx::ComponentAddedEvent<Player>>(*this);
     init();
 }
 
@@ -53,7 +54,7 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     ***********/
     
     glm::mat4 view = glm::lookAt(camPos,                       // Pos
-                                 glm::vec3(0.0f, 0.0f, 0.0f),  // Facing
+                                 glm::vec3(camPos.x, camPos.y, 0.0f),  // Facing
                                  glm::vec3(0.0f, 1.0f, 0.0f)); // Up
 
     //glm::mat4 projection = glm::perspective(45.0f, 
@@ -61,16 +62,19 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     //                                        0.01f, 
     //                                        2048.0f);
 
-    glm::mat4 projection = glm::ortho(-((float)width/2),    // Left
-                                       ((float)width/2),    // Right
-                                      -((float)height/2),   // Bottom
-                                       ((float)height/2),   // Top
-                                      -10.0f,               // zNear
-                                       10.0f                // zFar
+    float scale = 40.0f;
+    float scaleWidth = static_cast<float>(width) / scale;
+    float scaleHeight = static_cast<float>(height) / scale;
+
+    glm::mat4 projection = glm::ortho(-(scaleWidth/2),    // Left
+                                       (scaleWidth/2),    // Right
+                                      -(scaleHeight/2),   // Bottom
+                                       (scaleHeight/2),   // Top
+                                       10.0f,               // zFar
+                                      -10.0f                // zNear
                                      );
 
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::scale(model, glm::vec3(20.0f, 20.0f, 1.0f));
 
     glUseProgram(s);
 
@@ -91,10 +95,23 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     GLfloat amb[4] = {1.0f, 1.0f, 1.0f, 0.0f};
     glUniform4fv(b, 1, amb);
 
+    /************
+    *  CAMERA  *
+    ************/
+    try {
+        if (player.has_component<Position>()) {
+            Position *pos = player.component<Position>().get();
+            camPos.y = pos->y;
+            camPos.x = pos->x;
+        }
+    } catch (...) { // If the player doesn't exist or anything goes wrong
+        camPos.y = 0.0f;
+        camPos.x = 0.0f;
+    }
+
     /**************
     *  LIGHTING  *
     **************/
-    
 
     std::vector<glm::vec3> lightPos;
     std::vector<glm::vec4> lightColor;
@@ -103,7 +120,7 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     entities.each<Light, Position>([&]
         (entityx::Entity, Light &l, Position &p){
 
-        lightPos.push_back(glm::vec3(p.x, p.y,-10.0));
+        lightPos.push_back(glm::vec3(p.x, p.y, 1.0));
         lightColor.push_back(glm::vec4(l.r, l.g, l.b, l.strength));
         lightNum++;
     });
@@ -132,8 +149,8 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
         //    e.component<Scripted>()->updateRender();
         //}
 
-        float w = r.texture.width/2.0f;
-        float h = r.texture.height;
+        float w = 0.5f;
+        float h = (float)r.texture.height/r.texture.width;
 
         GLuint tri_vbo;
         GLfloat tri_data[] = {
@@ -179,6 +196,7 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
                               5*sizeof(float), (void*)(3*sizeof(float)));
         glDrawArrays(GL_TRIANGLES, 0, 6);
     });
+    glUniform1i(f, 0);
 
     // If we were given a world VBO render it
     if (worldVBO) {
@@ -298,4 +316,9 @@ void RenderSystem::receive(const WorldMeshUpdateEvent &wmu)
     worldVertex = wmu.numVertex;
     worldTexture = wmu.worldTexture;
     worldNormal = wmu.worldNormal;
+}
+
+void RenderSystem::receive(const entityx::ComponentAddedEvent<Player> &cae)
+{
+    player = cae.entity;
 }
