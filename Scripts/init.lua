@@ -2,18 +2,18 @@ player = {
     Player = 0,
     EventListeners = {
         MoveLeftPressed = function(self)
-            self.Velocity.x = self.Velocity.x - 3
+            self.Velocity.x = self.Velocity.x - 3.0
             self.Render.flipx = true;
         end,
         MoveLeftReleased = function(self)
-            self.Velocity.x = self.Velocity.x + 3
+            self.Velocity.x = self.Velocity.x + 3.0
         end,
         MoveRightPressed = function(self)
-            self.Velocity.x = self.Velocity.x + 3
+            self.Velocity.x = self.Velocity.x + 3.0
             self.Render.flipx = false;
         end,
         MoveRightReleased = function(self)
-            self.Velocity.x = self.Velocity.x - 3
+            self.Velocity.x = self.Velocity.x - 3.0
         end,
         JumpKeyPressed = function(self)
             if self.Physics.standing == true then
