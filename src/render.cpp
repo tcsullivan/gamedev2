@@ -37,17 +37,17 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
                           [[maybe_unused]] entityx::TimeDelta dt)
 {
     // TODO move these to only happen once to speed up rendering
-    GLuint s = worldShader.getProgram();
-    GLuint v = worldShader.getUniform("view");
-    GLuint p = worldShader.getUniform("projection");
-    GLuint m = worldShader.getUniform("model");
-    GLuint a = worldShader.getAttribute("vertex");
-    GLuint t = worldShader.getAttribute("texc");
+    static GLuint s = worldShader.getProgram();
+    static GLuint v = worldShader.getUniform("view");
+    static GLuint p = worldShader.getUniform("projection");
+    static GLuint m = worldShader.getUniform("model");
+    static GLuint a = worldShader.getAttribute("vertex");
+    static GLuint t = worldShader.getAttribute("texc");
 
-    GLuint q = worldShader.getUniform("textu");
-    GLuint n = worldShader.getUniform("normu");
-    GLuint b = worldShader.getUniform("AmbientLight");
-    GLuint f = worldShader.getUniform("Flipped");
+    static GLuint q = worldShader.getUniform("textu");
+    static GLuint n = worldShader.getUniform("normu");
+    static GLuint b = worldShader.getUniform("AmbientLight");
+    static GLuint f = worldShader.getUniform("Flipped");
 
     /***********
     *  SETUP  *
@@ -138,7 +138,7 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     *************/
 
     entities.each<Render, Position>(
-        [this, a, q, t, n, f](entityx::Entity, Render &r, Position &p) {
+        [this](entityx::Entity, Render &r, Position &p) {
 
         if (!r.visible)
             return;
@@ -220,6 +220,27 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
                               6*sizeof(float), (void*)(3*sizeof(float)));
         glDrawArrays(GL_TRIANGLES, 0, worldVertex);
     }
+
+    /******************
+    *  UI RENDERING  *
+    ******************/
+
+    view = glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f),  // Pos
+                       glm::vec3(0.0f, 0.0f, 0.0f),  // Facing
+                       glm::vec3(0.0f, 1.0f, 0.0f)); // Up
+
+    scale = 1.0f;
+    scaleWidth = static_cast<float>(width) / scale;
+    scaleHeight = static_cast<float>(height) / scale;
+
+    projection = glm::ortho(-(scaleWidth/2),    // Left
+                             (scaleWidth/2),    // Right
+                            -(scaleHeight/2),   // Bottom
+                             (scaleHeight/2),   // Top
+                             10.0f,             // zFar
+                            -10.0f);            // zNear
+
+    model = glm::mat4(1.0f);
 
     /*************
     *  CLEANUP  *
