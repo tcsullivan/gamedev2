@@ -18,6 +18,7 @@
  */
 
 #include "physics.hpp"
+
 #include "components/Physics.hpp"
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"
@@ -25,7 +26,7 @@
 void PhysicsSystem::configure([[maybe_unused]]entityx::EntityManager& entities,
                               [[maybe_unused]]entityx::EventManager& events)
 {
-
+    events.subscribe<WorldChangeEvent>(*this);
 }
     
 void PhysicsSystem::update([[maybe_unused]]entityx::EntityManager& entities,
@@ -33,17 +34,18 @@ void PhysicsSystem::update([[maybe_unused]]entityx::EntityManager& entities,
                            [[maybe_unused]]entityx::TimeDelta dt)
 {
     entities.each<Position, Velocity>
-        ([dt](entityx::Entity e, Position &pos, Velocity &vel){
+        ([this, dt](entityx::Entity e, Position &pos, Velocity &vel){
 
         bool has_phys = e.has_component<Physics>();
 
         pos.x += (vel.x * dt/1000.0);
         pos.y += (vel.y * dt/1000.0);
 
-        double fallPosition = 0;
-
         // TODO make this intersect world instead of 0 y
         if (has_phys) {
+
+            double fallPosition = currentWorld->getHeight(pos.x, pos.y, 0.0);
+
             Physics *p = e.component<Physics>().get();
             // TODO only make this occur when the entity has a hitbox
             if (pos.y == fallPosition) {
@@ -57,8 +59,13 @@ void PhysicsSystem::update([[maybe_unused]]entityx::EntityManager& entities,
                 p->standing = true;
             } else {
                 p->standing = false;
-                vel.y -= 920 * (dt/1000.0f);
+                vel.y -= 32.2 * (dt/1000.0f);
             }
         }
     });
+}
+
+void PhysicsSystem::receive(const WorldChangeEvent& wce)
+{
+    currentWorld = wce.newWorld;
 }

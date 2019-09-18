@@ -24,13 +24,18 @@
 #include <entityx/entityx.h>
 #include <sol/sol.hpp>
 
+#include "world.hpp"
+#include "events/world.hpp"
+
 /**
  * @class PhysicsSystem
  * Handles the position and velocity updating of all entities
  */
-class PhysicsSystem : public entityx::System<PhysicsSystem>
+class PhysicsSystem : public entityx::System<PhysicsSystem>,
+                      public entityx::Receiver<PhysicsSystem>
 {
 private:
+    World* currentWorld;
 public:
     PhysicsSystem(void) {}
 
@@ -49,6 +54,8 @@ public:
     void update(entityx::EntityManager& entites,
                 entityx::EventManager& events,
                 entityx::TimeDelta dt) final;
+
+    void receive(const WorldChangeEvent& wce);
 };
 
 #endif // SYSTEM_PHYSICS_HPP_

@@ -63,21 +63,27 @@ world = {
     Generate = function(self)
         math.randomseed(self.Seed)
         xsize, ysize, zsize = self:setSize(250, 128, 3)
-        --self.data = {}
         for Z = 0,zsize-1 do
-            --self.data[Z] = {}
             for X = 0,xsize-1 do
-                --self.data[Z][X] = {}
-                YGen = math.floor(6*math.sin(X/20) + Z) + 64
-                YDepth = math.random(2,5)
+                if Z == 0 then
+                    YGen = math.floor(6*math.sin(X/20)) + 64
+                elseif Z == 1 then
+                    YGen = math.floor(9*math.sin(X/20)) + 64
+                else
+                    YGen = math.floor(15*math.sin(X/20)) + 64
+                end
+                YDepth = math.random(3,5)
                 for Y = 0,ysize-1 do
                     if Y == YGen then
                         self:setData(X, Y, Z, "grass");
                     elseif Y < YGen and Y > (YGen - YDepth) then
                         self:setData(X, Y, Z, "dirt");
                     elseif Y < YGen then
-                        --self:setData(X, Y, Z, "stone");
-                        self:setData(X, Y, Z, "grass");
+                        self:setData(X, Y, Z, "stone");
+                    elseif Y == YGen + 1 then
+                        if math.random(0, 100) == 53 then
+                            self:setData(X, Y, Z, "flower");
+                        end
                     end
                     --print(X..","..Y..","..Z);
                 end

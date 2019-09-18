@@ -181,6 +181,31 @@ unsigned int World::setSeed(unsigned int s)
     return seed;
 }
 
+/* PHYSICS */
+double World::getHeight(double x, double y, double z)
+{
+    unsigned int X = static_cast<unsigned int>(x);
+    unsigned int Z = static_cast<unsigned int>(z);
+
+    double Y = 0.0;
+    try {
+        auto &d = data.at(Z).at(X);
+        for (int yi = d.size()-1; yi >= 0; yi--) {
+            if (d.at(yi) >= 0) {
+                if (!registry.at(d.at(yi)).passable) {
+                    Y = static_cast<double>(yi);
+                    Y += 1;
+                    break;
+                }
+            }
+        }
+    } catch (...) { // If we get any errors, just let the character 
+        return y;
+    }
+
+    return Y;
+}
+
 
 /******************
 *  WORLD SYSTEM  *
@@ -189,8 +214,6 @@ unsigned int World::setSeed(unsigned int s)
 World* WorldSystem::addWorld(sol::object t)
 {
     worlds.push_back(World(t));
-    if (currentWorld == nullptr)
-        currentWorld = &(worlds.back());
     return &(worlds.back());
 }
 

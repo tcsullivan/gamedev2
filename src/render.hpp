@@ -36,18 +36,19 @@
 
 #include "shader.hpp"
 #include "world.hpp"
+#include "components/Player.hpp"
 #include "events/render.hpp"
 #include "events/world.hpp"
 
 #include <map>
 
-struct RenderData
+struct UIRenderData
 {
     GLuint tex;
     GLuint normal;
     unsigned int vertex;
 
-    RenderData(GLuint _tex, GLuint _normal, unsigned int _vertex) :
+    UIRenderData(GLuint _tex, GLuint _normal, unsigned int _vertex) :
         tex(_tex), normal(_normal), vertex(_vertex) {}
 };
 
@@ -66,7 +67,13 @@ private:
     glm::vec3 camPos;
 
     // Map of VBOs and their render data
-    std::map<GLuint, RenderData> renders;
+    std::map<GLuint, UIRenderData> uiRenders;
+
+    GLuint worldVBO = 0;
+    unsigned int worldVertex = 0;
+    GLuint worldTexture = 0;
+    GLuint worldNormal = 0;
+    entityx::Entity player; // Save the player so we can track the camera
 
 public:
     RenderSystem() :
@@ -100,9 +107,9 @@ public:
     /************
     *  EVENTS  *
     ************/
-    //void receive(const WorldMeshUpdateEvent &wmu);
-    
+    void receive(const WorldMeshUpdateEvent &wmu);
     void receive(const NewRenderEvent &nre);
+    void receive(const entityx::ComponentAddedEvent<Player> &cae);
 };
 
 #endif // SYSTEM_RENDER_HPP_
