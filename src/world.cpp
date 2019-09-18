@@ -230,15 +230,14 @@ void WorldSystem::update([[maybe_unused]]entityx::EntityManager& entities,
     if (currentWorld == nullptr) {
         currentWorld = &(worlds.front());
         events.emit<WorldChangeEvent>(currentWorld);
-        std::cout << "Emitted" << std::endl;
     }
 
     if (currentWorld->meshUpdated) {
-        events.emit<NewRenderEvent>(
+        events.emit<WorldMeshUpdateEvent>(
             currentWorld->worldVBO, 
+            currentWorld->mesh.size(),
             currentWorld->getTexture(),
-            currentWorld->getNormal(),
-            currentWorld->mesh.size()
+            currentWorld->getNormal()
         );
     }
 }

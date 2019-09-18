@@ -64,6 +64,7 @@ private:
     SDL_GLContext context;
 
     Shader worldShader;
+    Shader uiShader;
     glm::vec3 camPos;
 
     // Map of VBOs and their render data
@@ -74,7 +75,6 @@ private:
     GLuint worldTexture = 0;
     GLuint worldNormal = 0;
     entityx::Entity player; // Save the player so we can track the camera
-
 public:
     RenderSystem() :
         window(nullptr, SDL_DestroyWindow) {}

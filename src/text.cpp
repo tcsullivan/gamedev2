@@ -131,15 +131,62 @@ void TextSystem::updateVBOs(void)
         auto& d = data.second;
         d.buffer.clear();
         for (auto& text : d.text) {
+            float cOff = 0.0f;
             for (char c : text.text) {
                 if (c < 32)
                     continue;
 
                 d.buffer += {
-                    text.x, text.y, text.z,
-                    d.data[c].offset.first, d.data[c].offset.second,
+                    text.x+cOff,
+                    text.y,
+                    text.z,
+                    d.data[c].offset.first,
+                    d.data[c].offset.second+d.data[c].dim.second,
                     1.0f
                 };
+                d.buffer += {
+                    text.x+cOff+d.data[c].dim.first,
+                    text.y,
+                    text.z,
+                    d.data[c].offset.first+d.data[c].dim.first, 
+                    d.data[c].offset.second+d.data[c].dim.second,
+                    1.0f
+                };
+                d.buffer += {
+                    text.x+cOff,
+                    text.y+d.data[c].dim.second,
+                    text.z,
+                    d.data[c].offset.first, 
+                    d.data[c].offset.second,
+                    1.0f
+                };
+
+                d.buffer += {
+                    text.x+cOff+d.data[c].dim.first,
+                    text.y,
+                    text.z,
+                    d.data[c].offset.first+d.data[c].dim.first, 
+                    d.data[c].offset.second+d.data[c].dim.second,
+                    1.0f
+                };
+                d.buffer += {
+                    text.x+cOff+d.data[c].dim.first,
+                    text.y+d.data[c].dim.second,
+                    text.z,
+                    d.data[c].offset.first+d.data[c].dim.first, 
+                    d.data[c].offset.second,
+                    1.0f
+                };
+                d.buffer += {
+                    text.x+cOff,
+                    text.y+d.data[c].dim.second,
+                    text.z,
+                    d.data[c].offset.first+d.data[c].dim.first, 
+                    d.data[c].offset.second,
+                    1.0f
+                };
+
+                cOff += d.data[c].dim.first + d.data[c].advance.first;
             }
         }
 

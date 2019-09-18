@@ -39,17 +39,17 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
                           [[maybe_unused]] entityx::TimeDelta dt)
 {
     // TODO move these to only happen once to speed up rendering
-    GLuint s = worldShader.getProgram();
-    GLuint v = worldShader.getUniform("view");
-    GLuint p = worldShader.getUniform("projection");
-    GLuint m = worldShader.getUniform("model");
-    GLuint a = worldShader.getAttribute("vertex");
-    GLuint t = worldShader.getAttribute("texc");
+    static GLuint s = worldShader.getProgram();
+    static GLuint v = worldShader.getUniform("view");
+    static GLuint p = worldShader.getUniform("projection");
+    static GLuint m = worldShader.getUniform("model");
+    static GLuint a = worldShader.getAttribute("vertex");
+    static GLuint t = worldShader.getAttribute("texc");
 
-    GLuint q = worldShader.getUniform("textu");
-    GLuint n = worldShader.getUniform("normu");
-    GLuint b = worldShader.getUniform("AmbientLight");
-    GLuint f = worldShader.getUniform("Flipped");
+    static GLuint q = worldShader.getUniform("textu");
+    static GLuint n = worldShader.getUniform("normu");
+    static GLuint b = worldShader.getUniform("AmbientLight");
+    static GLuint f = worldShader.getUniform("Flipped");
 
     /***********
     *  SETUP  *
@@ -140,7 +140,7 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     *************/
 
     entities.each<Render, Position>(
-        [this, a, q, t, n, f](entityx::Entity, Render &r, Position &p) {
+        [this](entityx::Entity, Render &r, Position &p) {
 
         if (!r.visible)
             return;
@@ -223,32 +223,74 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
         glDrawArrays(GL_TRIANGLES, 0, worldVertex);
     }
 
+    glDisableVertexAttribArray(a);
+    glDisableVertexAttribArray(t);
+
+    /******************
+    *  UI RENDERING  *
+    ******************/
+
+    static GLuint uiS = uiShader.getProgram();
+    static GLuint uiS_v = uiShader.getUniform("view");
+    static GLuint uiS_p = uiShader.getUniform("projection");
+    static GLuint uiS_m = uiShader.getUniform("model");
+    static GLuint uiS_a = uiShader.getAttribute("coord2d");
+    static GLuint uiS_t = uiShader.getAttribute("tex_coord");
+    static GLuint uiS_q = uiShader.getUniform("sampler");
+
+    glUseProgram(uiS);
+
+    view = glm::lookAt(glm::vec3(0.0f, 0.0f, 10.0f),  // Pos
+                       glm::vec3(0.0f, 0.0f, 0.0f),  // Facing
+                       glm::vec3(0.0f, 1.0f, 0.0f)); // Up
+
+    scale = 1.0f;
+    scaleWidth = static_cast<float>(width) / scale;
+    scaleHeight = static_cast<float>(height) / scale;
+
+    projection = glm::ortho(-(scaleWidth/2),    // Left
+                             (scaleWidth/2),    // Right
+                            -(scaleHeight/2),   // Bottom
+                             (scaleHeight/2),   // Top
+                             10.0f,             // zFar
+                            -10.0f);            // zNear
+
+    model = glm::mat4(1.0f);
+
+    glUniformMatrix4fv(uiS_v, 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(uiS_p, 1, GL_FALSE, glm::value_ptr(projection));
+    glUniformMatrix4fv(uiS_m, 1, GL_FALSE, glm::value_ptr(model));
+
+    glEnableVertexAttribArray(uiS_a);
+    glEnableVertexAttribArray(uiS_t);
+
     // Update all UI VBOs
     for (auto& r : uiRenders) {
         auto& render = r.second;
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, render.tex);
-        glUniform1i(q, 0);
+        glUniform1i(uiS_q, 0);
 
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, render.normal);
-        glUniform1i(n, 1);
+        //glActiveTexture(GL_TEXTURE1);
+        //glBindTexture(GL_TEXTURE_2D, render.normal);
+        //glUniform1i(n, 1);
 
         glBindBuffer(GL_ARRAY_BUFFER, r.first);
 
-        glVertexAttribPointer(a, 3, GL_FLOAT, GL_FALSE,
+        glVertexAttribPointer(uiS_a, 3, GL_FLOAT, GL_FALSE,
                               6*sizeof(float), 0);
-        glVertexAttribPointer(t, 2, GL_FLOAT, GL_FALSE, 
+        glVertexAttribPointer(uiS_t, 2, GL_FLOAT, GL_FALSE, 
                               6*sizeof(float), (void*)(3*sizeof(float)));
         glDrawArrays(GL_TRIANGLES, 0, render.vertex);
     }
 
+    glDisableVertexAttribArray(uiS_a);
+    glDisableVertexAttribArray(uiS_t);
+
     /*************
     *  CLEANUP  *
     *************/
-    glDisableVertexAttribArray(a);
-    glDisableVertexAttribArray(t);
 
     glDisable(GL_POLYGON_OFFSET_FILL);
     glDisable(GL_CULL_FACE);
@@ -317,8 +359,19 @@ int RenderSystem::init(void)
     worldShader.addUniform("AmbientLight");
     worldShader.addUniform("Flipped");
 
+    uiShader.createProgram("Shaders/ui.vert", "Shaders/ui.frag");
+
+    uiShader.addUniform("projection");
+    uiShader.addUniform("view");
+    uiShader.addUniform("model");
+
+    uiShader.addAttribute("coord2d");
+    uiShader.addAttribute("tex_coord");
+
+    uiShader.addUniform("sampler");
+
     glEnableVertexAttribArray(worldShader.getAttribute("vertex"));
-    glUseProgram(worldShader.getProgram());
+    glEnableVertexAttribArray(uiShader.getAttribute("coord2d"));
 
     // TODO
     //glPolygonOffset(1.0, 1.0);
