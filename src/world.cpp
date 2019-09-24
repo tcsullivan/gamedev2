@@ -137,7 +137,7 @@ void World::generateMesh()
 
     // Preallocate size of vertexes
     mesh = std::basic_string<WorldMeshData>();
-    for (float Z = 0; Z < data.size(); Z++) {
+    for (float Z = data.size() - 1; Z >= 0; Z--) {
         for (float X = 0; X < data.at(Z).size(); X++) {
             for (float Y = 0; Y < data.at(Z).at(X).size(); Y++) {
                 int d = data.at(Z).at(X).at(Y);
@@ -149,13 +149,26 @@ void World::generateMesh()
                 glm::vec2& to = t.offset;
                 glm::vec2& ts = t.size;
 
-                mesh += {X  , Y  , Z, to.x     , to.y+ts.y, 1.0};
-                mesh += {X+1, Y  , Z, to.x+ts.x, to.y+ts.y, 1.0};
-                mesh += {X  , Y+1, Z, to.x     , to.y     , 1.0};
+                float tr = 1.0f;
 
-                mesh += {X+1, Y  , Z, to.x+ts.x, to.y+ts.y, 1.0};
-                mesh += {X+1, Y+1, Z, to.x+ts.x, to.y     , 1.0};
-                mesh += {X  , Y+1, Z, to.x     , to.y     , 1.0};
+                // TODO play with this a bit so it only goes trans
+                //  if player is behind the front layer
+                try {
+                    if (Z < data.size() - 1 && Z >= 0) {
+                        if (data.at(Z+1).at(X).at(Y) == -1)
+                            tr = 1.0f;
+                    }
+                } catch (...) {
+                    tr = 1.0f;
+                }
+
+                mesh += {X  , Y  , Z, to.x     , to.y+ts.y, tr};
+                mesh += {X+1, Y  , Z, to.x+ts.x, to.y+ts.y, tr};
+                mesh += {X  , Y+1, Z, to.x     , to.y     , tr};
+
+                mesh += {X+1, Y  , Z, to.x+ts.x, to.y+ts.y, tr};
+                mesh += {X+1, Y+1, Z, to.x+ts.x, to.y     , tr};
+                mesh += {X  , Y+1, Z, to.x     , to.y     , tr};
             }
         }
     }

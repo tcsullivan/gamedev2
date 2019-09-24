@@ -45,6 +45,7 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     static GLuint m = worldShader.getUniform("model");
     static GLuint a = worldShader.getAttribute("vertex");
     static GLuint t = worldShader.getAttribute("texc");
+    static GLuint r = worldShader.getAttribute("trans");
 
     static GLuint q = worldShader.getUniform("textu");
     static GLuint n = worldShader.getUniform("normu");
@@ -52,6 +53,7 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     static GLuint f = worldShader.getUniform("Flipped");
 
     static glm::vec3 rot = glm::vec3(0.0f, 0.0f, -1.0f);
+    camPos.z = 15.0f;
 
     /***********
     *  SETUP  *
@@ -76,15 +78,21 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     float scaleWidth = static_cast<float>(width) / scale;
     float scaleHeight = static_cast<float>(height) / scale;
 
-    glm::mat4 projection = glm::ortho(-(scaleWidth/2),    // Left
-                                       (scaleWidth/2),    // Right
-                                      -(scaleHeight/2),   // Bottom
-                                       (scaleHeight/2),   // Top
-                                       100.0f,               // zFar
-                                      -100.0f                // zNear
-                                     );
+    //glm::mat4 projection = glm::ortho(-(scaleWidth/2),    // Left
+    //                                   (scaleWidth/2),    // Right
+    //                                  -(scaleHeight/2),   // Bottom
+    //                                   (scaleHeight/2),   // Top
+    //                                   100.0f,               // zFar
+    //                                  -100.0f                // zNear
+    //                                 );
+
+    glm::mat4 projection = glm::perspective(45.0f, 
+                                            ((float)width/(float)height), 
+                                            0.01f, 
+                                            2048.0f);
 
     glm::mat4 model = glm::mat4(1.0f);
+    model = glm::scale(model, glm::vec3(1.0f, 1.0f, -1.0f));
 
     glUseProgram(s);
 
@@ -95,6 +103,7 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
 
     glEnableVertexAttribArray(a);
     glEnableVertexAttribArray(t);
+    glEnableVertexAttribArray(r);
 
     // Ambient light, for now this is static
     GLfloat amb[4] = {1.0f, 1.0f, 1.0f, 0.0f};
@@ -143,9 +152,9 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     *************/
 
     entities.each<Render, Position>(
-        [this](entityx::Entity, Render &r, Position &p) {
+        [this](entityx::Entity, Render &rend, Position &p) {
 
-        if (!r.visible)
+        if (!rend.visible)
             return;
 
         // If our component was created via script, call the entity's
@@ -155,28 +164,28 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
         //}
 
         float w = 0.5f;
-        float h = (float)r.texture.height/r.texture.width;
+        float h = (float)rend.texture.height/rend.texture.width;
 
         GLuint tri_vbo;
         GLfloat tri_data[] = {
-                (float)p.x-w, (float)p.y  , 00.0f, 0.0f, 1.0f,
-                (float)p.x+w, (float)p.y  , 00.0f, 1.0f, 1.0f,
-                (float)p.x-w, (float)p.y+h, 00.0f, 0.0f, 0.0f,
-
-                (float)p.x+w, (float)p.y  , 00.0f, 1.0f, 1.0f,
-                (float)p.x+w, (float)p.y+h, 00.0f, 1.0f, 0.0f,
-                (float)p.x-w, (float)p.y+h, 00.0f, 0.0f, 0.0f,
+                (float)p.x-w, (float)p.y  , 0.0f, 0.0f, 1.0f, 1.0f,
+                (float)p.x+w, (float)p.y  , 0.0f, 1.0f, 1.0f, 1.0f,
+                (float)p.x-w, (float)p.y+h, 0.0f, 0.0f, 0.0f, 1.0f,
+                                                             
+                (float)p.x+w, (float)p.y  , 0.0f, 1.0f, 1.0f, 1.0f,
+                (float)p.x+w, (float)p.y+h, 0.0f, 1.0f, 0.0f, 1.0f,
+                (float)p.x-w, (float)p.y+h, 0.0f, 0.0f, 0.0f, 1.0f,
         };
 
         bool flipped = false;
 
         // TODO flip nicely (aka model transformations)
-        if (r.flipX) {
-            std::swap(tri_data[3], tri_data[8]);
-            tri_data[13] = tri_data[3];
+        if (rend.flipX) {
+            std::swap(tri_data[3], tri_data[9]);
+            tri_data[15] = tri_data[3];
 
-            std::swap(tri_data[23], tri_data[28]);
-            tri_data[18] = tri_data[23];
+            std::swap(tri_data[27], tri_data[33]);
+            tri_data[21] = tri_data[27];
 
             flipped = true;
         }
@@ -184,11 +193,11 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
         glUniform1i(f, flipped ? 1 : 0);
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, r.texture.tex);
+        glBindTexture(GL_TEXTURE_2D, rend.texture.tex);
         glUniform1i(q, 0);
 
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, r.normal.tex);
+        glBindTexture(GL_TEXTURE_2D, rend.normal.tex);
         glUniform1i(n, 1);
 
         glGenBuffers(1, &tri_vbo);
@@ -196,9 +205,11 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
         glBufferData(GL_ARRAY_BUFFER, sizeof(tri_data), tri_data, GL_STREAM_DRAW);
 
         glVertexAttribPointer(a, 3, GL_FLOAT, GL_FALSE,
-                              5*sizeof(float), 0);
-        glVertexAttribPointer(t, 2, GL_FLOAT, GL_FALSE, 
-                              5*sizeof(float), (void*)(3*sizeof(float)));
+                              6*sizeof(float), 0);
+        glVertexAttribPointer(t, 2, GL_FLOAT, GL_FALSE,
+                              6*sizeof(float), (void*)(3*sizeof(float)));
+        glVertexAttribPointer(r, 1, GL_FLOAT, GL_FALSE,
+                              6*sizeof(float), (void*)(5*sizeof(float)));
         glDrawArrays(GL_TRIANGLES, 0, 6);
     });
     glUniform1i(f, 0);
@@ -218,6 +229,8 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
                               6*sizeof(float), 0);
         glVertexAttribPointer(t, 2, GL_FLOAT, GL_FALSE, 
                               6*sizeof(float), (void*)(3*sizeof(float)));
+        glVertexAttribPointer(r, 1, GL_FLOAT, GL_FALSE, 
+                              6*sizeof(float), (void*)(5*sizeof(float)));
         glDrawArrays(GL_TRIANGLES, 0, worldVertex);
     }
 
@@ -348,6 +361,7 @@ int RenderSystem::init(void)
 
     worldShader.addAttribute("vertex");
     worldShader.addAttribute("texc");
+    worldShader.addAttribute("trans");
 
     worldShader.addUniform("textu");
     worldShader.addUniform("normu");
@@ -372,10 +386,9 @@ int RenderSystem::init(void)
     glEnableVertexAttribArray(worldShader.getAttribute("vertex"));
     glEnableVertexAttribArray(uiShader.getAttribute("coord2d"));
 
-    // TODO
     //glPolygonOffset(1.0, 1.0);
 
-    glClearColor(0.6, 0.8, 1.0, 0.0);
+    //glClearColor(0.6, 0.8, 1.0, 0.0);
     
     camPos = glm::vec3(0.0f, 0.0f, 5.0f);
 

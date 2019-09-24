@@ -13,50 +13,62 @@ world = {
             texture = {
                 file = "Assets/world.png",
                 offset = { x = 0, y = 0 },
-                size = { x = 8, y = 8 }
+                size = { x = 64, y = 64 }
             },
             normal = {
                 file = "Assets/world_normal.png",
                 offset = { x = 0, y = 0 },
-                size = { x = 8, y = 8 }
+                size = { x = 64, y = 64 }
             }
         });
         self:registerMaterial("dirt", {
             texture = {
                 file = "Assets/world.png",
-                offset = { x = 8, y = 0 },
-                size = { x = 8, y = 8 }
+                offset = { x = 64, y = 0 },
+                size = { x = 64, y = 64 }
             },
             normal = {
                 file = "Assets/world_normal.png",
-                offset = { x = 8, y = 0 },
-                size = { x = 8, y = 8 }
+                offset = { x = 64, y = 0 },
+                size = { x = 64, y = 64 }
             }
         });
         self:registerMaterial("stone", {
             texture = {
                 file = "Assets/world.png",
-                offset = { x = 16, y = 0 },
-                size = { x = 8, y = 8 }
+                offset = { x = 128, y = 0 },
+                size = { x = 64, y = 64 }
             },
             normal = {
                 file = "Assets/world_normal.png",
-                offset = { x = 16, y = 0 },
-                size = { x = 8, y = 8 }
+                offset = { x = 128, y = 0 },
+                size = { x = 64, y = 64 }
             }
         });
         self:registerMaterial("flower", {
             texture = {
                 file = "Assets/world.png",
-                offset = { x = 24, y = 0 },
-                size = { x = 8, y = 8 }
+                offset = { x = 192, y = 0 },
+                size = { x = 64, y = 64 }
             },
             normal = {
                 file = "Assets/world_normal.png",
-                offset = { x = 24, y = 0 },
-                size = { x = 8, y = 8 }
+                offset = { x = 192, y = 0 },
+                size = { x = 64, y = 64 }
             },
             passable = true
+        });
+        self:registerMaterial("trunk", {
+            texture = {
+                file = "Assets/world.png",
+                offset = { x = 256, y = 0 },
+                size = { x = 64, y = 64 }
+            },
+            normal = {
+                file = "Assets/world_normal.png",
+                offset = { x = 256, y = 0 },
+                size = { x = 64, y = 64 }
+            }
         });
     end,
 
@@ -83,6 +95,8 @@ world = {
                     elseif Y == YGen + 1 then
                         if math.random(0, 100) == 53 then
                             self:setData(X, Y, Z, "flower");
+                        elseif math.random(0, 100) == 45 then
+                            self:setData(X, Y, Z, "trunk");
                         end
                     end
                     --print(X..","..Y..","..Z);
