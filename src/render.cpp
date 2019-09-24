@@ -51,12 +51,20 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     static GLuint b = worldShader.getUniform("AmbientLight");
     static GLuint f = worldShader.getUniform("Flipped");
 
+    static glm::vec3 rot = glm::vec3(0.0f, 0.0f, -1.0f);
+
     /***********
     *  SETUP  *
     ***********/
+
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_POLYGON_OFFSET_FILL);
+
     
     glm::mat4 view = glm::lookAt(camPos,                       // Pos
-                                 glm::vec3(camPos.x, camPos.y, 0.0f),  // Facing
+                                 camPos + rot,                       // Facing
                                  glm::vec3(0.0f, 1.0f, 0.0f)); // Up
 
     //glm::mat4 projection = glm::perspective(45.0f, 
@@ -72,23 +80,18 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
                                        (scaleWidth/2),    // Right
                                       -(scaleHeight/2),   // Bottom
                                        (scaleHeight/2),   // Top
-                                       10.0f,               // zFar
-                                      -10.0f                // zNear
+                                       100.0f,               // zFar
+                                      -100.0f                // zNear
                                      );
 
     glm::mat4 model = glm::mat4(1.0f);
 
     glUseProgram(s);
 
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
 
     glUniformMatrix4fv(v, 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(p, 1, GL_FALSE, glm::value_ptr(projection));
     glUniformMatrix4fv(m, 1, GL_FALSE, glm::value_ptr(model));
-
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_POLYGON_OFFSET_FILL);
 
     glEnableVertexAttribArray(a);
     glEnableVertexAttribArray(t);
@@ -211,11 +214,6 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
         glUniform1i(n, 1);
 
         glBindBuffer(GL_ARRAY_BUFFER, worldVBO);
-        //glBufferData(GL_ARRAY_BUFFER, 
-        //             wm.size() * sizeof(WorldMeshData), 
-        //             &wm.front(), 
-        //             GL_STREAM_DRAW);
-
         glVertexAttribPointer(a, 3, GL_FLOAT, GL_FALSE,
                               6*sizeof(float), 0);
         glVertexAttribPointer(t, 2, GL_FLOAT, GL_FALSE, 
@@ -226,11 +224,13 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     glDisableVertexAttribArray(a);
     glDisableVertexAttribArray(t);
 
+    glUseProgram(0);
+
     /******************
     *  UI RENDERING  *
     ******************/
 
-    static GLuint uiS = uiShader.getProgram();
+    static GLuint uiS   = uiShader.getProgram();
     static GLuint uiS_v = uiShader.getUniform("view");
     static GLuint uiS_p = uiShader.getUniform("projection");
     static GLuint uiS_m = uiShader.getUniform("model");
@@ -241,19 +241,19 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     glUseProgram(uiS);
 
     view = glm::lookAt(glm::vec3(0.0f, 0.0f, 10.0f),  // Pos
-                       glm::vec3(0.0f, 0.0f, 0.0f),  // Facing
+                       glm::vec3(0.0f, 0.0f, 1.0f),  // Facing
                        glm::vec3(0.0f, 1.0f, 0.0f)); // Up
 
     scale = 1.0f;
     scaleWidth = static_cast<float>(width) / scale;
     scaleHeight = static_cast<float>(height) / scale;
 
-    projection = glm::ortho(-(scaleWidth/2),    // Left
-                             (scaleWidth/2),    // Right
-                            -(scaleHeight/2),   // Bottom
-                             (scaleHeight/2),   // Top
-                             10.0f,             // zFar
-                            -10.0f);            // zNear
+    projection = glm::ortho(-scaleWidth/2.0f, // Left
+                             scaleWidth/2,    // Right
+                            -scaleHeight/2,   // Bottom
+                             scaleHeight/2,   // Top
+                             100.0f,          // zFar
+                            -100.0f);         // zNear
 
     model = glm::mat4(1.0f);
 
@@ -268,16 +268,11 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     for (auto& r : uiRenders) {
         auto& render = r.second;
 
-        glActiveTexture(GL_TEXTURE0);
+        glActiveTexture(GL_TEXTURE9);
         glBindTexture(GL_TEXTURE_2D, render.tex);
-        glUniform1i(uiS_q, 0);
-
-        //glActiveTexture(GL_TEXTURE1);
-        //glBindTexture(GL_TEXTURE_2D, render.normal);
-        //glUniform1i(n, 1);
+        glUniform1i(uiS_q, 9);
 
         glBindBuffer(GL_ARRAY_BUFFER, r.first);
-
         glVertexAttribPointer(uiS_a, 3, GL_FLOAT, GL_FALSE,
                               6*sizeof(float), 0);
         glVertexAttribPointer(uiS_t, 2, GL_FLOAT, GL_FALSE, 
@@ -292,19 +287,16 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     *  CLEANUP  *
     *************/
 
+    glUseProgram(0);
+
     glDisable(GL_POLYGON_OFFSET_FILL);
     glDisable(GL_CULL_FACE);
-
-    glUseProgram(0);
 
     SDL_GL_SwapWindow(window.get());
 }
 
 int RenderSystem::init(void)
 {
-    // Select an OpenGL 4.3 profile.
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
     if (SDL_InitSubSystem(SDL_INIT_VIDEO) != 0) {
         std::cerr << "SDL video failed to initialize: "
@@ -323,6 +315,13 @@ int RenderSystem::init(void)
             << SDL_GetError() << std::endl;
         return -1;
     }
+
+    // Select an OpenGL 4.3 profile.
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
+                        SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
     context = SDL_GL_CreateContext(window.get());
 
@@ -376,7 +375,7 @@ int RenderSystem::init(void)
     // TODO
     //glPolygonOffset(1.0, 1.0);
 
-    //glClearColor(0.6, 0.8, 1.0, 0.0);
+    glClearColor(0.6, 0.8, 1.0, 0.0);
     
     camPos = glm::vec3(0.0f, 0.0f, 5.0f);
 

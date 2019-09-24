@@ -1,5 +1,11 @@
 #version 130
 
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+
 uniform sampler2D sampler;
 
 in vec2 texCoord;
@@ -12,5 +18,5 @@ void main(){
     //TODO allow antialiasing
 	//if (pixelColor.w != 1.0f)
 	//	discard;
-	FragColor = pixelColor * color;
+	FragColor = pixelColor.r * color;
 }

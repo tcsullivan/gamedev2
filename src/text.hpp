@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// hello
+
 #ifndef SYSTEM_TEXT_HPP_
 #define SYSTEM_TEXT_HPP_
 
@@ -60,6 +62,9 @@ struct Text {
 struct Font {
     GLuint tex;
     GLuint vbo;
+
+    float width;
+    float height;
 
     std::array<FT_Info, 96> data;
     // Stores currently shown text at given index into VBO?

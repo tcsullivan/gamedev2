@@ -162,9 +162,9 @@ void World::generateMesh()
 
     glBindBuffer(GL_ARRAY_BUFFER, worldVBO);
     glBufferData(GL_ARRAY_BUFFER, 
-                 mesh.size() * sizeof(mesh), 
-                 &mesh.front(), 
-                 GL_STREAM_DRAW);
+                 mesh.size() * sizeof(WorldMeshData), 
+                 mesh.data(), 
+                 GL_STATIC_DRAW);
 
     meshUpdated = true;
 }
@@ -200,7 +200,9 @@ double World::getHeight(double x, double y, double z)
             }
         }
     } catch (...) { // If we get any errors, just let the character 
-        return y;
+        //return y;
+        (void)y;
+        return 0.0;
     }
 
     return Y;
