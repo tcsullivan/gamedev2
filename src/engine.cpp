@@ -84,8 +84,15 @@ void Engine::logicLoop(void)
                                     the logic loop is run during our first
                                     loop. */
 
+    auto start = mc::now();
     while (shouldRun()) {
-        auto start = mc::now();
+        auto end = start;
+        start = mc::now();
+        auto diff = start-end;
+        auto micros = cr::duration_cast<cr::microseconds>(diff);
+        auto msc = micros.count();
+        dt = static_cast<double>(msc) / 1000.0;
+        elapsed += dt;
 
         systems.update<InputSystem>(dt);
         //systems.update<ScriptSystem>(dt);
@@ -107,35 +114,27 @@ void Engine::logicLoop(void)
         }
 
         std::this_thread::yield();
-
-        auto end = mc::now();
-        auto diff = end - start;
-        auto micros = cr::duration_cast<cr::microseconds>(diff);
-        auto msc = micros.count();
-        dt = static_cast<double>(msc) / 1000.0;
-        elapsed += dt;
     }
 }
 
 void Engine::physicsLoop(void)
 {
     entityx::TimeDelta dt = 0; /**< Elapsed milliseconds since each loop */
-
+    auto start = mc::now();
     while (shouldRun()) {
-        auto start = mc::now();
+        auto end = start;
+        start = mc::now();
+
+        auto diff = start - end;
+        auto micros = cr::duration_cast<cr::microseconds>(diff);
+        auto msc = micros.count();
+        dt = static_cast<double>(msc) / 1000.0;
 
         // Update the entities physics/position
         systems.update<PhysicsSystem>(dt);
 
         std::this_thread::yield();
-
-        auto end = mc::now();
-        auto diff = end - start;
-        auto micros = cr::duration_cast<cr::microseconds>(diff);
-        auto msc = micros.count();
-        dt = static_cast<double>(msc) / 1000.0;
     }
-    std::cout << std::endl;
 }
 
 void Engine::renderLoop(void)
