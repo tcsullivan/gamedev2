@@ -9,6 +9,7 @@ precision mediump float;
 uniform sampler2D textu;
 uniform sampler2D normu;
 
+in float fragTrans;
 in vec2 texCoord;
 in vec4 fragCoord;
 out vec4 FragColor;
@@ -25,6 +26,7 @@ void main()
     vec3 Falloff = vec3(0.4, 0.1, 0.002);
 
     vec4 DiffuseColor = texture2D(textu, texCoord);
+    DiffuseColor *= fragTrans;
 
     if (DiffuseColor.a < 0.1f)
         discard;

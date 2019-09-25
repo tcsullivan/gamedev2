@@ -27,6 +27,7 @@
 #include "script.hpp"
 #include "render.hpp"
 #include "physics.hpp"
+#include "text.hpp"
 
 #include "components/EventListener.hpp"
 #include "components/Script.hpp"
@@ -48,10 +49,22 @@ int Engine::init(void)
     systems.add<RenderSystem>();
     systems.add<ScriptSystem>(entities, *(systems.system<WorldSystem>().get()));
     systems.add<PhysicsSystem>();
+    systems.add<TextSystem>();
     systems.configure();
 
     // Load game script and entity data
-    systems.system<ScriptSystem>()->init();
+    auto* script = systems.system<ScriptSystem>().get();
+    script->addToGameNamespace("loadFont",
+    [this](std::string name, std::string file, int size) {
+        systems.system<TextSystem>().get()->loadFont(name, file, size);
+    });
+    script->addToGameNamespace("puts",
+    [this](std::string name, float x, float y, std::string text) {
+        systems.system<TextSystem>().get()->put(name, x, y, text);
+    });
+    script->init();
+    
+
     if (GameState::load("save.json", entities)) {
         std::cout << "Loaded from save.json. Delete the file if you don't want "
                      "it." << std::endl;
@@ -71,8 +84,15 @@ void Engine::logicLoop(void)
                                     the logic loop is run during our first
                                     loop. */
 
+    auto start = mc::now();
     while (shouldRun()) {
-        auto start = mc::now();
+        auto end = start;
+        start = mc::now();
+        auto diff = start-end;
+        auto micros = cr::duration_cast<cr::microseconds>(diff);
+        auto msc = micros.count();
+        dt = static_cast<double>(msc) / 1000.0;
+        elapsed += dt;
 
         systems.update<InputSystem>(dt);
         //systems.update<ScriptSystem>(dt);
@@ -94,41 +114,34 @@ void Engine::logicLoop(void)
         }
 
         std::this_thread::yield();
-
-        auto end = mc::now();
-        auto diff = end - start;
-        auto micros = cr::duration_cast<cr::microseconds>(diff);
-        auto msc = micros.count();
-        dt = static_cast<double>(msc) / 1000.0;
-        elapsed += dt;
     }
 }
 
 void Engine::physicsLoop(void)
 {
     entityx::TimeDelta dt = 0; /**< Elapsed milliseconds since each loop */
-
+    auto start = mc::now();
     while (shouldRun()) {
-        auto start = mc::now();
+        auto end = start;
+        start = mc::now();
+
+        auto diff = start - end;
+        auto micros = cr::duration_cast<cr::microseconds>(diff);
+        auto msc = micros.count();
+        dt = static_cast<double>(msc) / 1000.0;
 
         // Update the entities physics/position
         systems.update<PhysicsSystem>(dt);
 
         std::this_thread::yield();
-
-        auto end = mc::now();
-        auto diff = end - start;
-        auto micros = cr::duration_cast<cr::microseconds>(diff);
-        auto msc = micros.count();
-        dt = static_cast<double>(msc) / 1000.0;
     }
-    std::cout << std::endl;
 }
 
 void Engine::renderLoop(void)
 {
     entityx::TimeDelta dt = 0; /**< Elapsed milliseconds since each loop */
     while (shouldRun()) {
+        systems.update<TextSystem>(dt);
         systems.update<RenderSystem>(dt);
     }
 }

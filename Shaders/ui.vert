@@ -1,14 +1,19 @@
-attribute vec3 coord2d;
-attribute vec2 tex_coord;
+#version 130
 
-uniform mat4 ortho;
-uniform vec4 tex_color;
+in vec3 coord2d;
+in vec2 tex_coord;
 
-varying vec2 texCoord;
-varying vec4 color;
+uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
+
+out vec2 texCoord;
+out vec4 color;
 
 void main(){
     texCoord = tex_coord;
-    color = tex_color;
-    gl_Position = ortho * vec4(coord2d.xyz, 1.0);
+    color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    //color = tex_color;
+    //gl_Position = ortho * vec4(coord2d.xyz, 1.0f);
+    gl_Position = projection * view * model * vec4(coord2d.xyz, 1.0f);
 }

@@ -27,8 +27,10 @@
 void RenderSystem::configure([[maybe_unused]] entityx::EntityManager& entities,
                              [[maybe_unused]] entityx::EventManager& events)
 {
+    events.subscribe<NewRenderEvent>(*this);
     events.subscribe<WorldMeshUpdateEvent>(*this);
     events.subscribe<entityx::ComponentAddedEvent<Player>>(*this);
+
     init();
 }
 
@@ -37,24 +39,34 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
                           [[maybe_unused]] entityx::TimeDelta dt)
 {
     // TODO move these to only happen once to speed up rendering
-    GLuint s = worldShader.getProgram();
-    GLuint v = worldShader.getUniform("view");
-    GLuint p = worldShader.getUniform("projection");
-    GLuint m = worldShader.getUniform("model");
-    GLuint a = worldShader.getAttribute("vertex");
-    GLuint t = worldShader.getAttribute("texc");
+    static GLuint s = worldShader.getProgram();
+    static GLuint v = worldShader.getUniform("view");
+    static GLuint p = worldShader.getUniform("projection");
+    static GLuint m = worldShader.getUniform("model");
+    static GLuint a = worldShader.getAttribute("vertex");
+    static GLuint t = worldShader.getAttribute("texc");
+    static GLuint r = worldShader.getAttribute("trans");
 
-    GLuint q = worldShader.getUniform("textu");
-    GLuint n = worldShader.getUniform("normu");
-    GLuint b = worldShader.getUniform("AmbientLight");
-    GLuint f = worldShader.getUniform("Flipped");
+    static GLuint q = worldShader.getUniform("textu");
+    static GLuint n = worldShader.getUniform("normu");
+    static GLuint b = worldShader.getUniform("AmbientLight");
+    static GLuint f = worldShader.getUniform("Flipped");
+
+    static glm::vec3 rot = glm::vec3(0.0f, 0.0f, -1.0f);
+    camPos.z = 15.0f;
 
     /***********
     *  SETUP  *
     ***********/
+
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_POLYGON_OFFSET_FILL);
+
     
     glm::mat4 view = glm::lookAt(camPos,                       // Pos
-                                 glm::vec3(camPos.x, camPos.y, 0.0f),  // Facing
+                                 camPos + rot,                       // Facing
                                  glm::vec3(0.0f, 1.0f, 0.0f)); // Up
 
     //glm::mat4 projection = glm::perspective(45.0f, 
@@ -66,30 +78,32 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     float scaleWidth = static_cast<float>(width) / scale;
     float scaleHeight = static_cast<float>(height) / scale;
 
-    glm::mat4 projection = glm::ortho(-(scaleWidth/2),    // Left
-                                       (scaleWidth/2),    // Right
-                                      -(scaleHeight/2),   // Bottom
-                                       (scaleHeight/2),   // Top
-                                       10.0f,               // zFar
-                                      -10.0f                // zNear
-                                     );
+    //glm::mat4 projection = glm::ortho(-(scaleWidth/2),    // Left
+    //                                   (scaleWidth/2),    // Right
+    //                                  -(scaleHeight/2),   // Bottom
+    //                                   (scaleHeight/2),   // Top
+    //                                   100.0f,               // zFar
+    //                                  -100.0f                // zNear
+    //                                 );
+
+    glm::mat4 projection = glm::perspective(45.0f, 
+                                            ((float)width/(float)height), 
+                                            0.01f, 
+                                            2048.0f);
 
     glm::mat4 model = glm::mat4(1.0f);
+    model = glm::scale(model, glm::vec3(1.0f, 1.0f, -1.0f));
 
     glUseProgram(s);
 
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
 
     glUniformMatrix4fv(v, 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(p, 1, GL_FALSE, glm::value_ptr(projection));
     glUniformMatrix4fv(m, 1, GL_FALSE, glm::value_ptr(model));
 
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_POLYGON_OFFSET_FILL);
-
     glEnableVertexAttribArray(a);
     glEnableVertexAttribArray(t);
+    glEnableVertexAttribArray(r);
 
     // Ambient light, for now this is static
     GLfloat amb[4] = {1.0f, 1.0f, 1.0f, 0.0f};
@@ -138,9 +152,9 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     *************/
 
     entities.each<Render, Position>(
-        [this, a, q, t, n, f](entityx::Entity, Render &r, Position &p) {
+        [this](entityx::Entity, Render &rend, Position &p) {
 
-        if (!r.visible)
+        if (!rend.visible)
             return;
 
         // If our component was created via script, call the entity's
@@ -150,28 +164,28 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
         //}
 
         float w = 0.5f;
-        float h = (float)r.texture.height/r.texture.width;
+        float h = (float)rend.texture.height/rend.texture.width;
 
         GLuint tri_vbo;
         GLfloat tri_data[] = {
-                (float)p.x-w, (float)p.y  , 00.0f, 0.0f, 1.0f,
-                (float)p.x+w, (float)p.y  , 00.0f, 1.0f, 1.0f,
-                (float)p.x-w, (float)p.y+h, 00.0f, 0.0f, 0.0f,
-
-                (float)p.x+w, (float)p.y  , 00.0f, 1.0f, 1.0f,
-                (float)p.x+w, (float)p.y+h, 00.0f, 1.0f, 0.0f,
-                (float)p.x-w, (float)p.y+h, 00.0f, 0.0f, 0.0f,
+                (float)p.x-w, (float)p.y  , 0.0f, 0.0f, 1.0f, 1.0f,
+                (float)p.x+w, (float)p.y  , 0.0f, 1.0f, 1.0f, 1.0f,
+                (float)p.x-w, (float)p.y+h, 0.0f, 0.0f, 0.0f, 1.0f,
+                                                             
+                (float)p.x+w, (float)p.y  , 0.0f, 1.0f, 1.0f, 1.0f,
+                (float)p.x+w, (float)p.y+h, 0.0f, 1.0f, 0.0f, 1.0f,
+                (float)p.x-w, (float)p.y+h, 0.0f, 0.0f, 0.0f, 1.0f,
         };
 
         bool flipped = false;
 
         // TODO flip nicely (aka model transformations)
-        if (r.flipX) {
-            std::swap(tri_data[3], tri_data[8]);
-            tri_data[13] = tri_data[3];
+        if (rend.flipX) {
+            std::swap(tri_data[3], tri_data[9]);
+            tri_data[15] = tri_data[3];
 
-            std::swap(tri_data[23], tri_data[28]);
-            tri_data[18] = tri_data[23];
+            std::swap(tri_data[27], tri_data[33]);
+            tri_data[21] = tri_data[27];
 
             flipped = true;
         }
@@ -179,11 +193,11 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
         glUniform1i(f, flipped ? 1 : 0);
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, r.texture.tex);
+        glBindTexture(GL_TEXTURE_2D, rend.texture.tex);
         glUniform1i(q, 0);
 
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, r.normal.tex);
+        glBindTexture(GL_TEXTURE_2D, rend.normal.tex);
         glUniform1i(n, 1);
 
         glGenBuffers(1, &tri_vbo);
@@ -191,9 +205,11 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
         glBufferData(GL_ARRAY_BUFFER, sizeof(tri_data), tri_data, GL_STREAM_DRAW);
 
         glVertexAttribPointer(a, 3, GL_FLOAT, GL_FALSE,
-                              5*sizeof(float), 0);
-        glVertexAttribPointer(t, 2, GL_FLOAT, GL_FALSE, 
-                              5*sizeof(float), (void*)(3*sizeof(float)));
+                              6*sizeof(float), 0);
+        glVertexAttribPointer(t, 2, GL_FLOAT, GL_FALSE,
+                              6*sizeof(float), (void*)(3*sizeof(float)));
+        glVertexAttribPointer(r, 1, GL_FLOAT, GL_FALSE,
+                              6*sizeof(float), (void*)(5*sizeof(float)));
         glDrawArrays(GL_TRIANGLES, 0, 6);
     });
     glUniform1i(f, 0);
@@ -209,37 +225,91 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
         glUniform1i(n, 1);
 
         glBindBuffer(GL_ARRAY_BUFFER, worldVBO);
-        //glBufferData(GL_ARRAY_BUFFER, 
-        //             wm.size() * sizeof(WorldMeshData), 
-        //             &wm.front(), 
-        //             GL_STREAM_DRAW);
-
         glVertexAttribPointer(a, 3, GL_FLOAT, GL_FALSE,
                               6*sizeof(float), 0);
         glVertexAttribPointer(t, 2, GL_FLOAT, GL_FALSE, 
                               6*sizeof(float), (void*)(3*sizeof(float)));
+        glVertexAttribPointer(r, 1, GL_FLOAT, GL_FALSE, 
+                              6*sizeof(float), (void*)(5*sizeof(float)));
         glDrawArrays(GL_TRIANGLES, 0, worldVertex);
     }
+
+    glDisableVertexAttribArray(a);
+    glDisableVertexAttribArray(t);
+
+    glUseProgram(0);
+
+    /******************
+    *  UI RENDERING  *
+    ******************/
+
+    static GLuint uiS   = uiShader.getProgram();
+    static GLuint uiS_v = uiShader.getUniform("view");
+    static GLuint uiS_p = uiShader.getUniform("projection");
+    static GLuint uiS_m = uiShader.getUniform("model");
+    static GLuint uiS_a = uiShader.getAttribute("coord2d");
+    static GLuint uiS_t = uiShader.getAttribute("tex_coord");
+    static GLuint uiS_q = uiShader.getUniform("sampler");
+
+    glUseProgram(uiS);
+
+    view = glm::lookAt(glm::vec3(0.0f, 0.0f, 10.0f),  // Pos
+                       glm::vec3(0.0f, 0.0f, 1.0f),  // Facing
+                       glm::vec3(0.0f, 1.0f, 0.0f)); // Up
+
+    scale = 1.0f;
+    scaleWidth = static_cast<float>(width) / scale;
+    scaleHeight = static_cast<float>(height) / scale;
+
+    projection = glm::ortho(-scaleWidth/2.0f, // Left
+                             scaleWidth/2,    // Right
+                            -scaleHeight/2,   // Bottom
+                             scaleHeight/2,   // Top
+                             100.0f,          // zFar
+                            -100.0f);         // zNear
+
+    model = glm::mat4(1.0f);
+
+    glUniformMatrix4fv(uiS_v, 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(uiS_p, 1, GL_FALSE, glm::value_ptr(projection));
+    glUniformMatrix4fv(uiS_m, 1, GL_FALSE, glm::value_ptr(model));
+
+    glEnableVertexAttribArray(uiS_a);
+    glEnableVertexAttribArray(uiS_t);
+
+    // Update all UI VBOs
+    for (auto& r : uiRenders) {
+        auto& render = r.second;
+
+        glActiveTexture(GL_TEXTURE9);
+        glBindTexture(GL_TEXTURE_2D, render.tex);
+        glUniform1i(uiS_q, 9);
+
+        glBindBuffer(GL_ARRAY_BUFFER, r.first);
+        glVertexAttribPointer(uiS_a, 3, GL_FLOAT, GL_FALSE,
+                              6*sizeof(float), 0);
+        glVertexAttribPointer(uiS_t, 2, GL_FLOAT, GL_FALSE, 
+                              6*sizeof(float), (void*)(3*sizeof(float)));
+        glDrawArrays(GL_TRIANGLES, 0, render.vertex);
+    }
+
+    glDisableVertexAttribArray(uiS_a);
+    glDisableVertexAttribArray(uiS_t);
 
     /*************
     *  CLEANUP  *
     *************/
-    glDisableVertexAttribArray(a);
-    glDisableVertexAttribArray(t);
+
+    glUseProgram(0);
 
     glDisable(GL_POLYGON_OFFSET_FILL);
     glDisable(GL_CULL_FACE);
-
-    glUseProgram(0);
 
     SDL_GL_SwapWindow(window.get());
 }
 
 int RenderSystem::init(void)
 {
-    // Select an OpenGL 4.3 profile.
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
     if (SDL_InitSubSystem(SDL_INIT_VIDEO) != 0) {
         std::cerr << "SDL video failed to initialize: "
@@ -258,6 +328,13 @@ int RenderSystem::init(void)
             << SDL_GetError() << std::endl;
         return -1;
     }
+
+    // Select an OpenGL 4.3 profile.
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
+                        SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
     context = SDL_GL_CreateContext(window.get());
 
@@ -284,6 +361,7 @@ int RenderSystem::init(void)
 
     worldShader.addAttribute("vertex");
     worldShader.addAttribute("texc");
+    worldShader.addAttribute("trans");
 
     worldShader.addUniform("textu");
     worldShader.addUniform("normu");
@@ -294,10 +372,20 @@ int RenderSystem::init(void)
     worldShader.addUniform("AmbientLight");
     worldShader.addUniform("Flipped");
 
-    glEnableVertexAttribArray(worldShader.getAttribute("vertex"));
-    glUseProgram(worldShader.getProgram());
+    uiShader.createProgram("Shaders/ui.vert", "Shaders/ui.frag");
 
-    // TODO
+    uiShader.addUniform("projection");
+    uiShader.addUniform("view");
+    uiShader.addUniform("model");
+
+    uiShader.addAttribute("coord2d");
+    uiShader.addAttribute("tex_coord");
+
+    uiShader.addUniform("sampler");
+
+    glEnableVertexAttribArray(worldShader.getAttribute("vertex"));
+    glEnableVertexAttribArray(uiShader.getAttribute("coord2d"));
+
     //glPolygonOffset(1.0, 1.0);
 
     //glClearColor(0.6, 0.8, 1.0, 0.0);
@@ -310,6 +398,13 @@ int RenderSystem::init(void)
 /************
 *  EVENTS  *
 ************/
+
+void RenderSystem::receive(const NewRenderEvent &nre)
+{
+    uiRenders.insert_or_assign(nre.vbo,
+                               UIRenderData(nre.tex, nre.normal, nre.vertex));
+}
+
 void RenderSystem::receive(const WorldMeshUpdateEvent &wmu)
 {
     worldVBO = wmu.worldVBO;
@@ -322,3 +417,4 @@ void RenderSystem::receive(const entityx::ComponentAddedEvent<Player> &cae)
 {
     player = cae.entity;
 }
+

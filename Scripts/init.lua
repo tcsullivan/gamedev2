@@ -1,3 +1,5 @@
+game.loadFont("default", "Assets/FreePixel.ttf", 16)
+
 player = {
     Player = 0,
     EventListeners = {
@@ -6,6 +8,7 @@ player = {
             self.Render.flipx = true;
         end,
         MoveLeftReleased = function(self)
+            game.puts("default", self.Position.x, self.Position.y+100, "Hey. Hag?")
             self.Velocity.x = self.Velocity.x + 3.0
         end,
         MoveRightPressed = function(self)
@@ -52,20 +55,37 @@ player = {
         --end
         --self.visibleTick = self.visibleTick + 1
     end,
-    PhysicsIdle = function(self)
-        if self.Velocity.x < 0 then
-            self.Render.flipx = true
-        elseif self.Velocity.x > 0 then
-            self.Render.flipx = false
+    visibleTick = 0
+}
+
+ball = {
+    Position = {
+        x = 20,
+        y = 100
+    },
+    Velocity = {
+        x = 0.0,
+        y = 0.0,
+    },
+    Physics = 0,
+    Render = {
+        texture = "Assets/ball.png",
+        normal = "Assets/ball_normal.png",
+        visible = true,
+    },
+    Idle = function(self)
+        if self.Physics.standing == true then
+            self.Velocity.y = self.Velocity.y + 15
+            self.Velocity.x = math.random(-1, 1);
         end
     end,
-    visibleTick = 0
 }
 
 -- Create the world
 dofile("Scripts/world.lua")
 
 playerSpawn = game.spawn(player);
+game.spawn(ball);
 
 -------------------
 --  SERIALIZING  --

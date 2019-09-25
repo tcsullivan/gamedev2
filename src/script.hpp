@@ -47,6 +47,7 @@ private:
      * interactions between C and Lua
      */
     sol::state lua;
+    sol::table game;
 
     entityx::EntityManager& manager;
     
@@ -102,6 +103,11 @@ public:
      * Contains all calls that export components/functions to lua.
      */
     void scriptExport(void);
+
+    template<typename F>
+    void addToGameNamespace(const std::string& name, F func) {
+        game.set_function(name, func);
+    }
 };
 
 #endif // SYSTEM_SCRIPT_HPP_
