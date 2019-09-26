@@ -12,7 +12,7 @@ do
 	echo "########################################" >> TODOS
 	echo $file >> TODOS
 	echo "========================================" >> TODOS
-	grep -n -B 5 -A 5 "TODO" $file | sed s/--/========================================/g >> TODOS
+	grep -n -B 5 -A 5 "TODO" $file | sed s/^--/========================================/g >> TODOS
 	TODO_COUNT=$((TODO_COUNT+$(grep -c "TODO" $file)))
 done
 
