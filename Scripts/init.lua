@@ -8,7 +8,8 @@ player = {
             self.Render.flipx = true;
         end,
         MoveLeftReleased = function(self)
-            game.puts("default", self.Position.x, self.Position.y+100, "Hey. Hag?")
+            -- TODO can't put text at world coordinates right now
+            --game.puts("default", self.Position.x, self.Position.y+100, "Hey. Hag?")
             self.Velocity.x = self.Velocity.x + 3.0
         end,
         MoveRightPressed = function(self)
