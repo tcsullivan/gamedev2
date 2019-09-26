@@ -24,7 +24,9 @@
 #include <cereal/archives/json.hpp>
 #include <fstream>
 
-void Config::save(void) const
+std::map<std::string, std::variant<int, double, std::string>> Config::values;
+
+void Config::save(void)
 {
     if (std::ofstream file (fileName); file.good()) {
         cereal::JSONOutputArchive archive (file);

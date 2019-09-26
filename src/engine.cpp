@@ -36,6 +36,7 @@
 
 #include <fstream>
 
+using namespace std::literals::string_literals;
 using namespace std::chrono_literals;
 namespace cr = std::chrono;
 typedef std::chrono::high_resolution_clock mc;
@@ -137,17 +138,20 @@ void Engine::physicsLoop(void)
     }
 }
 
-void Engine::renderLoop(void)
+void Engine::renderLoop(int& fpsCounter)
 {
     entityx::TimeDelta dt = 0; /**< Elapsed milliseconds since each loop */
     while (shouldRun()) {
         systems.update<TextSystem>(dt);
         systems.update<RenderSystem>(dt);
+        fpsCounter++;
     }
 }
 
 void Engine::run(void)
 {
+    int fpsCounter = 0;
+
     // Start logic thread
     logicThread = std::thread([this](void) {
         logicLoop();
@@ -157,12 +161,22 @@ void Engine::run(void)
         physicsLoop();
     });
 
+    debugThread = std::thread([this, &fpsCounter](void) {
+        while (shouldRun()) {
+            std::this_thread::sleep_for(1s);
+            fps = fpsCounter;
+            fpsCounter = 0;
+            systems.system<TextSystem>()->put("default", 0, 0, "fps: "s + std::to_string(fps));
+        }
+    });
+
     // Keep render loop on main thread
-    renderLoop();
+    renderLoop(fpsCounter);
 
     // Done, bring logic thread back
     logicThread.join();
     physicsThread.join();
+    debugThread.join();
 
     // Save the entities' data
     GameState::save("save.json", entities);

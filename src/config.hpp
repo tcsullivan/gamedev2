@@ -30,11 +30,11 @@ class Config
 {
 private:
     static constexpr const char *fileName = "settings.json";
-    std::map<std::string, std::variant<int, double, std::string>> values;
+    static std::map<std::string, std::variant<int, double, std::string>> values;
 
 public:
     template<typename T>
-    std::optional<T> get(const std::string& name)
+    static std::optional<T> get(const std::string& name)
     {
         if (values.count(name) != 0) {
             if (auto value = std::get_if<T>(&values[name]); value != nullptr)
@@ -45,19 +45,20 @@ public:
     }
 
     template<typename T>
-    void set(const std::string& name, T val)
+    static void set(const std::string& name, T val)
     {
         values[name] = val;
     }
 
     template<typename T>
-    void add(const std::string& name)
+    static void require(const std::string& name, T defaultValue = T())
     {
-        values[name] = T();
+        if (values.count(name) == 0)
+            values[name] = defaultValue();
     }
 
-    void save(void) const;
-    void load(void);
+    static void save(void);
+    static void load(void);
 };
 
 #endif // CONFIG_HPP_

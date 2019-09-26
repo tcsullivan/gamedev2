@@ -36,19 +36,23 @@ private:
     entityx::EntityManager entities;
     entityx::SystemManager systems;
 
+    int fps;
+
     std::thread logicThread;
     std::thread physicsThread;
+    std::thread debugThread;
 
     void logicLoop(void);
     void physicsLoop(void);
-    void renderLoop(void);
+    void renderLoop(int& fpsCounter);
 
     bool shouldRun(void);
 
 public:
     Engine(void) :
         entities(events),
-        systems(entities, events) {}
+        systems(entities, events),
+        fps(0) {}
 
     /**
      * Initializes the game engine.

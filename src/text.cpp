@@ -30,7 +30,6 @@ void TextSystem::update([[maybe_unused]] entityx::EntityManager& entites,
             if (d.text.size() == 0)
                 continue;
 
-            // TODO make normal
             events.emit<NewRenderEvent>(d.vbo, d.tex, 0, d.buffer.size());
         }
     }
@@ -130,6 +129,12 @@ void TextSystem::put(const std::string& font,
 {
     if (fontData.find(font) == fontData.end())
         return;
+
+    auto& vector = fontData[font].text;
+    if (auto i = std::find_if(vector.begin(), vector.end(), [&x, &y](const Text& t) {
+            return t.x == x && t.y == y; }); i != vector.end()) {
+        vector.erase(i);
+    }
 
     fontData[font].text.emplace_back(text, x, y, -9.0f);
     shouldUpdateVBOs = true;
