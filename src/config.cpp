@@ -22,9 +22,14 @@
 
 #include <cereal/cereal.hpp>
 #include <cereal/archives/json.hpp>
+#include <filesystem>
 #include <fstream>
 
-std::map<std::string, std::variant<int, double, std::string>> Config::values;
+std::map<std::string, std::variant<int, double, std::string>> Config::values = {
+    { "title", "gamedev2" },
+    { "screenWidth", 640 },
+    { "screenHeight", 480 }
+};
 
 void Config::save(void)
 {

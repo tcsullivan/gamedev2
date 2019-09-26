@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <config.hpp>
 #include <render.hpp>
 #include <components/Render.hpp>
 #include <components/Position.hpp>
@@ -30,6 +31,10 @@ void RenderSystem::configure([[maybe_unused]] entityx::EntityManager& entities,
     events.subscribe<NewRenderEvent>(*this);
     events.subscribe<WorldMeshUpdateEvent>(*this);
     events.subscribe<entityx::ComponentAddedEvent<Player>>(*this);
+
+    title = Config::get<std::string>("title");
+    width = Config::get<int>("screenWidth");
+    height = Config::get<int>("screenHeight");
 
     init();
 }
@@ -74,9 +79,9 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     //                                        0.01f, 
     //                                        2048.0f);
 
-    float scale = 40.0f;
-    float scaleWidth = static_cast<float>(width) / scale;
-    float scaleHeight = static_cast<float>(height) / scale;
+    //float scale = 40.0f;
+    //float scaleWidth = static_cast<float>(width) / scale;
+    //float scaleHeight = static_cast<float>(height) / scale;
 
     //glm::mat4 projection = glm::ortho(-(scaleWidth/2),    // Left
     //                                   (scaleWidth/2),    // Right
@@ -257,16 +262,12 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
                        glm::vec3(0.0f, 0.0f, 1.0f),  // Facing
                        glm::vec3(0.0f, 1.0f, 0.0f)); // Up
 
-    scale = 1.0f;
-    scaleWidth = static_cast<float>(width) / scale;
-    scaleHeight = static_cast<float>(height) / scale;
-
-    projection = glm::ortho(-scaleWidth/2.0f, // Left
-                             scaleWidth/2,    // Right
-                            -scaleHeight/2,   // Bottom
-                             scaleHeight/2,   // Top
-                             100.0f,          // zFar
-                            -100.0f);         // zNear
+    projection = glm::ortho(0.0f,  // Left
+                            static_cast<float>(width),  // Right
+                            -static_cast<float>(height), // Top
+                            0.0f,
+                             100.0f,      // zFar
+                            -100.0f);     // zNear
 
     model = glm::mat4(1.0f);
 
@@ -318,10 +319,10 @@ int RenderSystem::init(void)
     }
 
     // Create window, managed by the unique_ptr
-    window.reset(SDL_CreateWindow(title,
-        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-        width, height,
-        SDL_WINDOW_OPENGL));
+    window.reset(SDL_CreateWindow(title.c_str(),
+                 SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+                 width, height,
+                 SDL_WINDOW_OPENGL));
 
     if (window.get() == nullptr) {
         std::cerr << "SDL window creation failed: "

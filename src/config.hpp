@@ -34,14 +34,14 @@ private:
 
 public:
     template<typename T>
-    static std::optional<T> get(const std::string& name)
+    static T get(const std::string& name)
     {
         if (values.count(name) != 0) {
             if (auto value = std::get_if<T>(&values[name]); value != nullptr)
                 return *value;
         }
     
-        return {};
+        return T(); 
     }
 
     template<typename T>

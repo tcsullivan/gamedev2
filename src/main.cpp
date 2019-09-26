@@ -21,7 +21,6 @@
 #define GLEW_STATIC
 #define SOL_ALL_SAFETIES_ON = 1
 
-#include "config.hpp"
 #include "engine.hpp"
 
 #include <SDL2/SDL.h>
@@ -43,20 +42,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
     Engine engine;
     engine.init();
 
-    //Config config;
-    //config.add<int>("screenWidth");
-    //config.add<int>("screenHeight");
-    //config.add<std::string>("title");
-    //config.load();
-    //std::cout << *config.get<int>("screenWidth") << std::endl;
-
     // Go go go!
     engine.run();
-
-    //config.set("screenWidth", 10000);
-    //config.set("screenHeight", 481);
-    //config.set("title", "gamEdevvv2");
-    //config.save();
 
     return 0;
 }

@@ -56,9 +56,9 @@ class RenderSystem : public entityx::System<RenderSystem>,
                      public entityx::Receiver<RenderSystem>
 {
 private:
-    constexpr static const char *title = "gamedev2";
-    constexpr static int width = 1280;
-    constexpr static int height = 720;
+    std::string title;
+    int width;
+    int height;
 
     std::unique_ptr<SDL_Window, void (*)(SDL_Window *)> window;
     SDL_GLContext context;

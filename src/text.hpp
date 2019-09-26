@@ -60,6 +60,8 @@ struct Text {
 
 // Stores texture and placement data for a font at a size.
 struct Font {
+    int fontSize;
+
     GLuint tex;
     GLuint vbo;
 

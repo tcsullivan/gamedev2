@@ -53,6 +53,7 @@ void TextSystem::loadFont(const std::string& name,
     auto& face = fonts[file];
     FT_Set_Pixel_Sizes(face, 0, size);
     fontData.try_emplace(name);
+    fontData[name].fontSize = size;
 
     // Calculate dimensions of final texture
     //
@@ -129,6 +130,8 @@ void TextSystem::put(const std::string& font,
 {
     if (fontData.find(font) == fontData.end())
         return;
+
+    y -= fontData[font].fontSize;
 
     auto& vector = fontData[font].text;
     if (auto i = std::find_if(vector.begin(), vector.end(), [&x, &y](const Text& t) {

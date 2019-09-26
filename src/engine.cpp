@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "config.hpp"
 #include "engine.hpp"
 #include "gamestate.hpp"
 #include "gamerun.hpp"
@@ -43,6 +44,8 @@ typedef std::chrono::high_resolution_clock mc;
 
 int Engine::init(void)
 {
+    Config::load();
+
     systems.add<GameRunSystem>();
     systems.add<InputSystem>();
     systems.add<PlayerSystem>(entities);
@@ -178,8 +181,9 @@ void Engine::run(void)
     physicsThread.join();
     debugThread.join();
 
-    // Save the entities' data
+    // Save the entities' data, and settings data
     GameState::save("save.json", entities);
+    Config::save();
 
     // Remove all Lua references from entities
     entities.each<Scripted>([](entityx::Entity, Scripted &f) { 
