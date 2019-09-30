@@ -37,7 +37,7 @@ DEPEXT = d
 
 LIBDIR = lib
 LIBS   = -L$(LIBDIR) -lSDL2 -lpthread -lentityx -lluajit -ldl -lGLEW -lGL \
-		 -lSDL2_image -lSOIL -lfreetype
+		 -lSDL2_image -lSOIL -lfreetype -lalut
 
 CXXFLAGS = -ggdb -std=c++17 -Wall -Wextra -Werror -pedantic \
 		   -Wno-class-memaccess -Wno-implicit-fallthrough -m64
