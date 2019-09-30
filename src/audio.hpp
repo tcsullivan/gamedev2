@@ -21,10 +21,12 @@
 #define SYSTEM_AUDIO_HPP_
 
 #include <AL/alut.h>
-
 #include <entityx/entityx.h>
 
-class AudioSystem : public entityx::System<AudioSystem>
+#include <components/Audio.hpp>
+
+class AudioSystem : public entityx::System<AudioSystem>,
+                    public entityx::Receiver<AudioSystem>
 {
 private:
     std::unique_ptr<ALCdevice, void (*)(ALCdevice *)> device;
@@ -46,6 +48,9 @@ public:
     void update(entityx::EntityManager& entities,
                 entityx::EventManager& events,
                 entityx::TimeDelta dt) final;
+
+    void receive(const entityx::ComponentAddedEvent<Audio>& cae);
+    void receive(const entityx::ComponentRemovedEvent<Audio>& cae);
 };
 
 #endif // SYSTEM_AUDIO_HPP_

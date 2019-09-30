@@ -27,12 +27,16 @@ AudioSystem::AudioSystem(void) :
 AudioSystem::~AudioSystem(void)
 {
     // Delete context before device
-    context.get_deleter()(context.get());
+    context.reset();
+    device.reset();
 }
 
 void AudioSystem::configure([[maybe_unused]] entityx::EntityManager& entities,
-                            [[maybe_unused]] entityx::EventManager& events)
+                            entityx::EventManager& events)
 {
+    events.subscribe<entityx::ComponentAddedEvent<Audio>>(*this);
+    events.subscribe<entityx::ComponentRemovedEvent<Audio>>(*this);
+
     // Access device
     device.reset(alcOpenDevice(nullptr));
     if (!device)
@@ -48,4 +52,14 @@ void AudioSystem::update([[maybe_unused]] entityx::EntityManager& entities,
                          [[maybe_unused]] entityx::EventManager& events,
                          [[maybe_unused]] entityx::TimeDelta dt)
 {}
+
+void AudioSystem::receive(const entityx::ComponentAddedEvent<Audio>& cae)
+{
+    alGenSources(1, const_cast<ALuint*>(&cae.component->source));
+}
+
+void AudioSystem::receive(const entityx::ComponentRemovedEvent<Audio>& cae)
+{
+    alDeleteSources(1, &cae.component->source);
+}
 
