@@ -26,6 +26,21 @@
 
 #include "world.hpp"
 
+/**
+ * Utility for pairing class instances to their member function calls.
+ * This is useful for adding functions to the Lua game namespace.
+ *
+ * @param func The member function to call
+ * @param instance The instance to bind to
+ * @return A function that calls the member function using the given instance
+ */
+template<class C, typename R, typename... Args>
+auto bindInstance(R (C::* func)(Args...), C *instance)
+{
+    return [instance, func](Args... args) { (instance->*func)(args...); };
+}
+
+
 struct EntitySpawnEvent
 {
     sol::object ref;

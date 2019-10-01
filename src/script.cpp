@@ -87,12 +87,6 @@ void ScriptSystem::doFile(void)
 
 void ScriptSystem::scriptExport(void)
 {
-    std::function<sol::table(sol::table)> entitySpawn = 
-        [this](sol::table t){ return spawn(t);};
-
-    std::function<World* (sol::object)> worldRegister =
-        [this](sol::object t){ return worldSystem.addWorld(t); };
-
     lua.new_usertype<Position>("Position",
             sol::constructors<Position(double x, double y), Position()>(),
             "x", &Position::x,
@@ -137,8 +131,9 @@ void ScriptSystem::scriptExport(void)
             "getSize", &World::getSize);
 
     game = lua["game"].get_or_create<sol::table>();
-    game.set_function("spawn", entitySpawn);
-    game.set_function("worldRegister", worldRegister);
+    game.set_function("spawn", bindInstance(&ScriptSystem::spawn, this));
+    game.set_function("worldRegister", bindInstance(&WorldSystem::addWorld,
+                                                    &worldSystem));
 }
 
 sol::table ScriptSystem::spawn(sol::object param)
