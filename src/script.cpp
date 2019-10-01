@@ -134,7 +134,12 @@ void ScriptSystem::scriptExport(void)
             "setData", &World::setData,
             "registerMaterial", &World::registerMaterial,
             "setSize", &World::setSize,
-            "getSize", &World::getSize);
+            "getSize", &World::getSize,
+
+            // New stuff
+            "unitSize", sol::property(&World::setUnitSize, &World::getUnitSize),
+            "createLayer", &World::registerLayer,
+            "createDecoLayer", &World::registerDecoLayer);
 
     game = lua["game"].get_or_create<sol::table>();
     game.set_function("spawn", entitySpawn);

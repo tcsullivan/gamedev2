@@ -57,6 +57,41 @@ struct WorldMaterial
     }
 };
 
+class Layer
+{
+private:
+    Texture texture;
+    Texture normal;
+
+    float drawLayer = 0.0f;
+
+public:
+
+    Layer(float z, sol::table tab) {
+        drawLayer = z;
+        if (tab["texture"] != nullptr) {
+            sol::object t = tab["texture"];
+            texture = Texture(t);
+        }
+        if (tab["normal"] != nullptr) {
+            sol::object n = tab["normal"];
+            normal = Texture(n);
+        }
+    }
+};
+
+class SolidLayer : public Layer
+{
+private:
+    // hitbox something something
+public:
+    SolidLayer(float z, sol::table tab) : Layer(z, tab) {
+        if (tab["hitbox"] != nullptr) {
+            std::cout << "hitbox: " << std::string(tab["hitbox"]) << std::endl;
+        }
+    }
+};
+
 class World
 {
     friend class WorldSystem;
@@ -71,6 +106,11 @@ private:
 
     std::unordered_map<std::string, int> string_registry;
     std::vector<WorldMaterial> registry;
+
+    // NEW
+    unsigned int unitSize;
+    std::vector<SolidLayer> solidLayers;
+    std::vector<Layer> drawLayers;
 
 protected:
     // RENDER
@@ -115,6 +155,13 @@ public:
 
     /* PHYSICS */
     double getHeight(double x, double y, double z);
+
+    // NEW
+    unsigned int getUnitSize() {return unitSize;}
+    void setUnitSize(unsigned int u) {unitSize = u;}
+
+    void registerLayer(float, sol::object);
+    void registerDecoLayer(float, sol::object);
 };
 
 /**

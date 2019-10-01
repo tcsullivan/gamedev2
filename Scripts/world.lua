@@ -7,7 +7,6 @@ world = {
     Register = function(self)
 
         -- TODO make world have global textures to speed up rendering
-
         self:registerMaterial("grass", {
             -- TODO combine both of these into 1
             texture = {
@@ -110,3 +109,25 @@ world = {
 
 --world:Generate()
 game.worldRegister(world)
+
+newWorld = {
+    Register = function(self)
+        self.unitSize = 8;
+        self:createLayer(0, {
+            texture = { file = "Assets/world/world1/layers/0/texture.png" },
+            normal = { file = "Assets/world/world1/layers/0/normal.png" },
+            hitbox = { file = "Assets/world/world1/layers/0/hitbox.png" }
+        });
+        self:createLayer(1, {
+            texture = { file = "Assets/world/world1/layers/1/texture.png" },
+            normal = { file = "Assets/world/world1/layers/1/normal.png" },
+            hitbox = { file = "Assets/world/world1/layers/1/hitbox.png" }
+        });
+        self:createDecoLayer(10, {
+            texture = { file = "Assets/world/world1/layers/deco/texture.png" },
+            normal = { file = "Assets/world/world1/layers/deco/normal.png" },
+        });
+    end,
+    Generate = function(self) end
+}
+game.worldRegister(newWorld);

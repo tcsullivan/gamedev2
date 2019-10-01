@@ -134,6 +134,8 @@ World::getSize()
 void World::generateMesh()
 {
     //const unsigned int voxelLength = 6; // 2 triangles @ 3 points each
+    if (!data.size())
+        return;
 
     // Preallocate size of vertexes
     mesh = std::basic_string<WorldMeshData>();
@@ -219,6 +221,29 @@ double World::getHeight(double x, double y, double z)
     }
 
     return Y;
+}
+
+/*********
+*  NEW  *
+*********/
+void World::registerLayer(float z, sol::object obj)
+{
+    if (obj.get_type() == sol::type::table) {
+        sol::table tab = obj;
+        solidLayers.push_back(SolidLayer(z, tab));
+    } else {
+        throw std::string("Layer must receive a table");
+    }
+}
+
+void World::registerDecoLayer(float z, sol::object obj)
+{
+    if (obj.get_type() == sol::type::table) {
+        sol::table tab = obj;
+        drawLayers.push_back(Layer(z, tab));
+    } else {
+        throw std::string("Layer must receive a table");
+    }
 }
 
 

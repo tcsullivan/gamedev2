@@ -83,4 +83,3 @@ $(OUTDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
 	@rm -f $(OUTDIR)/$*.$(DEPEXT).tmp
 
 .PHONY: all remake clean cleaner resources
-
