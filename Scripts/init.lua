@@ -37,6 +37,9 @@ player = {
     },
     Physics = 0,
     Name = "bord",
+    Audio = {
+        file = "Assets/jump.wav"
+    },
     hellotrue = true,
     hellofalse = false,
     Render = {

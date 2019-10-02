@@ -24,6 +24,7 @@
 #include <entityx/entityx.h>
 
 #include <components/Audio.hpp>
+#include <components/Position.hpp>
 
 class AudioSystem : public entityx::System<AudioSystem>,
                     public entityx::Receiver<AudioSystem>
@@ -51,6 +52,8 @@ public:
 
     void receive(const entityx::ComponentAddedEvent<Audio>& cae);
     void receive(const entityx::ComponentRemovedEvent<Audio>& cae);
+
+    void playSound(const Position& pos, const Audio& audio);
 };
 
 #endif // SYSTEM_AUDIO_HPP_

@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "audio.hpp"
 #include "config.hpp"
 #include "engine.hpp"
 #include "gamestate.hpp"
@@ -54,6 +55,7 @@ int Engine::init(void)
     systems.add<ScriptSystem>(entities, *(systems.system<WorldSystem>().get()));
     systems.add<PhysicsSystem>();
     systems.add<TextSystem>();
+    systems.add<AudioSystem>();
     systems.configure();
 
     // Load game script and entity data

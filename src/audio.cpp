@@ -20,13 +20,19 @@
 
 #include "audio.hpp"
 
+#include <AL/alut.h>
+#include <iostream>
+
 AudioSystem::AudioSystem(void) :
     device(nullptr, [](ALCdevice *d) { alcCloseDevice(d); }),
     context(nullptr, [](ALCcontext *c) { alcDestroyContext(c); }) {}
 
 AudioSystem::~AudioSystem(void)
 {
+    alutExit();
+
     // Delete context before device
+    alcMakeContextCurrent(nullptr);
     context.reset();
     device.reset();
 }
@@ -46,6 +52,9 @@ void AudioSystem::configure([[maybe_unused]] entityx::EntityManager& entities,
     context.reset(alcCreateContext(device.get(), nullptr));
     if (!alcMakeContextCurrent(context.get()))
         return; // TODO Another uh oh
+
+    if (alutInitWithoutContext(nullptr, nullptr) != AL_TRUE)
+        return; // TODO Third uh oh
 }
 
 void AudioSystem::update([[maybe_unused]] entityx::EntityManager& entities,
@@ -56,10 +65,26 @@ void AudioSystem::update([[maybe_unused]] entityx::EntityManager& entities,
 void AudioSystem::receive(const entityx::ComponentAddedEvent<Audio>& cae)
 {
     alGenSources(1, const_cast<ALuint*>(&cae.component->source));
+    //alGenBuffers(1, const_cast<ALuint*>(&cae.component->buffer));
+    
+    if (auto buf = alutCreateBufferFromFile(cae.component->fileName.c_str());
+        buf != AL_NONE) {
+        const_cast<Audio*>(cae.component.get())->buffer = buf;
+        alSourcei(cae.component->source, AL_BUFFER, buf);
+
+        std::cout << "Loaded audio: " << cae.component->fileName << std::endl;
+    }
 }
 
 void AudioSystem::receive(const entityx::ComponentRemovedEvent<Audio>& cae)
 {
+    alDeleteBuffers(1, &cae.component->buffer);
     alDeleteSources(1, &cae.component->source);
+}
+
+void AudioSystem::playSound(const Position& pos, const Audio& audio)
+{
+    alSource3f(audio.source, AL_POSITION, pos.x, pos.y, 0);
+    alSourcePlay(audio.source);
 }
 

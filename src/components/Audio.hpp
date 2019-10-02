@@ -24,14 +24,23 @@
 struct Audio : Component<Audio>
 {
 public:
+    std::string fileName;
     ALuint source;
+    ALuint buffer;
 
-    Audio(ALuint _source = 0) :
-        source(_source) {}
+    Audio(std::string _fileName = "") :
+        fileName(_fileName), source(0), buffer(0) {}
 
-    Audio FromLua([[maybe_unused]] sol::object ref)
+    Audio FromLua(sol::object ref)
     {
-        // TODO load from file name?
+        if (ref.get_type() == sol::type::table) {
+            sol::table tab = ref;
+            if (tab["file"] != nullptr)
+                this->fileName = tab["file"];
+        } else {
+            throw std::string("Audio table not formatted properly");
+        }
+
         return *this;
     }
 
