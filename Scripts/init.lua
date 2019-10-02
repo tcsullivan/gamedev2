@@ -21,6 +21,7 @@ player = {
         end,
         JumpKeyPressed = function(self)
             if self.Physics.standing == true then
+                game.play(self.Position, self.Audio)
                 self.Velocity.y = self.Velocity.y + 9
             end
         end,

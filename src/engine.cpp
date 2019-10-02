@@ -66,6 +66,9 @@ int Engine::init(void)
     script->addToGameNamespace("puts",
         bindInstance(&TextSystem::put,
                      systems.system<TextSystem>().get()));
+    script->addToGameNamespace("play",
+        bindInstance(&AudioSystem::playSound,
+                     systems.system<AudioSystem>().get()));
     script->init();
     
 
