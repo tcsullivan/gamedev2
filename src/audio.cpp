@@ -19,6 +19,7 @@
  */
 
 #include "audio.hpp"
+#include "components/Player.hpp"
 
 #include <AL/alut.h>
 #include <iostream>
@@ -55,12 +56,25 @@ void AudioSystem::configure([[maybe_unused]] entityx::EntityManager& entities,
 
     if (alutInitWithoutContext(nullptr, nullptr) != AL_TRUE)
         return; // TODO Third uh oh
+
+    ALfloat listenerOri[] = { 0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f };
+    alListener3f(AL_POSITION, 0, 0, 0.0f);
+    alListener3f(AL_VELOCITY, 0, 0, 0);
+    alListenerfv(AL_ORIENTATION, listenerOri);
 }
 
-void AudioSystem::update([[maybe_unused]] entityx::EntityManager& entities,
+void AudioSystem::update(entityx::EntityManager& entities,
                          [[maybe_unused]] entityx::EventManager& events,
                          [[maybe_unused]] entityx::TimeDelta dt)
-{}
+{
+    entities.each<Player, Position>(
+        []([[maybe_unused]] entityx::Entity e,
+                   [[maybe_unused]] Player& p,
+                   Position &pos)
+        {
+            alListener3f(AL_POSITION, pos.x, pos.y, 0.0f);
+        });
+}
 
 void AudioSystem::receive(const entityx::ComponentAddedEvent<Audio>& cae)
 {

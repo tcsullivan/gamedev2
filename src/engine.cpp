@@ -120,6 +120,7 @@ void Engine::logicLoop(void)
             });
         }
 
+        systems.update<AudioSystem>(dt);
         std::this_thread::yield();
     }
 }
