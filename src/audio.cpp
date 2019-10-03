@@ -57,10 +57,13 @@ void AudioSystem::configure([[maybe_unused]] entityx::EntityManager& entities,
     if (alutInitWithoutContext(nullptr, nullptr) != AL_TRUE)
         return; // TODO Third uh oh
 
+    // Set up listener
     ALfloat listenerOri[] = { 0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f };
     alListener3f(AL_POSITION, 0, 0, 0.0f);
     alListener3f(AL_VELOCITY, 0, 0, 0);
     alListenerfv(AL_ORIENTATION, listenerOri);
+
+    alDistanceModel(AL_LINEAR_DISTANCE); 
 }
 
 void AudioSystem::update(entityx::EntityManager& entities,
@@ -85,6 +88,9 @@ void AudioSystem::receive(const entityx::ComponentAddedEvent<Audio>& cae)
         buf != AL_NONE) {
         const_cast<Audio*>(cae.component.get())->buffer = buf;
         alSourcei(cae.component->source, AL_BUFFER, buf);
+        // TODO Do these values need to be scaled to the world or window?
+        alSourcef(cae.component->source, AL_MAX_DISTANCE, 25);
+        alSourcef(cae.component->source, AL_REFERENCE_DISTANCE, 2);
 
         std::cout << "Loaded audio: " << cae.component->fileName << std::endl;
     }
