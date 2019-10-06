@@ -27,13 +27,7 @@
 #include <sol/sol.hpp>
 
 #include "texture.hpp"
-
-struct WorldMeshData
-{
-    float posX, posY, posZ;
-    float texX, texY;
-    float transparency;
-}__attribute__((packed));
+#include "events/render.hpp"
 
 struct WorldMaterial
 {
@@ -59,12 +53,14 @@ struct WorldMaterial
 
 class Layer
 {
+    friend class World;
 private:
     Texture texture;
     Texture normal;
 
     float drawLayer = 0.0f;
 
+    GLuint layerVBO;
 public:
 
     Layer(float z, sol::table tab) {
@@ -77,6 +73,8 @@ public:
             sol::object n = tab["normal"];
             normal = Texture(n);
         }
+
+        glGenBuffers(1, &layerVBO);
     }
 };
 
@@ -99,24 +97,14 @@ private:
     unsigned int seed;
     unsigned int layers;
 
-    unsigned int height;
-    unsigned int width;
-
-    std::vector<std::vector<std::vector<int>>> data;
-
-    std::unordered_map<std::string, int> string_registry;
-    std::vector<WorldMaterial> registry;
-
-    // NEW
     unsigned int unitSize;
     std::vector<SolidLayer> solidLayers;
     std::vector<Layer> drawLayers;
 
 protected:
     // RENDER
-    std::basic_string<WorldMeshData> mesh;
+    std::vector<WorldMeshUpdateEvent> meshAdd;
     GLuint worldVBO;
-    bool meshUpdated = false;
 public:
     /* VARS */
     sol::function generate;
@@ -127,27 +115,12 @@ public:
     ~World() {
         registerMat = sol::nil;
         generate = sol::nil;
-        registry.clear();
-        data.clear();
     }
 
-    /* REGISTRY */
-    void registerMaterial(std::string, sol::object);
-
-    /* DATA */
-    void setData(unsigned int, unsigned int, unsigned int, std::string);
-
-    /* SIZE */
-    std::tuple<unsigned int, unsigned int, unsigned int> setSize(unsigned int,
-                                                                 unsigned int,
-                                                                 unsigned int);
     std::tuple<unsigned int, unsigned int, unsigned int> getSize();
 
     /* RENDERING */
     void generateMesh();
-    std::basic_string<WorldMeshData>& getMesh() {return mesh;}
-    GLuint getTexture() {return registry.at(0).texture.tex;}
-    GLuint getNormal() {return registry.at(0).normal.tex;};
 
     /* SEED */
     unsigned int getSeed();

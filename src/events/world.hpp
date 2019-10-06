@@ -28,16 +28,4 @@ struct WorldChangeEvent
         newWorld(w) {}
 };
 
-struct WorldMeshUpdateEvent
-{
-    GLuint worldVBO;
-    unsigned int numVertex;
-    GLuint worldTexture;
-    GLuint worldNormal;
-
-    WorldMeshUpdateEvent(GLuint v, unsigned int p,
-                         GLuint t, GLuint n) :
-        worldVBO(v), numVertex(p), worldTexture(t), worldNormal(n) {}
-};
-
 #endif//EVENTS_WORLD_HPP

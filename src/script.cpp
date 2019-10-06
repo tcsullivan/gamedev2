@@ -131,9 +131,6 @@ void ScriptSystem::scriptExport(void)
             sol::constructors<World(sol::object), World(void)>(),
             "Generate", &World::generate,
             "Seed", sol::property(&World::setSeed, &World::getSeed),
-            "setData", &World::setData,
-            "registerMaterial", &World::registerMaterial,
-            "setSize", &World::setSize,
             "getSize", &World::getSize,
 
             // New stuff

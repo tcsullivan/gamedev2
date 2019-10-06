@@ -37,8 +37,8 @@
 #include "shader.hpp"
 #include "world.hpp"
 #include "components/Player.hpp"
+
 #include "events/render.hpp"
-#include "events/world.hpp"
 
 #include <map>
 
@@ -49,6 +49,16 @@ struct UIRenderData
     unsigned int vertex;
 
     UIRenderData(GLuint _tex, GLuint _normal, unsigned int _vertex) :
+        tex(_tex), normal(_normal), vertex(_vertex) {}
+};
+
+struct WorldRenderData
+{
+    GLuint tex;
+    GLuint normal;
+    unsigned int vertex;
+
+    WorldRenderData(GLuint _tex, GLuint _normal, unsigned int _vertex) :
         tex(_tex), normal(_normal), vertex(_vertex) {}
 };
 
@@ -69,11 +79,8 @@ private:
 
     // Map of VBOs and their render data
     std::map<GLuint, UIRenderData> uiRenders;
+    std::map<GLuint, WorldRenderData> worldRenders;
 
-    GLuint worldVBO = 0;
-    unsigned int worldVertex = 0;
-    GLuint worldTexture = 0;
-    GLuint worldNormal = 0;
     entityx::Entity player; // Save the player so we can track the camera
 public:
     RenderSystem() :

@@ -18,7 +18,7 @@
  */
 
 #include "world.hpp"
-#include "events/render.hpp"
+
 #include "events/world.hpp"
 
 /*****************
@@ -55,133 +55,55 @@ World::World(sol::object param)
     // If a generate function is defined, call it
     if (generate != sol::nil)
         generate(this);
-
-    // Create our world VBO
-    glGenBuffers(1, &worldVBO);
-    // Generate our mesh
-    generateMesh();
+    std::cout << "flamingo" << std::endl;
 }
 
-/* REGISTRY */
-void World::registerMaterial(std::string name, sol::object data)
-{
-    if (data.get_type() == sol::type::table) {
-        sol::table tab = data;
-
-        // Make sure this material has not been registered before
-        auto it = string_registry.find(name);
-        if (it == string_registry.end()) {
-            string_registry.emplace(name, registry.size());
-            registry.push_back(WorldMaterial(tab));
-        } else {
-            std::cerr << "Material: " << name 
-                      << " was already registered" << std::endl;
-        }
-    } else {
-        // TODO better logging
-        std::cerr << "Material registration must have a table" << std::endl;
-    }
-}
-
-/* DATA */
-void World::setData(unsigned int x,
-                    unsigned int y,
-                    unsigned int z,
-                    std::string d)
-{
-    unsigned int discovered = -1;
-
-    auto found = string_registry.find(d);
-    if (found != string_registry.end())
-        discovered = found->second;
-
-    try {
-        data.at(z).at(x).at(y) = discovered;
-    } catch (std::out_of_range &oor) {
-    // Make sure any assignments that are outsize specified world size are
-    //  caught to avoid any seg faults
-        std::cerr << "Unable to set data at: "
-                  << x << "," << y << "," << z
-                  << " Exception: " << oor.what() << std::endl;
-    }
-}
-
-/* SIZE */
-std::tuple<unsigned int, unsigned int, unsigned int>
-World::setSize(unsigned int x, unsigned int y, unsigned int z)
-{
-    width = x;
-    height = y;
-    layers = z;
-
-    data = std::vector<std::vector<std::vector<int>>>
-        (z, std::vector<std::vector<int>>
-            (x,std::vector<int>
-                (y, -1)
-            )
-        );
-
-    return {width, height, layers};
-}
-
+// TODO
 std::tuple<unsigned int, unsigned int, unsigned int>
 World::getSize()
 {
-    return {width, height, layers};
+    //return {width, height, layers};
+    return {0, 0, 0};
 }
 
 /* RENDERING */
 void World::generateMesh()
 {
-    //const unsigned int voxelLength = 6; // 2 triangles @ 3 points each
-    if (!data.size())
-        return;
+    for (auto &l : solidLayers) {
+        
+        // Preallocate size of vertexes
 
-    // Preallocate size of vertexes
-    mesh = std::basic_string<WorldMeshData>();
-    for (float Z = data.size() - 1; Z >= 0; Z--) {
-        for (float X = 0; X < data.at(Z).size(); X++) {
-            for (float Y = 0; Y < data.at(Z).at(X).size(); Y++) {
-                int d = data.at(Z).at(X).at(Y);
+        float Z = l.drawLayer;
+        auto to = l.texture.offset;
+        auto ts = l.texture.size;
+        float tr = 1.0f;
 
-                if (d == -1) // Don't make a mesh for air of course
-                    continue;
+        float w = l.texture.width/unitSize;
+        float h = l.texture.height/unitSize;
 
-                Texture &t = registry.at(d).texture;
-                glm::vec2& to = t.offset;
-                glm::vec2& ts = t.size;
+        GLfloat mesh[36] = {0  , 0  , Z, to.x     , to.y+ts.y, tr,
+                            0+w, 0  , Z, to.x+ts.x, to.y+ts.y, tr,
+                            0  , 0+h, Z, to.x     , to.y     , tr,
 
-                float tr = 1.0f;
+                            0+w, 0  , Z, to.x+ts.x, to.y+ts.y, tr,
+                            0+w, 0+h, Z, to.x+ts.x, to.y     , tr,
+                            0  , 0+h, Z, to.x     , to.y     , tr};
 
-                // TODO play with this a bit so it only goes trans
-                //  if player is behind the front layer
-                try {
-                    if (Z < data.size() - 1 && Z >= 0) {
-                        if (data.at(Z+1).at(X).at(Y) == -1)
-                            tr = 1.0f;
-                    }
-                } catch (...) {
-                    tr = 1.0f;
-                }
+        glBindBuffer(GL_ARRAY_BUFFER, l.layerVBO);
+        glBufferData(GL_ARRAY_BUFFER, 
+                     36 * sizeof(GLfloat), 
+                     mesh, 
+                     GL_STATIC_DRAW);
 
-                mesh += {X  , Y  , Z, to.x     , to.y+ts.y, tr};
-                mesh += {X+1, Y  , Z, to.x+ts.x, to.y+ts.y, tr};
-                mesh += {X  , Y+1, Z, to.x     , to.y     , tr};
-
-                mesh += {X+1, Y  , Z, to.x+ts.x, to.y+ts.y, tr};
-                mesh += {X+1, Y+1, Z, to.x+ts.x, to.y     , tr};
-                mesh += {X  , Y+1, Z, to.x     , to.y     , tr};
-            }
-        }
+        meshAdd.push_back(WorldMeshUpdateEvent(l.layerVBO,
+                                               l.texture.tex,
+                                               l.normal.tex,
+                                               36));
     }
 
-    glBindBuffer(GL_ARRAY_BUFFER, worldVBO);
-    glBufferData(GL_ARRAY_BUFFER, 
-                 mesh.size() * sizeof(WorldMeshData), 
-                 mesh.data(), 
-                 GL_STATIC_DRAW);
-
-    meshUpdated = true;
+    for (auto &l : drawLayers) {
+        (void)l;
+    }
 }
 
 /* SEED */
@@ -199,27 +121,11 @@ unsigned int World::setSeed(unsigned int s)
 /* PHYSICS */
 double World::getHeight(double x, double y, double z)
 {
-    unsigned int X = static_cast<unsigned int>(x);
-    unsigned int Z = static_cast<unsigned int>(z);
+    (void)x;
+    (void)y;
+    (void)z;
 
-    double Y = 0.0;
-    try {
-        auto &d = data.at(Z).at(X);
-        for (int yi = d.size()-1; yi >= 0; yi--) {
-            if (d.at(yi) >= 0) {
-                if (!registry.at(d.at(yi)).passable) {
-                    Y = static_cast<double>(yi);
-                    Y += 1;
-                    break;
-                }
-            }
-        }
-    } catch (...) { // If we get any errors, just let the character 
-        //return y;
-        (void)y;
-        return 0.0;
-    }
-
+    double Y = 10.0f;
     return Y;
 }
 
@@ -234,6 +140,7 @@ void World::registerLayer(float z, sol::object obj)
     } else {
         throw std::string("Layer must receive a table");
     }
+    generateMesh();
 }
 
 void World::registerDecoLayer(float z, sol::object obj)
@@ -244,6 +151,7 @@ void World::registerDecoLayer(float z, sol::object obj)
     } else {
         throw std::string("Layer must receive a table");
     }
+    generateMesh();
 }
 
 
@@ -272,12 +180,8 @@ void WorldSystem::update([[maybe_unused]]entityx::EntityManager& entities,
         events.emit<WorldChangeEvent>(currentWorld);
     }
 
-    if (currentWorld->meshUpdated) {
-        events.emit<WorldMeshUpdateEvent>(
-            currentWorld->worldVBO, 
-            currentWorld->mesh.size(),
-            currentWorld->getTexture(),
-            currentWorld->getNormal()
-        );
+    for (auto &ma : currentWorld->meshAdd) {
+        events.emit<WorldMeshUpdateEvent>(ma);
     }
+    currentWorld->meshAdd.clear();
 }

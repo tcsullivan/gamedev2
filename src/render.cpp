@@ -219,24 +219,25 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     });
     glUniform1i(f, 0);
 
-    // If we were given a world VBO render it
-    if (worldVBO) {
+    for (auto& w : worldRenders) {
+        auto& layer = w.second;
+
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, worldTexture);
+        glBindTexture(GL_TEXTURE_2D, layer.tex);
         glUniform1i(q, 0);
 
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, worldNormal);
+        glBindTexture(GL_TEXTURE_2D, layer.normal);
         glUniform1i(n, 1);
 
-        glBindBuffer(GL_ARRAY_BUFFER, worldVBO);
+        glBindBuffer(GL_ARRAY_BUFFER, w.first);
         glVertexAttribPointer(a, 3, GL_FLOAT, GL_FALSE,
                               6*sizeof(float), 0);
         glVertexAttribPointer(t, 2, GL_FLOAT, GL_FALSE, 
                               6*sizeof(float), (void*)(3*sizeof(float)));
         glVertexAttribPointer(r, 1, GL_FLOAT, GL_FALSE, 
                               6*sizeof(float), (void*)(5*sizeof(float)));
-        glDrawArrays(GL_TRIANGLES, 0, worldVertex);
+        glDrawArrays(GL_TRIANGLES, 0, layer.vertex);
     }
 
     glDisableVertexAttribArray(a);
@@ -408,10 +409,12 @@ void RenderSystem::receive(const NewRenderEvent &nre)
 
 void RenderSystem::receive(const WorldMeshUpdateEvent &wmu)
 {
-    worldVBO = wmu.worldVBO;
-    worldVertex = wmu.numVertex;
-    worldTexture = wmu.worldTexture;
-    worldNormal = wmu.worldNormal;
+    worldRenders.insert_or_assign(
+        wmu.worldVBO,
+        WorldRenderData(wmu.worldTexture, 
+                        wmu.worldNormal,
+                        wmu.numVertex)
+    );
 }
 
 void RenderSystem::receive(const entityx::ComponentAddedEvent<Player> &cae)
