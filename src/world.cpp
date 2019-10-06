@@ -55,7 +55,6 @@ World::World(sol::object param)
     // If a generate function is defined, call it
     if (generate != sol::nil)
         generate(this);
-    std::cout << "flamingo" << std::endl;
 }
 
 // TODO
@@ -121,12 +120,22 @@ unsigned int World::setSeed(unsigned int s)
 /* PHYSICS */
 double World::getHeight(double x, double y, double z)
 {
-    (void)x;
     (void)y;
-    (void)z;
+    double Y = 0.0f;
+    for (auto &l : solidLayers) {
+        if (z == l.drawLayer) {
+            int wx = x*unitSize;
 
-    double Y = 10.0f;
-    return Y;
+            int h = 0.0;
+            for (auto b : l.hitbox[wx]) {
+                if (b)
+                    Y = h;
+                h++;
+            }
+            return Y;
+        }
+    }
+    return 0;
 }
 
 /*********

@@ -21,6 +21,8 @@
 
 #include "texture.hpp"
 
+#include <soil/SOIL.h>
+
 #include <unordered_map>
 #include <iostream>
 

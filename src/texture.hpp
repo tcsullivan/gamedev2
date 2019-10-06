@@ -20,8 +20,6 @@
 #ifndef TEXTURE_HPP_
 #define TEXTURE_HPP_
 
-#include <soil/SOIL.h>
-
 #include <sol/sol.hpp>
 
 #include <GL/glew.h>

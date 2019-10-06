@@ -26,6 +26,8 @@
 #include <entityx/entityx.h>
 #include <sol/sol.hpp>
 
+#include <soil/SOIL.h>
+
 #include "texture.hpp"
 #include "events/render.hpp"
 
@@ -80,12 +82,32 @@ public:
 
 class SolidLayer : public Layer
 {
+    friend class World;
 private:
-    // hitbox something something
+    std::vector<std::vector<bool>> hitbox;
 public:
     SolidLayer(float z, sol::table tab) : Layer(z, tab) {
         if (tab["hitbox"] != nullptr) {
-            std::cout << "hitbox: " << std::string(tab["hitbox"]) << std::endl;
+            int width, height;
+            unsigned char* box = 
+                SOIL_load_image(std::string(tab["hitbox"]).c_str(),
+                                &width, &height, 0,
+                                SOIL_LOAD_RGBA);
+
+            for (int w = 0; w < width; w++) {
+                hitbox.push_back(std::vector<bool>(height));
+                for (int h = 0; h < height; h++) {
+                    unsigned char* c = &box[(h) + (height*w*4)];
+                    // we want to read the red channel
+                    if (c[3]) {
+                        hitbox[w][h] = true;
+                    }
+                    else
+                        hitbox[w][h] = false;
+                }
+            }
+
+            SOIL_free_image_data(box);
         }
     }
 };
