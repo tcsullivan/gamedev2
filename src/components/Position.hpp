@@ -24,9 +24,9 @@
 struct Position : Component<Position>
 {
 public:
-    double x, y;
+    float x, y;
 
-    Position(double _x = 0, double _y = 0) :
+    Position(float _x = 0, float _y = 0) :
         x(_x), y(_y) {}
 
     Position FromLua(sol::object ref)
@@ -36,6 +36,11 @@ public:
         this->y = vec.y;
 
         return *this;
+    }
+
+    glm::vec2 vec()
+    {
+        return glm::vec2(x, y);
     }
 
     void serialize(cereal::JSONOutputArchive& ar) final {

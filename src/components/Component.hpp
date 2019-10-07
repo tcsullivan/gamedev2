@@ -24,6 +24,8 @@
 #include <entityx/entityx.h>
 #include <sol/sol.hpp>
 
+#include <glm/glm.hpp>
+
 #include <script/vectors.hpp>
 
 template<typename T>

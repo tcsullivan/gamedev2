@@ -25,23 +25,22 @@
 struct Velocity : Component<Velocity>
 {
 public:
-    double x, y;
+    float x, y;
 
-    Velocity(double _x = 0, double _y = 0) :
+    Velocity(float _x = 0, float _y = 0) :
         x(_x), y(_y) {}
 
     Velocity FromLua(sol::object ref)
     {
-        if (ref.get_type() == sol::type::table) {
-            sol::table tab = ref;
-            if (tab["x"] != nullptr)
-                this->x = tab["x"];
-            if (tab["y"] != nullptr)
-                this->y = tab["y"];
-        } else {
-            throw std::string("Velocity table not formatted properly");
-        }
+        glm::vec2 vel = Script::to<glm::vec2>(ref);
+        this->x = vel.x;
+        this->y = vel.y;
         return *this;
+    }
+
+    glm::vec2 vec()
+    {
+        return glm::vec2(x, y);
     }
 
     void serialize(cereal::JSONOutputArchive& ar) final {

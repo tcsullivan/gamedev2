@@ -26,6 +26,8 @@
 #include <unordered_map>
 #include <iostream>
 
+#include <script/vectors.hpp>
+
 struct TextureData
 {
     GLuint tex = 0;
@@ -101,20 +103,10 @@ Texture::Texture(sol::object param)
         else
             return; // If we don't have image data just return a null image
 
-        if (tab["offset"] == sol::type::table) {
-            sol::table off = tab["offset"];
-            if (off["x"] == sol::type::number)
-                offset.x = off.get<float>("x")/width;
-            if (off["y"] == sol::type::number)
-                offset.y = off.get<float>("y")/height;
-        }
+        if (tab["offset"].get_type() == sol::type::table)
+            offset = Script::to<glm::vec2>(tab["offset"]);
 
-        if (tab["size"] == sol::type::table) {
-            sol::table siz = tab["size"];
-            if (siz["x"] == sol::type::number)
-                size.x = siz.get<float>("x")/width;
-            if (siz["y"] == sol::type::number)
-                size.y = siz.get<float>("y")/height;
-        }
+        if (tab["size"].get_type() == sol::type::table)
+            size = Script::to<glm::vec2>(tab["size"]);
     }
 }

@@ -167,19 +167,18 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
         //if (e.has_component<Scripted>()) {
         //    e.component<Scripted>()->updateRender();
         //}
-
-        float w = 0.5f;
-        float h = (float)rend.texture.height/rend.texture.width;
+        
+        auto& c = rend.corners;
 
         GLuint tri_vbo;
         GLfloat tri_data[] = {
-                (float)p.x-w, (float)p.y  , 0.0f, 0.0f, 1.0f, 1.0f,
-                (float)p.x+w, (float)p.y  , 0.0f, 1.0f, 1.0f, 1.0f,
-                (float)p.x-w, (float)p.y+h, 0.0f, 0.0f, 0.0f, 1.0f,
-                                                             
-                (float)p.x+w, (float)p.y  , 0.0f, 1.0f, 1.0f, 1.0f,
-                (float)p.x+w, (float)p.y+h, 0.0f, 1.0f, 0.0f, 1.0f,
-                (float)p.x-w, (float)p.y+h, 0.0f, 0.0f, 0.0f, 1.0f,
+                p.x+c[0].x, p.y+c[0].y, 0.0f, 0.0f, 1.0f, 1.0f,
+                p.x+c[1].x, p.y+c[1].y, 0.0f, 1.0f, 1.0f, 1.0f,
+                p.x+c[2].x, p.y+c[2].y, 0.0f, 0.0f, 0.0f, 1.0f,
+                                   
+                p.x+c[1].x, p.y+c[1].y, 0.0f, 1.0f, 1.0f, 1.0f,
+                p.x+c[3].x, p.y+c[3].y, 0.0f, 1.0f, 0.0f, 1.0f,
+                p.x+c[2].x, p.y+c[2].y, 0.0f, 0.0f, 0.0f, 1.0f,
         };
 
         bool flipped = false;

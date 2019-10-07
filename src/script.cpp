@@ -94,7 +94,7 @@ void ScriptSystem::scriptExport(void)
         [this](sol::object t){ return worldSystem.addWorld(t); };
 
     lua.new_usertype<Position>("Position",
-            sol::constructors<Position(double x, double y), Position()>(),
+            sol::constructors<Position(float x, float y), Position()>(),
             "x", &Position::x,
             "y", &Position::y);
 
@@ -109,7 +109,7 @@ void ScriptSystem::scriptExport(void)
             "flipx", &Render::flipX);
 
     lua.new_usertype<Velocity>("Velocity",
-            sol::constructors<Velocity(double, double), Velocity()>(),
+            sol::constructors<Velocity(float, float), Velocity()>(),
             "x", &Velocity::x,
             "y", &Velocity::y);
 

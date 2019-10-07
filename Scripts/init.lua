@@ -34,24 +34,24 @@ player = {
         x = 0.0,
         y = 0.0
     },
-    Hitbox = {
-        bounds = {
+    Physics = {
+        gravity = true,
+        hitbox = {
             {x = -0.5, y = -0.8},
             {x = 0.5, y = -0.8},
             {x = -0.5, y = 0.8},
             {x = 0.5, y = 0.8},
         }
     },
-    Physics = 0,
     Name = "bord",
     Render = {
         texture = "Assets/player.png",
         visible = true,
-        bounds = {
-            {x = -0.5, y = -0.8},
-            {x = 0.5, y = -0.8},
-            {x = -0.5, y = 0.8},
-            {x = 0.5, y = 0.8},
+        offset = {
+            ll = {x = -0.5, y = -0.8},
+            lr = {x = 0.5, y = -0.8},
+            ul = {x = -0.5, y = 0.8},
+            ur = {x = 0.5, y = 0.8},
         }
     },
     Light = {

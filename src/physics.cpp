@@ -41,10 +41,10 @@ void PhysicsSystem::update([[maybe_unused]]entityx::EntityManager& entities,
         pos.x += (vel.x * dt/1000.0);
         pos.y += (vel.y * dt/1000.0);
 
-        // TODO make this intersect world instead of 0 y
+        // If the entity has physics
         if (has_phys) {
 
-            double fallPosition = currentWorld->getHeight(pos.x, pos.y, 0.0);
+            float fallPosition = currentWorld->getHeight(pos.x, pos.y, 0.0);
 
             Physics *p = e.component<Physics>().get();
             // TODO only make this occur when the entity has a hitbox

@@ -28,6 +28,12 @@ public:
     Texture normal;
     bool visible;
     bool flipX = false;
+    glm::vec2 corners[4] = {
+        glm::vec2(-0.5, -0.5), // lower left
+        glm::vec2( 0.5, -0.5), // lower right
+        glm::vec2(-0.5,  0.5), // upper left
+        glm::vec2( 0.5,  0.5)  // upper right
+    };
 
     Render(std::string _file) :
         texture(_file), visible(true) {}
@@ -46,6 +52,19 @@ public:
                 this->normal = Texture(tab.get<std::string>("normal"));
             if (tab["flipx"].get_type() == sol::type::boolean)
                 this->flipX = tab["flipx"];
+
+            if (tab["offset"].get_type() == sol::type::table) {
+                sol::table offset = tab["offset"];
+                if (offset["ll"] == sol::type::table)
+                    corners[0] = Script::to<glm::vec2>(offset["ll"]);
+                if (offset["lr"] == sol::type::table)
+                    corners[1] = Script::to<glm::vec2>(offset["lr"]);
+                if (offset["ul"] == sol::type::table)
+                    corners[2] = Script::to<glm::vec2>(offset["ul"]);
+                if (offset["ur"] == sol::type::table)
+                    corners[3] = Script::to<glm::vec2>(offset["ur"]);
+            }
+
         } else {
             throw std::string(
                 "Render component table formatted incorrectly"
