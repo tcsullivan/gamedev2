@@ -88,22 +88,22 @@ private:
 public:
     SolidLayer(float z, sol::table tab) : Layer(z, tab) {
         if (tab["hitbox"] != nullptr) {
-            int width, height;
+            int width, height, channels;
             unsigned char* box = 
                 SOIL_load_image(std::string(tab["hitbox"]).c_str(),
-                                &width, &height, 0,
+                                &width, &height, &channels,
                                 SOIL_LOAD_RGBA);
 
-            for (int w = 0; w < width; w++) {
+            for (int w = 0; w < width*4; w+=4) {
                 hitbox.push_back(std::vector<bool>(height));
                 for (int h = 0; h < height; h++) {
-                    unsigned char* c = &box[(h) + (height*w*4)];
-                    // we want to read the red channel
+                    unsigned char* c = &box[(w) + (width*h*4)];
+                    // we want to read the alpha
                     if (c[3]) {
-                        hitbox[w][h] = true;
+                        hitbox[w/4][height-h] = true;
                     }
                     else
-                        hitbox[w][h] = false;
+                        hitbox[w/4][height-h] = false;
                 }
             }
 

@@ -128,11 +128,12 @@ double World::getHeight(double x, double y, double z)
 
             int h = 0.0;
             for (auto b : l.hitbox[wx]) {
-                if (b)
+                if (b == true)
                     Y = h;
                 h++;
             }
-            return Y;
+            std::cout << l.drawLayer << "," << wx << "," << Y << std::endl;
+            return (Y/unitSize);
         }
     }
     return 0;

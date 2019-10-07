@@ -86,7 +86,7 @@ ball = {
 dofile("Scripts/world.lua")
 
 playerSpawn = game.spawn(player);
-game.spawn(ball);
+--game.spawn(ball);
 
 -------------------
 --  SERIALIZING  --
