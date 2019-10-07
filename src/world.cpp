@@ -132,7 +132,6 @@ double World::getHeight(double x, double y, double z)
                     Y = h;
                 h++;
             }
-            std::cout << l.drawLayer << "," << wx << "," << Y << std::endl;
             return (Y/unitSize);
         }
     }

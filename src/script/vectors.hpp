@@ -1,4 +1,6 @@
 /**
+ * @file vectors.hpp
+ *
  * Copyright (C) 2019  Belle-Isle, Andrew <drumsetmonkey@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,33 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef COMPONENT_HPP_
-#define COMPONENT_HPP_
+#ifndef SCRIPT_VECTORS_HPP_
+#define SCRIPT_VECTORS_HPP_
 
-#include <cereal/cereal.hpp>
-#include <cereal/archives/json.hpp>
-
-#include <entityx/entityx.h>
 #include <sol/sol.hpp>
 
-#include <script/vectors.hpp>
-
-template<typename T>
-class Component : public entityx::Component<T>
+namespace Script
 {
-public:
-    virtual T FromLua(sol::object) = 0;
+    template<class T>
+    T to(sol::object obj);
+}
 
-    virtual void serialize(cereal::JSONOutputArchive& ar) = 0;
-    virtual void serialize(cereal::JSONInputArchive& ar) = 0;
-
-    void internal_serialize(bool save, void *ar) final {
-        if (save)
-            serialize(*reinterpret_cast<cereal::JSONOutputArchive*>(ar));
-        else
-            serialize(*reinterpret_cast<cereal::JSONInputArchive*>(ar));
-    }
-};
-
-#endif // COMPONENT_HPP_
-
+#endif//SCRIPT_VECTORS_HPP_

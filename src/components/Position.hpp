@@ -31,15 +31,10 @@ public:
 
     Position FromLua(sol::object ref)
     {
-        if (ref.get_type() == sol::type::table) {
-            sol::table tab = ref;
-            if (tab["x"] != nullptr)
-                this->x = tab["x"];
-            if (tab["y"] != nullptr)
-                this->y = tab["y"];
-        } else {
-            throw std::string("Position table not formatted properly");
-        }
+        glm::vec2 vec = Script::to<glm::vec2>(ref);
+        this->x = vec.x;
+        this->y = vec.y;
+
         return *this;
     }
 

@@ -28,20 +28,31 @@ player = {
         end
     },
     Position = {
-        x = 15,
-        y = 75
+        15.0, 10.0
     },
     Velocity = {
         x = 0.0,
         y = 0.0
     },
+    Hitbox = {
+        bounds = {
+            {x = -0.5, y = -0.8},
+            {x = 0.5, y = -0.8},
+            {x = -0.5, y = 0.8},
+            {x = 0.5, y = 0.8},
+        }
+    },
     Physics = 0,
     Name = "bord",
-    hellotrue = true,
-    hellofalse = false,
     Render = {
         texture = "Assets/player.png",
-        visible = true
+        visible = true,
+        bounds = {
+            {x = -0.5, y = -0.8},
+            {x = 0.5, y = -0.8},
+            {x = -0.5, y = 0.8},
+            {x = 0.5, y = 0.8},
+        }
     },
     Light = {
         r = 1.0,
@@ -50,11 +61,6 @@ player = {
         strength = 1.0
     },
     Idle = function(self)
-        --if (self.visibleTick >= 20) then
-        --    self.Render.visible = not self.Render.visible
-        --    self.visibleTick = 0
-        --end
-        --self.visibleTick = self.visibleTick + 1
     end,
     visibleTick = 0
 }
@@ -86,7 +92,7 @@ ball = {
 dofile("Scripts/world.lua")
 
 playerSpawn = game.spawn(player);
---game.spawn(ball);
+game.spawn(ball);
 
 -------------------
 --  SERIALIZING  --

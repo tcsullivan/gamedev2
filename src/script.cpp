@@ -145,7 +145,7 @@ void ScriptSystem::scriptExport(void)
 
 sol::table ScriptSystem::spawn(sol::object param)
 {
-    sol::table* toRet; // "Entitiy" table to be returned
+    sol::table* toRet = NULL; // "Entitiy" table to be returned
     if (param.get_type() == sol::type::table) {
         sol::table tab = param; // Cast the generic parameter to a table
 

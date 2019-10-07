@@ -94,16 +94,16 @@ public:
                                 &width, &height, &channels,
                                 SOIL_LOAD_RGBA);
 
-            for (int w = 0; w < width*4; w+=4) {
+            for (int w = 0; w < width*channels; w+=channels) {
                 hitbox.push_back(std::vector<bool>(height));
                 for (int h = 0; h < height; h++) {
-                    unsigned char* c = &box[(w) + (width*h*4)];
-                    // we want to read the alpha
-                    if (c[3]) {
-                        hitbox[w/4][height-h] = true;
+                    unsigned char* c = &box[(w) + (width*h*channels)];
+                    // we want to read the last channel (alpha)
+                    if (c[channels-1]) {
+                        hitbox[w/channels][height-h] = true;
                     }
                     else
-                        hitbox[w/4][height-h] = false;
+                        hitbox[w/channels][height-h] = false;
                 }
             }
 
