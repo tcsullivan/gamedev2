@@ -68,17 +68,17 @@ World::getSize()
 /* RENDERING */
 void World::generateMesh()
 {
-    for (auto &l : solidLayers) {
+    for (auto &l : drawLayers) {
         
         // Preallocate size of vertexes
 
-        float Z = l.drawLayer;
-        auto to = l.texture.offset;
-        auto ts = l.texture.size;
+        float Z = l->drawLayer;
+        auto to = l->texture.offset;
+        auto ts = l->texture.size;
         float tr = 1.0f;
 
-        float w = l.texture.width/unitSize;
-        float h = l.texture.height/unitSize;
+        float w = l->texture.width/unitSize;
+        float h = l->texture.height/unitSize;
 
         GLfloat mesh[36] = {0  , 0  , Z, to.x     , to.y+ts.y, tr,
                             0+w, 0  , Z, to.x+ts.x, to.y+ts.y, tr,
@@ -88,20 +88,16 @@ void World::generateMesh()
                             0+w, 0+h, Z, to.x+ts.x, to.y     , tr,
                             0  , 0+h, Z, to.x     , to.y     , tr};
 
-        glBindBuffer(GL_ARRAY_BUFFER, l.layerVBO);
+        glBindBuffer(GL_ARRAY_BUFFER, l->layerVBO);
         glBufferData(GL_ARRAY_BUFFER, 
                      36 * sizeof(GLfloat), 
                      mesh, 
                      GL_STATIC_DRAW);
 
-        meshAdd.push_back(WorldMeshUpdateEvent(l.layerVBO,
-                                               l.texture.tex,
-                                               l.normal.tex,
+        meshAdd.push_back(WorldMeshUpdateEvent(l->layerVBO,
+                                               l->texture.tex,
+                                               l->normal.tex,
                                                36));
-    }
-
-    for (auto &l : drawLayers) {
-        (void)l;
     }
 }
 
@@ -123,20 +119,72 @@ double World::getHeight(double x, double y, double z)
     (void)y;
     double Y = 0.0f;
     for (auto &l : solidLayers) {
-        if (z == l.drawLayer) {
+        if (z == l->drawLayer) {
             int wx = x*unitSize;
 
             int h = 0.0;
-            for (auto b : l.hitbox[wx]) {
+            for (auto b : l->hitbox[wx]) {
                 if (b == true)
                     Y = h;
                 h++;
             }
-            return (Y/unitSize);
+            return ((Y+1)/unitSize);
         }
     }
     return 0;
 }
+
+std::vector<std::pair<glm::vec2, glm::vec2>> 
+World::getIntersectingPlanes(glm::vec2 origin, glm::vec2 dest)
+{
+    (void)origin;
+    (void)dest;
+    //glm::ivec2 worldOrigin = origin*unitSize;
+    //glm::ivec2 worldDest = dest*unitSize;
+
+    return std::vector<std::pair<glm::vec2, glm::vec2>>();
+}
+
+glm::vec3 World::collide(glm::vec3 &start, glm::vec3 &end, Physics &phys)
+{
+    (void)start;
+    (void)end;
+    (void)phys;
+    for (auto &l : solidLayers) {
+        if (end.z == l->drawLayer) {
+            glm::vec2 len = end-start;
+            glm::vec2 dir = glm::normalize(len);
+            float step = 1.0f/unitSize;
+
+            // TODO move this
+            glm::vec2 pos = start;
+
+            for (float i = 0; i < len.length(); i+=step) {
+                pos += dir;
+
+                if (dir.x > 0.0f) {
+                // Moving to the right
+                    //glm::vec2 origin = pos + phys.corners[1]; // bottom right
+                    //glm::vec2 orDir = glm::vec2(0, 1);
+
+                } else if (dir.x < 0.0f) {
+                // Moving to the left
+
+                }
+
+                if (dir.y > 0.0f) {
+                // Moving upwards
+
+                } else if (dir.y < 0.0f) {
+                // Moving downwards
+
+                }
+            }
+        }
+    }
+    return glm::vec3(0);
+}
+
 
 /*********
 *  NEW  *
@@ -145,7 +193,9 @@ void World::registerLayer(float z, sol::object obj)
 {
     if (obj.get_type() == sol::type::table) {
         sol::table tab = obj;
-        solidLayers.push_back(SolidLayer(z, tab));
+        SolidLayer s(z, tab);
+        solidLayers.push_back(std::make_shared<SolidLayer>(s));
+        drawLayers.push_back(std::make_shared<Layer>(s));
     } else {
         throw std::string("Layer must receive a table");
     }
@@ -156,7 +206,7 @@ void World::registerDecoLayer(float z, sol::object obj)
 {
     if (obj.get_type() == sol::type::table) {
         sol::table tab = obj;
-        drawLayers.push_back(Layer(z, tab));
+        drawLayers.push_back(std::make_shared<Layer>(Layer(z, tab)));
     } else {
         throw std::string("Layer must receive a table");
     }

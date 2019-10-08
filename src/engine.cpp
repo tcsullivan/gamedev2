@@ -59,13 +59,11 @@ int Engine::init(void)
     // Load game script and entity data
     auto* script = systems.system<ScriptSystem>().get();
     script->addToGameNamespace("loadFont",
-    [this](std::string name, std::string file, int size) {
-        systems.system<TextSystem>().get()->loadFont(name, file, size);
-    });
+        bindInstance(&TextSystem::loadFont,
+                     systems.system<TextSystem>().get()));
     script->addToGameNamespace("puts",
-    [this](std::string name, float x, float y, std::string text) {
-        systems.system<TextSystem>().get()->put(name, x, y, text);
-    });
+        bindInstance(&TextSystem::put,
+                     systems.system<TextSystem>().get()));
     script->init();
     
 

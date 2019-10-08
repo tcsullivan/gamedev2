@@ -4,6 +4,14 @@
 
 #include <iostream>
 
+TextSystem::~TextSystem(void)
+{
+    for (auto [name, face] : fonts)
+        FT_Done_Face(face);
+
+    FT_Done_FreeType(freetype);
+}
+
 void TextSystem::configure([[maybe_unused]] entityx::EntityManager& entities,
                            [[maybe_unused]] entityx::EventManager& events)
 {
@@ -25,12 +33,11 @@ void TextSystem::update([[maybe_unused]] entityx::EntityManager& entites,
         shouldUpdateVBOs = false;
         updateVBOs();
 
-        for (auto& data : fontData) {
-            auto& d = data.second;
-            if (d.text.size() == 0)
-                continue;
-
-            events.emit<NewRenderEvent>(d.vbo, d.tex, 0, d.buffer.size());
+        for (auto& [name, font] : fontData) {
+            if (font.text.size() != 0) {
+                events.emit<NewRenderEvent>(font.vbo, font.tex, 0,
+                                            font.buffer.size());
+            }
         }
     }
 }
@@ -145,8 +152,7 @@ void TextSystem::put(const std::string& font,
 
 void TextSystem::updateVBOs(void)
 {
-    for (auto& data : fontData) {
-        auto& d = data.second;
+    for (auto& [name, d] : fontData) {
         d.buffer.clear();
         for (auto& text : d.text) {
             float tx = text.x;

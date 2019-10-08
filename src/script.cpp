@@ -87,16 +87,11 @@ void ScriptSystem::doFile(void)
 
 void ScriptSystem::scriptExport(void)
 {
-    std::function<sol::table(sol::table)> entitySpawn = 
-        [this](sol::table t){ return spawn(t);};
-
-    std::function<World* (sol::object)> worldRegister =
-        [this](sol::object t){ return worldSystem.addWorld(t); };
-
     lua.new_usertype<Position>("Position",
-            sol::constructors<Position(float x, float y), Position()>(),
+            sol::constructors<Position(float x, float y, float z), Position()>(),
             "x", &Position::x,
-            "y", &Position::y);
+            "y", &Position::y,
+            "z", &Position::z);
 
     lua.new_usertype<Name>("Name",
             sol::constructors<Name(std::string), Name()>(),
@@ -125,7 +120,8 @@ void ScriptSystem::scriptExport(void)
 
     lua.new_usertype<Physics>("Physics",
             sol::constructors<Physics(void), Physics()>(),
-            "standing", &Physics::standing);
+            "standing", &Physics::standing,
+            "gravity", &Physics::gravity);
 
     lua.new_usertype<World>("World",
             sol::constructors<World(sol::object), World(void)>(),
@@ -139,8 +135,9 @@ void ScriptSystem::scriptExport(void)
             "createDecoLayer", &World::registerDecoLayer);
 
     game = lua["game"].get_or_create<sol::table>();
-    game.set_function("spawn", entitySpawn);
-    game.set_function("worldRegister", worldRegister);
+    game.set_function("spawn", bindInstance(&ScriptSystem::spawn, this));
+    game.set_function("worldRegister", bindInstance(&WorldSystem::addWorld,
+                                                    &worldSystem));
 }
 
 sol::table ScriptSystem::spawn(sol::object param)

@@ -25,8 +25,38 @@ struct Physics : Component<Physics>
 {
 public:
     bool standing = true;
+    bool gravity = true;
+    glm::vec2 corners[4] = {
+        glm::vec2(-0.5, -0.5), // lower left
+        glm::vec2( 0.5, -0.5), // lower right
+        glm::vec2(-0.5,  0.5), // upper left
+        glm::vec2( 0.5,  0.5)  // upper right
+    };
+
     Physics FromLua([[maybe_unused]] sol::object ref)
     {
+        if (ref.get_type() == sol::type::table) {
+            sol::table tab = ref;
+
+            if (tab["gravity"].get_type() == sol::type::boolean)
+                this->gravity = tab["gravity"];
+
+            if (tab["hitbox"].get_type() == sol::type::table) {
+                sol::table hitbox = tab["hitbox"];
+                if (hitbox["ll"] == sol::type::table)
+                    corners[0] = Script::to<glm::vec2>(hitbox["ll"]);
+                if (hitbox["lr"] == sol::type::table)
+                    corners[1] = Script::to<glm::vec2>(hitbox["lr"]);
+                if (hitbox["ul"] == sol::type::table)
+                    corners[2] = Script::to<glm::vec2>(hitbox["ul"]);
+                if (hitbox["ur"] == sol::type::table)
+                    corners[3] = Script::to<glm::vec2>(hitbox["ur"]);
+            }
+        } else {
+            throw std::string(
+                "Physics component table formatted incorrectly"
+            );
+        }
         return *this;
     }
 

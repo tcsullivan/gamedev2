@@ -77,6 +77,8 @@ struct Font {
 class TextSystem : public entityx::System<TextSystem>
 {
 public:
+    ~TextSystem(void);
+
     /**
      * Prepares the system for running.
      */

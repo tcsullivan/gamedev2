@@ -82,4 +82,7 @@ $(OUTDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
 	@sed -e 's/.*://' -e 's/\\$$//' < $(OUTDIR)/$*.$(DEPEXT).tmp | fmt -1 | sed -e 's/^ *//' -e 's/$$/:/' >> $(OUTDIR)/$*.$(DEPEXT)
 	@rm -f $(OUTDIR)/$*.$(DEPEXT).tmp
 
-.PHONY: all remake clean cleaner resources
+mem: $(EXEC)
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(EXEC)
+
+.PHONY: all remake clean cleaner resources mem

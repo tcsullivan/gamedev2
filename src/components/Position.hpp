@@ -24,23 +24,24 @@
 struct Position : Component<Position>
 {
 public:
-    float x, y;
+    float x, y, z;
 
-    Position(float _x = 0, float _y = 0) :
-        x(_x), y(_y) {}
+    Position(float _x = 0, float _y = 0, float _z = 0) :
+        x(_x), y(_y), z(_z) {}
 
     Position FromLua(sol::object ref)
     {
-        glm::vec2 vec = Script::to<glm::vec2>(ref);
+        glm::vec3 vec = Script::to<glm::vec3>(ref);
         this->x = vec.x;
         this->y = vec.y;
+        this->z = vec.z;
 
         return *this;
     }
 
-    glm::vec2 vec()
+    glm::vec3 vec()
     {
-        return glm::vec2(x, y);
+        return glm::vec3(x, y, z);
     }
 
     void serialize(cereal::JSONOutputArchive& ar) final {

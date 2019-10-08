@@ -339,9 +339,8 @@ int RenderSystem::init(void)
 
     context = SDL_GL_CreateContext(window.get());
 
-    GLenum err;
     glewExperimental = GL_TRUE;
-    if((err=glewInit()) != GLEW_OK){
+    if (auto err = glewInit(); err != GLEW_OK){
         std::cerr << "GLEW was not able to initialize! Error: " << 
             glewGetErrorString(err) << std::endl;
         return -1;

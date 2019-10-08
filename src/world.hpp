@@ -31,6 +31,11 @@
 #include "texture.hpp"
 #include "events/render.hpp"
 
+#include <components/Position.hpp> // For entity position
+#include <components/Velocity.hpp> // For entity velocity
+#include <components/Physics.hpp>  // For entity hitbox(es)
+
+
 struct WorldMaterial
 {
     bool passable = false;
@@ -120,8 +125,11 @@ private:
     unsigned int layers;
 
     unsigned int unitSize;
-    std::vector<SolidLayer> solidLayers;
-    std::vector<Layer> drawLayers;
+    std::vector<std::shared_ptr<SolidLayer>> solidLayers;
+    std::vector<std::shared_ptr<Layer>> drawLayers;
+
+    std::vector<std::pair<glm::vec2, glm::vec2>>
+        getIntersectingPlanes(glm::vec2 origin, glm::vec2 dir);
 
 protected:
     // RENDER
@@ -150,6 +158,7 @@ public:
 
     /* PHYSICS */
     double getHeight(double x, double y, double z);
+    glm::vec3 collide(glm::vec3 &start, glm::vec3 &end, Physics &phys);
 
     // NEW
     unsigned int getUnitSize() {return unitSize;}
