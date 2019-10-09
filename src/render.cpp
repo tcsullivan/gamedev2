@@ -69,6 +69,20 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     glEnable(GL_CULL_FACE);
     glEnable(GL_POLYGON_OFFSET_FILL);
 
+    /************
+    *  CAMERA  *
+    ************/
+    try {
+        if (player.has_component<Position>()) {
+            Position *pos = player.component<Position>().get();
+            camPos.y = pos->y;
+            camPos.x = pos->x;
+        }
+    } catch (...) { // If the player doesn't exist or anything goes wrong
+        camPos.y = 0.0f;
+        camPos.x = 0.0f;
+    }
+
     
     glm::mat4 view = glm::lookAt(camPos,                       // Pos
                                  camPos + rot,                       // Facing
@@ -101,7 +115,6 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
 
     glUseProgram(s);
 
-
     glUniformMatrix4fv(v, 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(p, 1, GL_FALSE, glm::value_ptr(projection));
     glUniformMatrix4fv(m, 1, GL_FALSE, glm::value_ptr(model));
@@ -113,20 +126,6 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     // Ambient light, for now this is static
     GLfloat amb[4] = {1.0f, 1.0f, 1.0f, 0.0f};
     glUniform4fv(b, 1, amb);
-
-    /************
-    *  CAMERA  *
-    ************/
-    try {
-        if (player.has_component<Position>()) {
-            Position *pos = player.component<Position>().get();
-            camPos.y = pos->y;
-            camPos.x = pos->x;
-        }
-    } catch (...) { // If the player doesn't exist or anything goes wrong
-        camPos.y = 0.0f;
-        camPos.x = 0.0f;
-    }
 
     /**************
     *  LIGHTING  *
