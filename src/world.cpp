@@ -134,55 +134,110 @@ double World::getHeight(double x, double y, double z)
     return 0;
 }
 
-std::vector<std::pair<glm::vec2, glm::vec2>> 
-World::getIntersectingPlanes(glm::vec2 origin, glm::vec2 dest)
+bool World::isSolid(glm::vec3 pos)
 {
-    (void)origin;
-    (void)dest;
-    //glm::ivec2 worldOrigin = origin*unitSize;
-    //glm::ivec2 worldDest = dest*unitSize;
+    for (auto &l : solidLayers) {
+        if (pos.z == l->drawLayer) {
+            int wx = pos.x * unitSize;
+            int wy = pos.y * unitSize;
+            if (wx < 0 || wy < 0) return true;
 
-    return std::vector<std::pair<glm::vec2, glm::vec2>>();
+            return l->hitbox[wx][wy];
+        }
+    }
+    return false;
+}
+
+std::vector<glm::vec3>
+World::getIntersectingPlanes(glm::vec3 origin, Physics &phys)
+{
+    std::vector<glm::vec3> planes;
+
+    glm::vec3 goal = origin;
+
+    origin.x += phys.corners[0].x;
+    origin.y += phys.corners[0].y;
+
+    goal.x += phys.corners[3].x;
+    goal.y += phys.corners[3].y;
+
+    float step = 1.0f/unitSize;
+    for (;origin.y <= goal.y; origin.y += step){
+        for (;origin.x <= goal.x; origin.x += step) {
+            if (isSolid(origin)) {
+                planes.push_back(origin);
+            }
+        }
+    }
+
+    return planes;
 }
 
 glm::vec3 World::collide(glm::vec3 &start, glm::vec3 &end, Physics &phys)
 {
-    (void)start;
-    (void)end;
-    (void)phys;
+    // How far to push the entity to unintersect with the world
+    glm::vec3 push(0);
     for (auto &l : solidLayers) {
-        if (end.z == l->drawLayer) {
-            glm::vec2 len = end-start;
-            glm::vec2 dir = glm::normalize(len);
+        if (start.z == l->drawLayer) {
+            glm::vec3 len = end-start;
+            glm::vec3 dir = glm::normalize(len);
             float step = 1.0f/unitSize;
 
-            // TODO move this
-            glm::vec2 pos = start;
+            glm::vec3 pos = start;
 
-            for (float i = 0; i < len.length(); i+=step) {
-                pos += dir;
+            for (float i = 0.0f; i < glm::length(len); i+=step, pos+=dir) {
+                // Get all colliding world spaces
+                std::vector<glm::vec3> inter = getIntersectingPlanes(pos, phys);
 
-                if (dir.x > 0.0f) {
-                // Moving to the right
-                    //glm::vec2 origin = pos + phys.corners[1]; // bottom right
-                    //glm::vec2 orDir = glm::vec2(0, 1);
+                if (i == 0.0f)
+                    std::cout << inter.size() << std::endl;
 
-                } else if (dir.x < 0.0f) {
-                // Moving to the left
+                // If there are no colliding world spaces, don't bother
+                if (inter.size()) {
+                    if (dir.x > 0.0f) {
+                    // Moving to the right
+                        int closest = inter.at(0).x;
+                        for (auto &p : inter) {
+                            if (p.x < closest)
+                                closest = p.x;
+                        }
+                        push.x -= abs(closest - (pos.x + phys.corners[1].x));
 
-                }
+                    } else if (dir.x < 0.0f) {
+                    // Moving to the left
+                        int closest = inter.at(0).x;
+                        for (auto &p : inter) {
+                            if (p.x > closest)
+                                closest = p.x;
+                        }
+                        push.x += abs(closest - (pos.x + phys.corners[0].x));
+                    }
 
-                if (dir.y > 0.0f) {
-                // Moving upwards
+                    if (dir.y > 0.0f) {
+                    // Moving upwards
+                        int closest = inter.at(0).y;
+                        for (auto &p : inter) {
+                            if (p.y < closest)
+                                closest = p.y;
+                        }
+                        push.y -= abs(closest - (pos.y + phys.corners[2].y));
+                    } else if (dir.y < 0.0f) {
+                    // Moving downwards
+                        int closest = inter.at(0).y;
+                        for (auto &p : inter) {
+                            if (p.y > closest)
+                                closest = p.y;
+                        }
+                        push.y += abs(closest - (pos.y + phys.corners[0].y));
+                    }
 
-                } else if (dir.y < 0.0f) {
-                // Moving downwards
-
+                    if (push != glm::vec3(0.0f))
+                        return pos + push;
                 }
             }
         }
     }
-    return glm::vec3(0);
+    return end;
 }
 
 

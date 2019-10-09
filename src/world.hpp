@@ -128,8 +128,10 @@ private:
     std::vector<std::shared_ptr<SolidLayer>> solidLayers;
     std::vector<std::shared_ptr<Layer>> drawLayers;
 
-    std::vector<std::pair<glm::vec2, glm::vec2>>
-        getIntersectingPlanes(glm::vec2 origin, glm::vec2 dir);
+    std::vector<glm::vec3>
+        getIntersectingPlanes(glm::vec3 origin, Physics &phys);
+
+    bool isSolid(glm::vec3 pos);
 
 protected:
     // RENDER

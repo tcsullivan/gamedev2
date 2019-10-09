@@ -26,7 +26,7 @@ struct Position : Component<Position>
 public:
     float x, y, z;
 
-    Position(float _x = 0, float _y = 0, float _z = 0) :
+    Position(float _x = 0.0f, float _y = 0.0f, float _z = 0.0f) :
         x(_x), y(_y), z(_z) {}
 
     Position FromLua(sol::object ref)

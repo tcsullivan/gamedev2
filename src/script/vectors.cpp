@@ -34,7 +34,7 @@ namespace Script
     template<>
     glm::vec2 to<glm::vec2>(sol::object obj)
     {
-        glm::vec2 toReturn;
+        glm::vec2 toReturn(0.0f);
 
         if (obj.get_type() == sol::type::table) {
             sol::table table = obj;
@@ -60,7 +60,7 @@ namespace Script
     template<>
     glm::vec3 to<glm::vec3>(sol::object obj)
     {
-        glm::vec3 toReturn;
+        glm::vec3 toReturn(0.0f);
 
         if (obj.get_type() == sol::type::table) {
             sol::table table = obj;
@@ -84,7 +84,7 @@ namespace Script
     template<>
     glm::vec4 to<glm::vec4>(sol::object obj)
     {
-        glm::vec4 toReturn;
+        glm::vec4 toReturn(0.0f);
 
         if (obj.get_type() == sol::type::table) {
             sol::table table = obj;

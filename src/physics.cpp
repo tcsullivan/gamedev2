@@ -38,29 +38,45 @@ void PhysicsSystem::update([[maybe_unused]]entityx::EntityManager& entities,
 
         bool has_phys = e.has_component<Physics>();
 
-        pos.x += (vel.x * dt/1000.0);
-        pos.y += (vel.y * dt/1000.0);
-
         // If the entity has physics
         if (has_phys) {
-
-            float fallPosition = currentWorld->getHeight(pos.x, pos.y, 0.0);
-
             Physics *p = e.component<Physics>().get();
-            // TODO only make this occur when the entity has a hitbox
-            if (pos.y == fallPosition) {
-                p->standing = true;
-                return;
-            }
 
-            if (pos.y < fallPosition) {
-                pos.y = fallPosition;
-                vel.y = 0;
-                p->standing = true;
-            } else {
-                p->standing = false;
-                vel.y -= 32.2 * (dt/1000.0f);
-            }
+            glm::vec3 start = pos.vec();
+
+            glm::vec3 goal = pos.vec();
+            goal.x += (vel.x * dt/1000.0);
+            goal.y += (vel.y * dt/1000.0);
+
+            glm::vec3 end = currentWorld->collide(start, goal, *p);
+            (void)end;
+
+            //std::cout << end.x << "," << end.y << std::endl;
+
+            pos.x = goal.x;
+            pos.y = goal.y;
+            pos.z = goal.z;
+
+            //float fallPosition = currentWorld->getHeight(pos.x, pos.y, 0.0);
+
+            // TODO only make this occur when the entity has a hitbox
+            //if (pos.y == fallPosition) {
+            //    p->standing = true;
+            //    return;
+            //}
+
+            //if (pos.y < fallPosition) {
+            //    pos.y = fallPosition;
+            //    vel.y = 0;
+            //    p->standing = true;
+            //} else {
+            //    p->standing = false;
+            //if (p->gravity)
+            //    vel.y -= 32.2 * (dt/1000.0f);
+            //}
+        } else {
+            pos.x += (vel.x * dt/1000.0);
+            pos.y += (vel.y * dt/1000.0);
         }
     });
 }

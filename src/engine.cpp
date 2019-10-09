@@ -164,10 +164,21 @@ void Engine::run(void)
 
     debugThread = std::thread([this, &fpsCounter](void) {
         while (shouldRun()) {
-            std::this_thread::sleep_for(1s);
-            fps = fpsCounter;
+            std::this_thread::sleep_for(250ms);
+            fps = fpsCounter*4;
             fpsCounter = 0;
-            systems.system<TextSystem>()->put("default", 0, 0, "fps: "s + std::to_string(fps));
+
+            systems.system<TextSystem>()->
+                put("default", 0, 0, "fps: "s + std::to_string(fps));
+
+            entities.each<Player, Position>(
+                [this](entityx::Entity, Player &p, Position &pos){
+                (void)p;
+                std::string pr = "pos: " + std::to_string(pos.x) 
+                               + "," + std::to_string(pos.y);
+                systems.system<TextSystem>()->put("default", 0, -24, pr);
+                   
+            });
         }
     });
 
