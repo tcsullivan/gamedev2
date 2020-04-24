@@ -103,7 +103,7 @@ world = {
                 end
             end
         end
-        self:setData(1000, 1345, 5, "grass"); -- Test error checking
+        --self:setData(1000, 1345, 5, "grass"); -- Test error checking
         print("Done with world gen");
     end
 }
