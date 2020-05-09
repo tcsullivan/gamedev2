@@ -111,6 +111,11 @@ npc = {
         b = 1.0,
         strength = 0.5
     },
+    EventListeners = {
+        MousePressed = function(self, x, y, button)
+            self.Velocity.y = 3.0;
+        end
+    },
     Idle = function(self)
 		if (self.visibleTick == 0) then
 			self.visibleTick = math.random(40, 60)

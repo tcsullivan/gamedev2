@@ -1,5 +1,5 @@
 /**
- * @file window.hpp
+ * @file input.hpp
  * Handles user input received from SDL.
  *
  * Copyright (C) 2019 Clyne Sullivan
@@ -56,34 +56,23 @@ struct KeyDownEvent {
 class InputSystem : public entityx::System<InputSystem>
 {
 public:
+    InputSystem();
+
     /**
      * Prepares the system for running.
      */
-    void configure([[maybe_unused]] entityx::EntityManager& entities,
-                   [[maybe_unused]] entityx::EventManager& events) final {}
+    void configure(entityx::EntityManager& entities,
+                   entityx::EventManager& events) final;
 
     /**
      * Updates the system by checking for SDL events.
      */
-    void update([[maybe_unused]] entityx::EntityManager& entities,
-                [[maybe_unused]] entityx::EventManager& events,
-                [[maybe_unused]] entityx::TimeDelta dt) final
-    {
-        for (SDL_Event event; SDL_PollEvent(&event);) {
-            switch (event.type) {
-            case SDL_KEYUP:
-                if (auto key = event.key; key.repeat == 0)
-                    events.emit<KeyUpEvent>(key.keysym);
-                break;
-            case SDL_KEYDOWN:
-                if (auto key = event.key; key.repeat == 0)
-                    events.emit<KeyDownEvent>(key.keysym);
-                break;
-            default:
-                break;
-            }
-        }
-    }
+    void update(entityx::EntityManager& entities,
+                entityx::EventManager& events,
+                entityx::TimeDelta dt) final;
+
+private:
+    bool isMouseDown;
 };
 
 #endif // SYSTEM_INPUT_HPP_

@@ -54,26 +54,23 @@ void PlayerSystem::receive(const KeyDownEvent& kue)
 {
     if (player.valid()) {
         if (kue.sym == SDLK_a) {
-            entities.each<EventListener>([&]([[maybe_unused]] entityx::Entity e,
-                                             EventListener& el)
-            {
+            entities.each<EventListener>(
+                [](entityx::Entity e, EventListener& el) {
                     el.tryListener("MoveLeftPressed",
                                    e.component<Scripted>()->caller);
-            });
+                });
         } else if (kue.sym == SDLK_d) {
-            entities.each<EventListener>([&]([[maybe_unused]] entityx::Entity e,
-                                             EventListener& el)
-            {
+            entities.each<EventListener>(
+                [](entityx::Entity e, EventListener& el) {
                     el.tryListener("MoveRightPressed",
                                    e.component<Scripted>()->caller);
-            });
+                });
         } else if (kue.sym == SDLK_SPACE) {
-            entities.each<EventListener>([&]([[maybe_unused]] entityx::Entity e,
-                                             EventListener& el)
-            {
+            entities.each<EventListener>(
+                [](entityx::Entity e, EventListener& el) {
                     el.tryListener("JumpKeyPressed",
                                    e.component<Scripted>()->caller);
-            });
+                });
         }
     }
 }
@@ -82,26 +79,23 @@ void PlayerSystem::receive(const KeyUpEvent& kue)
 {
     if (player.valid()) {
         if (kue.sym == SDLK_a) {
-            entities.each<EventListener>([&]([[maybe_unused]] entityx::Entity e,
-                                             EventListener& el)
-            {
+            entities.each<EventListener>(
+                [](entityx::Entity e, EventListener& el) {
                     el.tryListener("MoveLeftReleased",
                                    e.component<Scripted>()->caller);
-            });
+                });
         } else if (kue.sym == SDLK_d) {
-            entities.each<EventListener>([&]([[maybe_unused]] entityx::Entity e,
-                                             EventListener& el)
-            {
+            entities.each<EventListener>(
+                [](entityx::Entity e, EventListener& el) {
                     el.tryListener("MoveRightReleased",
                                    e.component<Scripted>()->caller);
-            });
+                });
         } else if (kue.sym == SDLK_SPACE) {
-            entities.each<EventListener>([&]([[maybe_unused]] entityx::Entity e,
-                                             EventListener& el)
-            {
+            entities.each<EventListener>(
+                [](entityx::Entity e, EventListener& el) {
                     el.tryListener("JumpKeyReleased",
                                    e.component<Scripted>()->caller);
-            });
+                });
         }
     }
 }
