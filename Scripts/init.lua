@@ -21,6 +21,7 @@ player = {
         end,
         JumpKeyPressed = function(self)
             if self.Physics.standing == true then
+                game.play(self.Position, self.Audio)
                 self.Velocity.y = self.Velocity.y + 9
             end
         end,
@@ -37,6 +38,9 @@ player = {
     },
     Physics = 0,
     Name = "bord",
+    Audio = {
+        file = "Assets/jump.wav"
+    },
     hellotrue = true,
     hellofalse = false,
     Render = {
@@ -76,10 +80,14 @@ ball = {
     },
     Idle = function(self)
         if self.Physics.standing == true then
+            game.play(self.Position, self.Audio)
             self.Velocity.y = self.Velocity.y + 15
             self.Velocity.x = math.random(-1, 1);
         end
     end,
+    Audio = {
+        file = "Assets/boing.wav"
+    },
 }
 
 npc = {

@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "audio.hpp"
 #include "config.hpp"
 #include "engine.hpp"
 #include "gamestate.hpp"
@@ -54,6 +55,7 @@ int Engine::init(void)
     systems.add<ScriptSystem>(entities, *(systems.system<WorldSystem>().get()));
     systems.add<PhysicsSystem>();
     systems.add<TextSystem>();
+    systems.add<AudioSystem>();
     systems.configure();
 
     // Load game script and entity data
@@ -64,6 +66,9 @@ int Engine::init(void)
     script->addToGameNamespace("puts",
         bindInstance(&TextSystem::put,
                      systems.system<TextSystem>().get()));
+    script->addToGameNamespace("play",
+        bindInstance(&AudioSystem::playSound,
+                     systems.system<AudioSystem>().get()));
     script->init();
     
 
@@ -115,6 +120,7 @@ void Engine::logicLoop(void)
             });
         }
 
+        systems.update<AudioSystem>(dt);
         std::this_thread::yield();
     }
 }
