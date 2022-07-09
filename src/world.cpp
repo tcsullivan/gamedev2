@@ -189,8 +189,8 @@ glm::vec3 World::collide(glm::vec3 &start, glm::vec3 &end, Physics &phys)
                 // Get all colliding world spaces
                 std::vector<glm::vec3> inter = getIntersectingPlanes(pos, phys);
 
-                if (i == 0.0f)
-                    std::cout << inter.size() << std::endl;
+                //if (i == 0.0f)
+                //    std::cout << inter.size() << std::endl;
 
                 // If there are no colliding world spaces, don't bother
                 if (inter.size()) {

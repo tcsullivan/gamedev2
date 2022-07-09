@@ -33,7 +33,7 @@ struct KeyUpEvent
     SDL_Keycode sym;
     Uint16 mod;
 
-    KeyUpEvent(const SDL_Keysym& keysym) :
+    explicit KeyUpEvent(const SDL_Keysym& keysym) :
         sym(keysym.sym), mod(keysym.mod) {}
 };
 
@@ -45,8 +45,26 @@ struct KeyDownEvent {
     SDL_Keycode sym;
     Uint16 mod;
 
-    KeyDownEvent(const SDL_Keysym& keysym) :
+    explicit KeyDownEvent(const SDL_Keysym& keysym) :
         sym(keysym.sym), mod(keysym.mod) {}
+};
+
+struct MouseUpEvent {
+    Uint8 button;
+    Sint32 x;
+    Sint32 y;
+
+    explicit MouseUpEvent(const SDL_MouseButtonEvent& mbe) :
+        button(mbe.button), x(mbe.x), y(mbe.y) {}
+};
+
+struct MouseDownEvent {
+    Uint8 button;
+    Sint32 x;
+    Sint32 y;
+
+    explicit MouseDownEvent(const SDL_MouseButtonEvent& mbe) :
+        button(mbe.button), x(mbe.x), y(mbe.y) {}
 };
 
 /**
@@ -78,6 +96,12 @@ public:
             case SDL_KEYDOWN:
                 if (auto key = event.key; key.repeat == 0)
                     events.emit<KeyDownEvent>(key.keysym);
+                break;
+            case SDL_MOUSEBUTTONUP:
+                events.emit<MouseUpEvent>(event.button);
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                events.emit<MouseDownEvent>(event.button);
                 break;
             default:
                 break;

@@ -29,6 +29,7 @@
 #include "render.hpp"
 #include "physics.hpp"
 #include "text.hpp"
+#include "ui.hpp"
 
 #include "components/EventListener.hpp"
 #include "components/Script.hpp"
@@ -54,6 +55,7 @@ int Engine::init(void)
     systems.add<ScriptSystem>(entities, *(systems.system<WorldSystem>().get()));
     systems.add<PhysicsSystem>();
     systems.add<TextSystem>();
+    systems.add<UISystem>();
     systems.configure();
 
     // Load game script and entity data
@@ -144,6 +146,7 @@ void Engine::renderLoop(int& fpsCounter)
     entityx::TimeDelta dt = 0; /**< Elapsed milliseconds since each loop */
     while (shouldRun()) {
         systems.update<TextSystem>(dt);
+        systems.update<UISystem>(dt);
         systems.update<RenderSystem>(dt);
         fpsCounter++;
     }
@@ -153,16 +156,10 @@ void Engine::run(void)
 {
     int fpsCounter = 0;
 
-    // Start logic thread
-    logicThread = std::thread([this](void) {
-        logicLoop();
-    });
+    logicThread = std::thread([this] { logicLoop(); });
+    physicsThread = std::thread([this] { physicsLoop(); });
 
-    physicsThread = std::thread([this](void) {
-        physicsLoop();
-    });
-
-    debugThread = std::thread([this, &fpsCounter](void) {
+    debugThread = std::thread([this, &fpsCounter] {
         while (shouldRun()) {
             std::this_thread::sleep_for(250ms);
             fps = fpsCounter*4;
@@ -176,7 +173,7 @@ void Engine::run(void)
                 (void)p;
                 std::string pr = "pos: " + std::to_string(pos.x) 
                                + "," + std::to_string(pos.y);
-                systems.system<TextSystem>()->put("default", 0, -24, pr);
+                systems.system<TextSystem>()->put("default", 0, 24, pr);
                    
             });
         }

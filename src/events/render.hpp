@@ -18,6 +18,8 @@
 #ifndef EVENTS_RENDER_HPP_
 #define EVENTS_RENDER_HPP_
 
+#include <GL/glew.h>
+
 struct NewRenderEvent
 {
     GLuint vbo;

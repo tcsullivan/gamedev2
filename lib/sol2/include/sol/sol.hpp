@@ -22,6 +22,8 @@
 #ifndef SOL_HPP
 #define SOL_HPP
 
+#include <limits>
+
 #if defined(UE_BUILD_DEBUG) || defined(UE_BUILD_DEVELOPMENT) || defined(UE_BUILD_TEST) || defined(UE_BUILD_SHIPPING) || defined(UE_SERVER)
 #define SOL_INSIDE_UNREAL
 #ifdef check

@@ -13,13 +13,15 @@ TextSystem::~TextSystem(void)
 }
 
 void TextSystem::configure([[maybe_unused]] entityx::EntityManager& entities,
-                           [[maybe_unused]] entityx::EventManager& events)
+                           entityx::EventManager& events)
 {
+    shouldUpdateVBOs = false;
+
+    events.subscribe<ShowTextEvent>(*this);
+
     if (FT_Init_FreeType(&freetype) != 0) {
         // TODO handle error
     }
-
-    shouldUpdateVBOs = false;
 }
     
 /**
@@ -40,6 +42,11 @@ void TextSystem::update([[maybe_unused]] entityx::EntityManager& entites,
             }
         }
     }
+}
+
+void TextSystem::receive(const ShowTextEvent& ste)
+{
+    put(ste.font, ste.x, ste.y, ste.text);
 }
 
 void TextSystem::loadFont(const std::string& name,
@@ -138,7 +145,7 @@ void TextSystem::put(const std::string& font,
     if (fontData.find(font) == fontData.end())
         return;
 
-    y -= fontData[font].fontSize;
+    y += fontData[font].fontSize;
 
     auto& vector = fontData[font].text;
     if (auto i = std::find_if(vector.begin(), vector.end(), [&x, &y](const Text& t) {
@@ -146,7 +153,8 @@ void TextSystem::put(const std::string& font,
         vector.erase(i);
     }
 
-    fontData[font].text.emplace_back(text, x, y, -9.0f);
+    // Invert y axis so positive grows south.
+    fontData[font].text.emplace_back(text, x, -y, -9.0f);
     shouldUpdateVBOs = true;
 }
 

@@ -345,7 +345,7 @@ int RenderSystem::init(void)
         return -1;
     }
 
-    SDL_GL_SetSwapInterval(0);
+    SDL_GL_SetSwapInterval(1);
 
     glEnable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);

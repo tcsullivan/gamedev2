@@ -74,7 +74,20 @@ struct Font {
     std::basic_string<TextMeshData> buffer;
 };
 
-class TextSystem : public entityx::System<TextSystem>
+struct ShowTextEvent
+{
+    std::string font;
+    float x;
+    float y;
+    std::string text;
+
+    explicit ShowTextEvent(const std::string& _font, float _x, float _y,
+        const std::string& _text) :
+        font(_font), x(_x), y(_y), text(_text) {}
+};
+
+class TextSystem : public entityx::System<TextSystem>,
+                   public entityx::Receiver<TextSystem>
 {
 public:
     ~TextSystem(void);
@@ -91,6 +104,8 @@ public:
     void update(entityx::EntityManager& entites,
                 entityx::EventManager& events,
                 entityx::TimeDelta dt) final;
+
+    void receive(const ShowTextEvent&);
 
     void put(const std::string& font, float x, float y, const std::string& text);
 
