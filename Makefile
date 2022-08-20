@@ -89,7 +89,7 @@ $(OUTDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
 	@rm -f $(OUTDIR)/$*.$(DEPEXT).tmp
 
 lib/libentityx.a:
-	@cmake lib/entityx -DENTITYX_BUILD_SHARED=FALSE
+	@cmake -S lib/entityx -B lib/entityx -DENTITYX_BUILD_SHARED=FALSE
 	@make -Clib/entityx -j4 entityx
 	@cp lib/entityx/libentityx.a lib/libentityx.a
 
