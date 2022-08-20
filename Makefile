@@ -40,11 +40,16 @@ LIBS   = -L$(LIBDIR) -lSDL2 -lpthread -lentityx -lluajit -ldl -lGLEW -lGL \
 		 -lSDL2_image -lSOIL -lfreetype -lopenal -lalut
 
 CXXFLAGS = -ggdb -std=c++17 -Wall -Wextra -Werror -pedantic \
-		   -Wno-class-memaccess -Wno-implicit-fallthrough -m64
+		   -Wno-class-memaccess -Wno-implicit-fallthrough -Wno-unused-parameter
 
-CXXINCS = -Isrc -I$(LIBDIR)/LuaJIT/src -I$(LIBDIR)/entityx \
-		  -I$(LIBDIR)/LuaBridge/Source -I$(LIBDIR)/sol2/include \
-		  -I$(LIBDIR)/soil -I$(LIBDIR)/cereal/include -I$(LIBDIR)/freetype
+CXXINCS = -I$(SRCDIR) \
+          -I$(LIBDIR)/entityx \
+          -I$(LIBDIR)/LuaJIT/src \
+          -I$(LIBDIR)/LuaBridge/Source \
+          -I$(LIBDIR)/sol2/include \
+          -I$(LIBDIR)/soil \
+          -I$(LIBDIR)/cereal/include \
+	  -I$(LIBDIR)/freetype
 
 CXXSRC := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 CXXOBJ := $(patsubst $(SRCDIR)/%,$(OUTDIR)/%,$(CXXSRC:.$(SRCEXT)=.$(OBJEXT)))

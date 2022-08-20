@@ -47,7 +47,7 @@ public:
         ar(CEREAL_NVP(name));
     }
 
-    std::string serializeName(void) const final {
+    virtual std::string serializeName(void) const final {
         return "Name";
     }
 };

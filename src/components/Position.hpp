@@ -51,7 +51,7 @@ public:
         ar(CEREAL_NVP(x), CEREAL_NVP(y));
     }
 
-    std::string serializeName(void) const final {
+    virtual std::string serializeName(void) const final {
         return "Position";
     }
 };

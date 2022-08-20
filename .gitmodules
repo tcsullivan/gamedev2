@@ -1,3 +1,10 @@
 [submodule "lib/sol2"]
 	path = lib/sol2
 	url = https://github.com/ThePhD/sol2
+[submodule "lib/entityx"]
+	path = lib/entityx
+	url = https://github.com/tcsullivan/entityx
+	branch = remove-std-iterator
+[submodule "lib/cereal"]
+	path = lib/cereal
+	url = https://github.com/USCiLab/cereal

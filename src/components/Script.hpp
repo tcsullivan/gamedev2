@@ -119,7 +119,7 @@ public:
 
     }
 
-    std::string serializeName(void) const final {
+    virtual std::string serializeName(void) const final {
         return "Scripted";
     }
 };

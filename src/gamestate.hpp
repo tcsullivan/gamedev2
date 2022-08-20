@@ -27,6 +27,30 @@
 
 #include <fstream>
 
+struct EntitySerializer
+{
+    template<class Archive>
+    static void serialize(entityx::EntityManager& entities, entityx::Entity entity, bool save, Archive& ar)
+    {
+        // TODO try and reimplement without modifying entityx?
+        // Or, make a new branch...
+
+        //const auto mask = entity.component_mask();
+
+        //for (size_t i = 0; i < entities.component_helpers_.size(); i++) {
+        //    auto helper = entities.component_helpers_[i];
+        //    if (helper && mask.test(i)) {
+        //        auto* c = helper->get_component(entity);
+        //        ar.setNextName(c->serializeName().c_str());
+        //        ar.startNode();
+        //        c->internal_serialize(save, static_cast<void*>(&ar));
+        //        ar.finishNode();
+        //    }
+        //}
+    }
+};
+
+
 /**
  * @class GameState
  * Manages save files that contain entity data.
@@ -98,7 +122,7 @@ private:
         for (auto entity : entities.entities_for_debugging()) {
             archive.setNextName((name + std::to_string(i++)).c_str());
             archive.startNode();
-            entities.entity_serialize(entity, save, archive);
+            EntitySerializer::serialize(entities, entity, save, archive);
             archive.finishNode();
         }
     }
