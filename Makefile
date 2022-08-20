@@ -68,6 +68,8 @@ directories:
 clean:
 	@echo "  CLEAN"
 	@$(RM) -rf $(OUTDIR)
+
+cleanall: clean
 	@$(RM) -f lib/libentityx.a lib/libluajit.a lib/libsoil.a
 
 cleaner: clean
@@ -96,8 +98,8 @@ lib/libluajit.a:
 	@cp lib/luajit/src/libluajit.a lib/libluajit.a
 
 lib/libsoil.a:
-	@gcc -c lib/soil/soil/*.c
-	@ar rcs lib/libsoil.a lib/soil/soil/*.o
+	@make -Clib/soil -j4
+	@cp lib/soil/libsoil.a lib/libsoil.a
 
-.PHONY: all remake clean cleaner resources
+.PHONY: all remake clean cleaner cleanall resources
 

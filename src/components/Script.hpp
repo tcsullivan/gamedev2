@@ -74,7 +74,7 @@ public:
             else if (value.get_type() == sol::type::number)
                 table_components.push_back(std::make_tuple(
                     key.as<std::string>(),
-                    std::string("return " + value.as<std::string>())
+                    std::string("return ") + std::to_string(value.as<double>())
                 ));
             else if (value.get_type() == sol::type::boolean) {
                 table_components.push_back(std::make_tuple(
