@@ -8,3 +8,6 @@
 [submodule "lib/cereal"]
 	path = lib/cereal
 	url = https://github.com/USCiLab/cereal
+[submodule "lib/luajit"]
+	path = lib/luajit
+	url = https://luajit.org/git/luajit.git

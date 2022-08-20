@@ -37,15 +37,14 @@ DEPEXT = d
 
 LIBDIR = lib
 LIBS   = -L$(LIBDIR) -lSDL2 -lpthread -lentityx -lluajit -ldl -lGLEW -lGL \
-		 -lSDL2_image -lSOIL -lfreetype -lopenal -lalut
+         -lSDL2_image -lsoil -lfreetype -lopenal -lalut
 
 CXXFLAGS = -ggdb -std=c++17 -Wall -Wextra -Werror -pedantic \
-		   -Wno-class-memaccess -Wno-implicit-fallthrough -Wno-unused-parameter
+           -Wno-class-memaccess -Wno-implicit-fallthrough -Wno-unused-parameter
 
 CXXINCS = -I$(SRCDIR) \
           -I$(LIBDIR)/entityx \
-          -I$(LIBDIR)/LuaJIT/src \
-          -I$(LIBDIR)/LuaBridge/Source \
+          -I$(LIBDIR)/luajit/src \
           -I$(LIBDIR)/sol2/include \
           -I$(LIBDIR)/soil \
           -I$(LIBDIR)/cereal/include \
@@ -69,11 +68,11 @@ directories:
 clean:
 	@echo "  CLEAN"
 	@$(RM) -rf $(OUTDIR)
+	@$(RM) -f lib/libentityx.a lib/libluajit.a lib/libsoil.a
 
 cleaner: clean
-#@$(RM) -rf $(EXECDIR)
 
-$(EXEC): $(CXXOBJ)
+$(EXEC): lib/libentityx.a lib/libluajit.a lib/libsoil.a $(CXXOBJ)
 	@echo "  CXX   " $(EXEC)
 	@$(CXX) -o $(EXECDIR)/$(EXEC) $^ $(LIBS)
 
@@ -86,6 +85,19 @@ $(OUTDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
 	@sed -e 's|.*:|$(OUTDIR)/$*.$(OBJEXT):|' < $(OUTDIR)/$*.$(DEPEXT).tmp > $(OUTDIR)/$*.$(DEPEXT)
 	@sed -e 's/.*://' -e 's/\\$$//' < $(OUTDIR)/$*.$(DEPEXT).tmp | fmt -1 | sed -e 's/^ *//' -e 's/$$/:/' >> $(OUTDIR)/$*.$(DEPEXT)
 	@rm -f $(OUTDIR)/$*.$(DEPEXT).tmp
+
+lib/libentityx.a:
+	@cmake lib/entityx -DENTITYX_BUILD_SHARED=FALSE
+	@make -Clib/entityx -j4 entityx
+	@cp lib/entityx/libentityx.a lib/libentityx.a
+
+lib/libluajit.a:
+	@make -Clib/luajit -j4
+	@cp lib/luajit/src/libluajit.a lib/libluajit.a
+
+lib/libsoil.a:
+	@gcc -c lib/soil/soil/*.c
+	@ar rcs lib/libsoil.a lib/soil/soil/*.o
 
 .PHONY: all remake clean cleaner resources
 
