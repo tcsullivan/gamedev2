@@ -87,8 +87,8 @@ void TextSystem::loadFont(const std::string& name,
 
     glGenTextures(1, &font.tex);
     glBindTexture(GL_TEXTURE_2D, font.tex);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height,
-                 0, GL_RED, GL_UNSIGNED_BYTE, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_INTENSITY8, width, height,
+                 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, 0);
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -120,7 +120,7 @@ void TextSystem::loadFont(const std::string& name,
         auto* g = face->glyph;
         glTexSubImage2D(GL_TEXTURE_2D, 0, offsetX, offsetY,
                         g->bitmap.width, g->bitmap.rows,
-                        GL_RED, GL_UNSIGNED_BYTE,
+                        GL_LUMINANCE, GL_UNSIGNED_BYTE,
                         g->bitmap.buffer);
 
         auto& d = font.data[c-32];
@@ -144,17 +144,21 @@ void TextSystem::put(const std::string& font,
 {
     if (fontData.find(font) == fontData.end())
         return;
-
-    y += fontData[font].fontSize;
-
     auto& vector = fontData[font].text;
-    if (auto i = std::find_if(vector.begin(), vector.end(), [&x, &y](const Text& t) {
-            return t.x == x && t.y == y; }); i != vector.end()) {
-        vector.erase(i);
+
+    y = -(y + fontData[font].fontSize);
+
+    const auto it = std::find_if(vector.begin(), vector.end(),
+        [&x, &y](const Text& t) {
+            return t.x == static_cast<int>(x) && t.y == static_cast<int>(y);
+        });
+    if (it != vector.end()) {
+        *it = Text(text, x, y);
+    } else {
+        // Invert y axis so positive grows south.
+        fontData[font].text.emplace_back(text, x, y);
     }
 
-    // Invert y axis so positive grows south.
-    fontData[font].text.emplace_back(text, x, -y, -9.0f);
     shouldUpdateVBOs = true;
 }
 

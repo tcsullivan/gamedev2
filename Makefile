@@ -39,7 +39,7 @@ LIBDIR = lib
 LIBS   = -L$(LIBDIR) -lSDL2 -lpthread -lentityx -lluajit -ldl -lGLEW -lGL \
 		 -lSDL2_image -lSOIL -lfreetype
 
-CXXFLAGS = -ggdb -std=c++17 -Wall -Wextra -Werror -pedantic \
+CXXFLAGS = -ggdb -g3 -std=c++17 -Wall -Wextra -Werror -pedantic \
 		   -Wno-class-memaccess -Wno-implicit-fallthrough -m64 -O1
 
 CXXINCS = -Isrc -I$(LIBDIR)/LuaJIT/src -I$(LIBDIR)/entityx \

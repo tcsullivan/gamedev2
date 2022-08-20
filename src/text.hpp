@@ -50,8 +50,8 @@ struct FT_Info {
 
 struct Text {
     std::string text;
-    float x;
-    float y;
+    int x;
+    int y;
     float z;
 
     Text(std::string _text, float _x, float _y, float _z = 0.0f) :
