@@ -42,16 +42,17 @@ public:
         return *this;
     }
 
-    void tryListener(const std::string& name, sol::table& self)
+    template<typename... Args>
+    void tryListener(const std::string& name, sol::table& self, Args... args)
     {
         if (listeners[name] == sol::type::function)
-            listeners[name](self);
+            listeners[name](self, args...);
     }
 
     void serialize([[maybe_unused]] cereal::JSONOutputArchive& ar) final {}
     void serialize([[maybe_unused]] cereal::JSONInputArchive& ar) final {}
 
-    std::string serializeName(void) const final {
+    virtual std::string serializeName(void) const final {
         return "EventListener";
     }
 };

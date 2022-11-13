@@ -1,4 +1,4 @@
-newWorld = {
+local newWorld = {
     Register = function(self)
         self.unitSize = 8;
         self:createLayer(0, {

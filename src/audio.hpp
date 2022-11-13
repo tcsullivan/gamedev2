@@ -1,6 +1,6 @@
 /**
- * @file input.hpp
- * Handles user input received from SDL.
+ * @file audio.hpp
+ * Handles audio loading and playback
  *
  * Copyright (C) 2019 Clyne Sullivan
  *
@@ -15,65 +15,46 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#ifndef SYSTEM_AUDIO_HPP_
+#define SYSTEM_AUDIO_HPP_
 
-#ifndef SYSTEM_INPUT_HPP_
-#define SYSTEM_INPUT_HPP_
-
+#include <AL/alut.h>
 #include <entityx/entityx.h>
-#include <SDL2/SDL.h>
 
-/**
- * @class KeyUpEvent
- * Stores info regarding key releases.
- */
-struct KeyUpEvent
+#include <components/Audio.hpp>
+#include <components/Position.hpp>
+
+class AudioSystem : public entityx::System<AudioSystem>,
+                    public entityx::Receiver<AudioSystem>
 {
-    SDL_Keycode sym;
-    Uint16 mod;
+private:
+    std::unique_ptr<ALCdevice, void (*)(ALCdevice *)> device;
+    std::unique_ptr<ALCcontext, void (*)(ALCcontext *)> context;
 
-    KeyUpEvent(const SDL_Keysym& keysym) :
-        sym(keysym.sym), mod(keysym.mod) {}
-};
-
-/**
- * @class KeyDownEvent
- * Stores info regarding key presses.
- */
-struct KeyDownEvent {
-    SDL_Keycode sym;
-    Uint16 mod;
-
-    KeyDownEvent(const SDL_Keysym& keysym) :
-        sym(keysym.sym), mod(keysym.mod) {}
-};
-
-/**
- * @class InputSystem
- * Listens for user input from SDL, and emits input events accordingly.
- */
-class InputSystem : public entityx::System<InputSystem>
-{
 public:
-    InputSystem();
+    AudioSystem(void);
+    ~AudioSystem(void);
 
     /**
      * Prepares the system for running.
      */
     void configure(entityx::EntityManager& entities,
                    entityx::EventManager& events) final;
-
+    
     /**
-     * Updates the system by checking for SDL events.
+     * Updates the render system.
      */
     void update(entityx::EntityManager& entities,
                 entityx::EventManager& events,
                 entityx::TimeDelta dt) final;
 
-private:
-    bool isMouseDown;
+    void receive(const entityx::ComponentAddedEvent<Audio>& cae);
+    void receive(const entityx::ComponentRemovedEvent<Audio>& cae);
+
+    void playSound(const Position& pos, const Audio& audio);
 };
 
-#endif // SYSTEM_INPUT_HPP_
+#endif // SYSTEM_AUDIO_HPP_
 

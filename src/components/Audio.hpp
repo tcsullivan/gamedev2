@@ -1,7 +1,4 @@
 /**
- * @file Player.hpp
- * Component for designating player-controlled entities.
- *
  * Copyright (C) 2019 Clyne Sullivan
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,19 +14,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#ifndef COMPONENT_AUDIO_HPP_
+#define COMPONENT_AUDIO_HPP_
 
-#ifndef COMPONENT_PLAYER_HPP_
-#define COMPONENT_PLAYER_HPP_
+#include <AL/al.h>
 
 #include "Component.hpp"
 
-struct Player : Component<Player>
+struct Audio : Component<Audio>
 {
 public:
-    char _unused;
+    std::string fileName;
+    ALuint source;
+    ALuint buffer;
 
-    Player FromLua([[maybe_unused]] sol::object ref)
+    Audio(std::string _fileName = "") :
+        fileName(_fileName), source(0), buffer(0) {}
+
+    Audio FromLua(sol::object ref)
     {
+        if (ref.get_type() == sol::type::table) {
+            sol::table tab = ref;
+            if (tab["file"] != nullptr)
+                this->fileName = tab["file"];
+        } else {
+            throw std::string("Audio table not formatted properly");
+        }
+
         return *this;
     }
 
@@ -37,9 +48,9 @@ public:
     void serialize([[maybe_unused]] cereal::JSONInputArchive& ar) final {}
 
     virtual std::string serializeName(void) const final {
-        return "Player";
+        return "Audio";
     }
 };
 
-#endif // COMPONENT_PLAYER_HPP_
+#endif // COMPONENT_AUDIO_HPP_
 
