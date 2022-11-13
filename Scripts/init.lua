@@ -4,32 +4,36 @@ player = {
     Player = 0,
     EventListeners = {
         MoveLeftPressed = function(self)
-            --self.Velocity.x = self.Velocity.x - 3.0
-            self.Velocity.y = self.Velocity.y - 1.0
+            self.Velocity.x = self.Velocity.x - 3.0
             self.Render.flipx = true;
         end,
         MoveLeftReleased = function(self)
             -- TODO can't put text at world coordinates right now
             --game.puts("default", self.Position.x, self.Position.y+100, "Hey. Hag?")
-            --self.Velocity.x = self.Velocity.x + 3.0
-            self.Velocity.y = self.Velocity.y + 1.0
+            self.Velocity.x = self.Velocity.x + 3.0
         end,
         MoveRightPressed = function(self)
-            --self.Velocity.x = self.Velocity.x + 3.0
-            self.Velocity.y = self.Velocity.y + 1.0
+            self.Velocity.x = self.Velocity.x + 3.0
             self.Render.flipx = false;
         end,
         MoveRightReleased = function(self)
-            --self.Velocity.x = self.Velocity.x - 3.0
-            self.Velocity.y = self.Velocity.y - 1.0
+            self.Velocity.x = self.Velocity.x - 3.0
         end,
         JumpKeyPressed = function(self)
-            if self.Physics.standing == true then
-                game.play(self.Position, self.Audio)
-                self.Velocity.y = self.Velocity.y + 9
-            end
+            -- if self.Physics.standing == true then
+            --     game.play(self.Position, self.Audio)
+            --     self.Velocity.y = self.Velocity.y + 9
+            -- end
+            self.Velocity.y = self.Velocity.y + 3.0
         end,
         JumpKeyReleased = function(self)
+            self.Velocity.y = self.Velocity.y - 3.0
+        end,
+        CrouchKeyPressed = function(self)
+            self.Velocity.y = self.Velocity.y - 3.0
+        end,
+        CrouchKeyReleased = function(self)
+            self.Velocity.y = self.Velocity.y + 3.0
         end
     },
     Position = {

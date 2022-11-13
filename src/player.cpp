@@ -71,6 +71,12 @@ void PlayerSystem::receive(const KeyDownEvent& kue)
                     el.tryListener("JumpKeyPressed",
                                    e.component<Scripted>()->caller);
                 });
+        } else if (kue.sym == SDLK_LSHIFT) {
+            entities.each<EventListener>(
+                [](entityx::Entity e, EventListener& el) {
+                    el.tryListener("CrouchKeyPressed",
+                                   e.component<Scripted>()->caller);
+                });
         }
     }
 }
@@ -94,6 +100,12 @@ void PlayerSystem::receive(const KeyUpEvent& kue)
             entities.each<EventListener>(
                 [](entityx::Entity e, EventListener& el) {
                     el.tryListener("JumpKeyReleased",
+                                   e.component<Scripted>()->caller);
+                });
+        } else if (kue.sym == SDLK_LSHIFT) {
+            entities.each<EventListener>(
+                [](entityx::Entity e, EventListener& el) {
+                    el.tryListener("CrouchKeyReleased",
                                    e.component<Scripted>()->caller);
                 });
         }

@@ -30,7 +30,7 @@ EXEC = main
 EXECDIR = .
 
 SRCDIR = src
-OUTDIR = out
+OUTDIR = build
 SRCEXT = cpp
 OBJEXT = o
 DEPEXT = d
@@ -61,7 +61,7 @@ all: resources $(EXEC)
 
 resources: directories
 
-directories: 
+directories:
 	@mkdir -p $(EXECDIR)
 	@mkdir -p $(OUTDIR)
 
@@ -82,7 +82,7 @@ $(OUTDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
 	@echo "  CXX   " $<
 	@mkdir -p $(dir $@)
 	@$(CXX) $(CXXFLAGS) $(CXXINCS) -c -o $@ $<
-	@$(CXX) $(CXXFLAGS) $(INCDEP) -MM $(SRCDIR)/$*.$(SRCEXT) > $(OUTDIR)/$*.$(DEPEXT)
+	@$(CXX) $(CXXFLAGS) $(CXXINCS) $(INCDEP) -MM $(SRCDIR)/$*.$(SRCEXT) > $(OUTDIR)/$*.$(DEPEXT)
 	@cp -f $(OUTDIR)/$*.$(DEPEXT) $(OUTDIR)/$*.$(DEPEXT).tmp
 	@sed -e 's|.*:|$(OUTDIR)/$*.$(OBJEXT):|' < $(OUTDIR)/$*.$(DEPEXT).tmp > $(OUTDIR)/$*.$(DEPEXT)
 	@sed -e 's/.*://' -e 's/\\$$//' < $(OUTDIR)/$*.$(DEPEXT).tmp | fmt -1 | sed -e 's/^ *//' -e 's/$$/:/' >> $(OUTDIR)/$*.$(DEPEXT)

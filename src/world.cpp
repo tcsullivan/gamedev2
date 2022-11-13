@@ -69,7 +69,7 @@ World::getSize()
 void World::generateMesh()
 {
     for (auto &l : drawLayers) {
-        
+
         // Preallocate size of vertexes
 
         float Z = l->drawLayer;
@@ -89,9 +89,9 @@ void World::generateMesh()
                             0  , 0+h, Z, to.x     , to.y     , tr};
 
         glBindBuffer(GL_ARRAY_BUFFER, l->layerVBO);
-        glBufferData(GL_ARRAY_BUFFER, 
-                     36 * sizeof(GLfloat), 
-                     mesh, 
+        glBufferData(GL_ARRAY_BUFFER,
+                     36 * sizeof(GLfloat),
+                     mesh,
                      GL_STATIC_DRAW);
 
         meshAdd.push_back(WorldMeshUpdateEvent(l->layerVBO,
@@ -192,7 +192,7 @@ glm::vec3 World::collide(glm::vec3 &start, glm::vec3 &end, Physics &phys)
                 if (i == 0.0f) {
                     std::cout << inter.size() << std::endl;
                     if (inter.size()) {
-                        p.standing = true;
+                        // p.standing = true;
                     }
                 }
 
