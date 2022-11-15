@@ -57,6 +57,7 @@ int Engine::init(void)
     systems.add<PhysicsSystem>();
     systems.add<TextSystem>();
     systems.add<AudioSystem>();
+    systems.add<UISystem>();
     systems.configure();
 
     // Load game script and entity data
