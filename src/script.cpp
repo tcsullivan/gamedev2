@@ -75,6 +75,7 @@ void ScriptSystem::doFile(void)
 /********************
 *  SCRIPT PARSING  *
 ********************/
+#include <components/Audio.hpp>
 #include <components/EventListener.hpp>
 #include <components/Position.hpp>
 #include <components/Player.hpp>
@@ -123,6 +124,10 @@ void ScriptSystem::scriptExport(void)
             "standing", &Physics::standing,
             "gravity", &Physics::gravity);
 
+    lua.new_usertype<Audio>("Audio",
+            sol::constructors<Audio(std::string)>(),
+            "file", &Audio::fileName);
+
     lua.new_usertype<World>("World",
             sol::constructors<World(sol::object), World(void)>(),
             "Generate", &World::generate,
@@ -170,6 +175,11 @@ sol::table ScriptSystem::spawn(sol::object param)
         if (tab["Name"] != nullptr) {
             (*toRet)["Name"] =
                 e.assign<Name>(Name().FromLua(tab["Name"])).get();
+        }
+
+        if (tab["Audio"] != nullptr) {
+            (*toRet)["Audio"] =
+                e.assign<Audio>(Audio().FromLua(tab["Audio"])).get();
         }
 
         if (tab["Render"] != nullptr) {

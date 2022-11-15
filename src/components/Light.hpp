@@ -58,7 +58,7 @@ public:
         ar(CEREAL_NVP(r), CEREAL_NVP(g), CEREAL_NVP(b), CEREAL_NVP(strength));
     }
 
-    std::string serializeName(void) const final {
+    virtual std::string serializeName(void) const final {
         return "Light";
     }
 };

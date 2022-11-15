@@ -1,0 +1,13 @@
+[submodule "lib/sol2"]
+	path = lib/sol2
+	url = https://github.com/ThePhD/sol2
+[submodule "lib/entityx"]
+	path = lib/entityx
+	url = https://github.com/tcsullivan/entityx
+	branch = serialize
+[submodule "lib/cereal"]
+	path = lib/cereal
+	url = https://github.com/USCiLab/cereal
+[submodule "lib/luajit"]
+	path = lib/luajit
+	url = https://luajit.org/git/luajit.git

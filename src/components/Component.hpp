@@ -37,7 +37,7 @@ public:
     virtual void serialize(cereal::JSONOutputArchive& ar) = 0;
     virtual void serialize(cereal::JSONInputArchive& ar) = 0;
 
-    void internal_serialize(bool save, void *ar) final {
+    virtual void internal_serialize(bool save, void *ar) final {
         if (save)
             serialize(*reinterpret_cast<cereal::JSONOutputArchive*>(ar));
         else

@@ -25,6 +25,7 @@ player = {
         end,
         JumpKeyPressed = function(self)
             if self.Physics.standing == true then
+                game.play(self.Position, self.Audio)
                 self.Velocity.y = self.Velocity.y + 9
             end
         end,
@@ -47,6 +48,11 @@ player = {
         }
     },
     Name = "bord",
+    Audio = {
+        file = "Assets/jump.wav"
+    },
+    hellotrue = true,
+    hellofalse = false,
     Render = {
         texture = "Assets/player.png",
         visible = true,
@@ -85,17 +91,59 @@ ball = {
     },
     Idle = function(self)
         if self.Physics.standing == true then
+            game.play(self.Position, self.Audio)
             self.Velocity.y = self.Velocity.y + 15
             self.Velocity.x = math.random(-1, 1);
         end
     end,
+    Audio = {
+        file = "Assets/boing.wav"
+    },
+}
+
+npc = {
+    Position = {
+        x = 30,
+        y = 75
+    },
+    Velocity = {
+        x = 0.0,
+        y = 0.0
+    },
+    Physics = 0,
+    Name = "Paul",
+    Render = {
+        texture = "Assets/cat.png",
+        visible = true
+    },
+    Light = {
+        r = 1.0,
+        g = 1.0,
+        b = 1.0,
+        strength = 0.5
+    },
+    EventListeners = {
+        MousePressed = function(self, x, y, button)
+            self.Velocity.y = 3.0;
+        end
+    },
+    Idle = function(self)
+		if (self.visibleTick == 0) then
+			self.visibleTick = math.random(40, 60)
+			self.Velocity.x = math.random(-1, 1) * 1.0
+        else
+            self.visibleTick = self.visibleTick - 1
+        end
+    end,
+    visibleTick = 0
 }
 
 -- Create the world
 dofile("Scripts/world.lua")
 
 playerSpawn = game.spawn(player);
---game.spawn(ball);
+game.spawn(ball);
+game.spawn(npc);
 
 -------------------
 --  SERIALIZING  --

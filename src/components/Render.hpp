@@ -81,7 +81,7 @@ public:
         ar(CEREAL_NVP(visible), CEREAL_NVP(flipX));
     }
 
-    std::string serializeName(void) const final {
+    virtual std::string serializeName(void) const final {
         return "Render";
     }
 };
