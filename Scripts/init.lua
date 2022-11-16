@@ -30,6 +30,7 @@ player = {
             end
         end,
         JumpKeyReleased = function(self)
+            game.dialog(30, -150, 400, 100)
         end
     },
     Position = {

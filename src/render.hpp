@@ -116,6 +116,7 @@ public:
     ************/
     void receive(const WorldMeshUpdateEvent &wmu);
     void receive(const NewRenderEvent &nre);
+    void receive(const DelRenderEvent &dre);
     void receive(const entityx::ComponentAddedEvent<Player> &cae);
 };
 

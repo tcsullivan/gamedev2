@@ -27,9 +27,18 @@ struct NewRenderEvent
     GLuint normal;
     unsigned int vertex;
 
+    NewRenderEvent() = default;
     NewRenderEvent(GLuint _vbo, GLuint _tex, 
                    GLuint _normal, unsigned int _vertex) :
         vbo(_vbo), tex(_tex), normal(_normal), vertex(_vertex) {}
+};
+
+struct DelRenderEvent
+{
+    GLuint vbo;
+
+    DelRenderEvent(GLuint _vbo) :
+        vbo(_vbo) {}
 };
 
 struct WorldMeshUpdateEvent

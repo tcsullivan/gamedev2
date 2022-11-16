@@ -39,7 +39,7 @@ LIBDIR = lib
 LIBS   = -L$(LIBDIR) -lSDL2 -lpthread -lentityx -lluajit -ldl -lGLEW -lGL \
          -lSDL2_image -lsoil -lfreetype -lopenal -lalut
 
-CXXFLAGS = -ggdb -std=c++17 -Wall -Wextra -Werror -pedantic \
+CXXFLAGS = -ggdb -std=c++20 -Wall -Wextra -Werror -pedantic \
            -Wno-class-memaccess -Wno-implicit-fallthrough -Wno-unused-parameter
 
 CXXINCS = -I$(SRCDIR) \

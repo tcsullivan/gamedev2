@@ -71,6 +71,9 @@ int Engine::init(void)
     script->addToGameNamespace("play",
         bindInstance(&AudioSystem::playSound,
                      systems.system<AudioSystem>().get()));
+    script->addToGameNamespace("dialog",
+        bindInstance(&UISystem::createDialogBox,
+                     systems.system<UISystem>().get()));
     script->init();
     
 

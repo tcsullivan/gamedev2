@@ -29,6 +29,7 @@ void RenderSystem::configure([[maybe_unused]] entityx::EntityManager& entities,
                              [[maybe_unused]] entityx::EventManager& events)
 {
     events.subscribe<NewRenderEvent>(*this);
+    events.subscribe<DelRenderEvent>(*this);
     events.subscribe<WorldMeshUpdateEvent>(*this);
     events.subscribe<entityx::ComponentAddedEvent<Player>>(*this);
 
@@ -402,6 +403,12 @@ void RenderSystem::receive(const NewRenderEvent &nre)
 {
     uiRenders.insert_or_assign(nre.vbo,
                                UIRenderData(nre.tex, nre.normal, nre.vertex));
+}
+
+void RenderSystem::receive(const DelRenderEvent &dre)
+{
+    if (uiRenders.contains(dre.vbo))
+        uiRenders.erase(dre.vbo);
 }
 
 void RenderSystem::receive(const WorldMeshUpdateEvent &wmu)

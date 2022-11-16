@@ -21,11 +21,13 @@
 #ifndef SYSTEM_UI_HPP_
 #define SYSTEM_UI_HPP_
 
-#include <entityx/entityx.h>
+#include "events/render.hpp"
 
-#include <map>
-#include <string>
-#include <tuple>
+#include <entityx/entityx.h>
+#include <GL/glew.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_opengl.h>
+
 #include <vector>
 
 class UISystem : public entityx::System<UISystem>
@@ -36,6 +38,18 @@ public:
     void update(entityx::EntityManager&,
                 entityx::EventManager&,
                 entityx::TimeDelta) final;
+
+    void createDialogBox(float x, float y, float w, float h);
+
+private:
+    struct Box {
+        GLuint vbo;
+        float x, y, w, h;
+    };
+
+    std::vector<Box> m_boxes;
+
+    NewRenderEvent generateDialogBox(Box& box);
 };
 
 #endif // SYSTEM_UI_HPP_
