@@ -15,7 +15,7 @@ void UISystem::configure(entityx::EntityManager&, entityx::EventManager&)
 void UISystem::createDialogBox(float x, float y, float w, float h)
 {
     // Queue for generation in the main thread.
-    m_boxes.emplace_back(0, x, y, w, h);
+    m_boxes.emplace_back(0, x, -y, w, h);
 }
 
 void UISystem::update(entityx::EntityManager&,
