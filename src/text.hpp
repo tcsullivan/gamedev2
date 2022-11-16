@@ -23,6 +23,8 @@
 #ifndef SYSTEM_TEXT_HPP_
 #define SYSTEM_TEXT_HPP_
 
+#include "events/ui.hpp"
+
 #include <entityx/entityx.h>
 #include <ft2build.h>
 #include <freetype/freetype.h>
@@ -67,6 +69,7 @@ struct Font {
 
     float width;
     float height;
+    bool changed = false;
 
     std::array<FT_Info, 96> data;
     // Stores currently shown text at given index into VBO?
@@ -106,6 +109,7 @@ public:
                 entityx::TimeDelta dt) final;
 
     void receive(const ShowTextEvent&);
+    void receive(const HideDialog&);
 
     void put(const std::string& font, float x, float y, const std::string& text);
 

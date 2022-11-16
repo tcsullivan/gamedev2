@@ -22,15 +22,15 @@
 #define SYSTEM_UI_HPP_
 
 #include "events/render.hpp"
+#include "events/ui.hpp"
 
 #include <entityx/entityx.h>
 #include <GL/glew.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_opengl.h>
 
 #include <vector>
 
-class UISystem : public entityx::System<UISystem>
+class UISystem : public entityx::System<UISystem>,
+                 public entityx::Receiver<UISystem>
 {
 public:
     void configure(entityx::EntityManager&, entityx::EventManager&) final;
@@ -38,6 +38,8 @@ public:
     void update(entityx::EntityManager&,
                 entityx::EventManager&,
                 entityx::TimeDelta) final;
+
+    void receive(const HideDialog &hd);
 
     void createDialogBox(float x, float y, float w, float h);
 
@@ -48,6 +50,7 @@ private:
     };
 
     std::vector<Box> m_boxes;
+    bool m_clear_boxes = false;
 
     NewRenderEvent generateDialogBox(Box& box);
 };

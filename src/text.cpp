@@ -1,6 +1,7 @@
 #include "text.hpp"
 
 #include "events/render.hpp"
+#include "events/ui.hpp"
 
 #include <iostream>
 
@@ -18,6 +19,7 @@ void TextSystem::configure([[maybe_unused]] entityx::EntityManager& entities,
     shouldUpdateVBOs = false;
 
     events.subscribe<ShowTextEvent>(*this);
+    events.subscribe<HideDialog>(*this);
 
     if (FT_Init_FreeType(&freetype) != 0) {
         // TODO handle error
@@ -36,7 +38,9 @@ void TextSystem::update([[maybe_unused]] entityx::EntityManager& entites,
         updateVBOs();
 
         for (auto& [name, font] : fontData) {
-            if (font.text.size() != 0) {
+            if (font.changed) {
+                font.changed = false;
+
                 events.emit<NewRenderEvent>(font.vbo, font.tex, 0,
                                             font.buffer.size());
             }
@@ -47,6 +51,18 @@ void TextSystem::update([[maybe_unused]] entityx::EntityManager& entites,
 void TextSystem::receive(const ShowTextEvent& ste)
 {
     put(ste.font, ste.x, ste.y, ste.text);
+}
+
+void TextSystem::receive(const HideDialog&)
+{
+    auto fd = fontData.find("dialog");
+
+    if (fd != fontData.end()) {
+        auto& font = fd->second;
+
+        font.text.clear();
+        font.changed = true;
+    }
 }
 
 void TextSystem::loadFont(const std::string& name,
@@ -98,12 +114,6 @@ void TextSystem::loadFont(const std::string& name,
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-    //    // convert red-on-black to RGBA
-    //    auto& g = face->glyph;
-    //    std::vector<uint32_t> buf (g->bitmap.width * g->bitmap.rows, 0xFFFFFF);
-    //    for (auto j = buf.size(); j--;)
-    //        buf[j] |= g->bitmap.buffer[j] << 24;
-
     // Load each character and add it to the texture
     //
 
@@ -137,16 +147,19 @@ void TextSystem::loadFont(const std::string& name,
               << font.tex << ")" << std::endl;
 }
 
-void TextSystem::put(const std::string& font,
+void TextSystem::put(const std::string& fname,
                      float x,
                      float y,
                      const std::string& text)
 {
-    if (fontData.find(font) == fontData.end())
+    auto fd = fontData.find(fname);
+    if (fd == fontData.end())
         return;
-    auto& vector = fontData[font].text;
+    auto& font = fd->second;
 
-    y = -(y + fontData[font].fontSize);
+    auto& vector = font.text;
+
+    y = -(y + font.fontSize);
 
     const auto it = std::find_if(vector.begin(), vector.end(),
         [&x, &y](const Text& t) {
@@ -156,9 +169,10 @@ void TextSystem::put(const std::string& font,
         *it = Text(text, x, y);
     } else {
         // Invert y axis so positive grows south.
-        fontData[font].text.emplace_back(text, x, y);
+        vector.emplace_back(text, x, y);
     }
 
+    font.changed = true;
     shouldUpdateVBOs = true;
 }
 

@@ -8,8 +8,9 @@
 
 static const unsigned int NRE_TEX_DATA = 0xBBBBBBBB;
 
-void UISystem::configure(entityx::EntityManager&, entityx::EventManager&)
+void UISystem::configure(entityx::EntityManager&, entityx::EventManager &events)
 {
+    events.subscribe<HideDialog>(*this);
 }
 
 void UISystem::createDialogBox(float x, float y, float w, float h)
@@ -22,12 +23,29 @@ void UISystem::update(entityx::EntityManager&,
     entityx::EventManager& events,
     entityx::TimeDelta)
 {
-    for (auto& b : m_boxes) {
-        if (b.vbo == 0) {
-            auto nre = generateDialogBox(b);
-            events.emit<NewRenderEvent>(nre);
+    if (m_clear_boxes) {
+        m_clear_boxes = false;
+
+        for (const auto& b : m_boxes) {
+            if (b.vbo != 0) {
+                events.emit<DelRenderEvent>(b.vbo);
+            }
+        }
+
+        m_boxes.clear();
+    } else {
+        for (auto& b : m_boxes) {
+            if (b.vbo == 0) {
+                auto nre = generateDialogBox(b);
+                events.emit<NewRenderEvent>(nre);
+            }
         }
     }
+}
+
+void UISystem::receive(const HideDialog&)
+{
+    m_clear_boxes = true;
 }
 
 NewRenderEvent UISystem::generateDialogBox(Box& box)

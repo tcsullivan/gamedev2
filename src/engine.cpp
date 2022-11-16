@@ -74,6 +74,8 @@ int Engine::init(void)
     script->addToGameNamespace("dialog",
         bindInstance(&UISystem::createDialogBox,
                      systems.system<UISystem>().get()));
+    script->addToGameNamespace("dialogClear",
+        [this] { events.emit<HideDialog>(); });
     script->init();
     
 

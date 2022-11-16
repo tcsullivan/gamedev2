@@ -1,4 +1,5 @@
 game.loadFont("default", "Assets/FreePixel.ttf", 16)
+game.loadFont("dialog", "Assets/FreePixel.ttf", 16)
 
 player = {
     Player = 0,
@@ -7,6 +8,7 @@ player = {
             self.Velocity.x = self.Velocity.x - 3.0
             --self.Velocity.y = self.Velocity.y - 1.0
             self.Render.flipx = true;
+            game.dialogClear()
         end,
         MoveLeftReleased = function(self)
             self.Velocity.x = self.Velocity.x + 3.0
@@ -29,7 +31,7 @@ player = {
         end,
         JumpKeyReleased = function(self)
             game.dialog(30, 150, 400, 100)
-            game.puts("default", 36, 52, "Hey. Hag?")
+            game.puts("dialog", 36, 52, "Hey. Hag?")
         end
     },
     Position = {
