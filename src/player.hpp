@@ -2,7 +2,7 @@
  * @file player.hpp
  * Manages player input.
  *
- * Copyright (C) 2019 Clyne Sullivan
+ * Copyright (C) 2022 Clyne Sullivan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,23 +30,15 @@
 /**
  * @class PlayerSystem
  * Controls player entity movement.
+ * TODO is this system necessary?
  */
 class PlayerSystem : public entityx::System<PlayerSystem>,
                      public entityx::Receiver<PlayerSystem>
 {
 private:
-    /**
-     * Defines player's horizontal movement velocity.
-     */
-    constexpr static double GROUND_VELOCITY = 100;
-
-    entityx::EntityManager& entities;
     entityx::Entity player;
 
 public:
-    PlayerSystem(entityx::EntityManager& _entities) :
-        entities(_entities) {}
-
     /**
      * Prepares the system for running.
      */
@@ -69,16 +61,6 @@ public:
      * Invalidates the system's player entity (assume player is gone).
      */
     void receive(const entityx::ComponentRemovedEvent<Player>& cre);
-
-    /**
-     * Applies velocity based on key press.
-     */
-    void receive(const KeyDownEvent& kue);
-
-    /**
-     * Removes applied velocity
-     */
-    void receive(const KeyUpEvent& kue);
 };
 
 #endif // SYSTEM_PLAYER_HPP_

@@ -6,36 +6,36 @@ player = {
     EventListeners = {
         MoveLeftPressed = function(self)
             self.Velocity.x = self.Velocity.x - 3.0
-            --self.Velocity.y = self.Velocity.y - 1.0
-            self.Render.flipx = true;
-            game.dialogClear()
+            self.Render.flipx = true
         end,
         MoveLeftReleased = function(self)
             self.Velocity.x = self.Velocity.x + 3.0
-            --self.Velocity.y = self.Velocity.y + 1.0
         end,
         MoveRightPressed = function(self)
             self.Velocity.x = self.Velocity.x + 3.0
-            --self.Velocity.y = self.Velocity.y + 1.0
-            self.Render.flipx = false;
+            self.Render.flipx = false
         end,
         MoveRightReleased = function(self)
             self.Velocity.x = self.Velocity.x - 3.0
-            --self.Velocity.y = self.Velocity.y - 1.0
         end,
         JumpKeyPressed = function(self)
             if self.Physics.standing == true then
                 game.play(self.Position, self.Audio)
-                --self.Velocity.y = self.Velocity.y + 9
             end
         end,
         JumpKeyReleased = function(self)
-            game.dialog(30, 150, 400, 100)
+            game.dialog(30, 50, 400, 100)
             game.puts("dialog", 36, 52, "Hey. Hag?")
+        end,
+        MousePressed = function(self, mx, my)
+            if mx > 30 and mx < 430 and my > 50 and my < 150 then
+                game.dialogClear()
+            end
         end
     },
     Position = {
-        15.0, 20.0
+        x = 15.0,
+        y = 20.0
     },
     Velocity = {
         x = 0.0,

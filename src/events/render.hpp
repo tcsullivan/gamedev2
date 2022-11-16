@@ -20,6 +20,7 @@
 
 #include <GL/glew.h>
 
+// TODO this is only for UI renders...
 struct NewRenderEvent
 {
     GLuint vbo;

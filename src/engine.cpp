@@ -50,7 +50,7 @@ int Engine::init(void)
 
     systems.add<GameRunSystem>();
     systems.add<InputSystem>();
-    systems.add<PlayerSystem>(entities);
+    systems.add<PlayerSystem>();
     systems.add<WorldSystem>();
     systems.add<RenderSystem>();
     systems.add<ScriptSystem>(entities, *(systems.system<WorldSystem>().get()));
@@ -180,8 +180,7 @@ void Engine::run(void)
                 put("default", 0, 0, "fps: "s + std::to_string(fps));
 
             entities.each<Player, Position>(
-                [this](entityx::Entity, Player &p, Position &pos){
-                (void)p;
+                [this](entityx::Entity, Player&, Position &pos){
                 std::string pr = "pos: " + std::to_string(pos.x) 
                                + "," + std::to_string(pos.y);
                 systems.system<TextSystem>()->put("default", 0, 24, pr);

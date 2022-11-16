@@ -2,7 +2,7 @@
  * @file input.hpp
  * Handles user input received from SDL.
  *
- * Copyright (C) 2019 Clyne Sullivan
+ * Copyright (C) 2022 Clyne Sullivan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,51 +21,11 @@
 #ifndef SYSTEM_INPUT_HPP_
 #define SYSTEM_INPUT_HPP_
 
+#include "events/input.hpp"
+
 #include <entityx/entityx.h>
-#include <SDL2/SDL.h>
 
-/**
- * @class KeyUpEvent
- * Stores info regarding key releases.
- */
-struct KeyUpEvent
-{
-    SDL_Keycode sym;
-    Uint16 mod;
-
-    explicit KeyUpEvent(const SDL_Keysym& keysym) :
-        sym(keysym.sym), mod(keysym.mod) {}
-};
-
-/**
- * @class KeyDownEvent
- * Stores info regarding key presses.
- */
-struct KeyDownEvent {
-    SDL_Keycode sym;
-    Uint16 mod;
-
-    explicit KeyDownEvent(const SDL_Keysym& keysym) :
-        sym(keysym.sym), mod(keysym.mod) {}
-};
-
-struct MouseUpEvent {
-    Uint8 button;
-    Sint32 x;
-    Sint32 y;
-
-    explicit MouseUpEvent(const SDL_MouseButtonEvent& mbe) :
-        button(mbe.button), x(mbe.x), y(mbe.y) {}
-};
-
-struct MouseDownEvent {
-    Uint8 button;
-    Sint32 x;
-    Sint32 y;
-
-    explicit MouseDownEvent(const SDL_MouseButtonEvent& mbe) :
-        button(mbe.button), x(mbe.x), y(mbe.y) {}
-};
+#include <map>
 
 /**
  * @class InputSystem
@@ -90,6 +50,18 @@ public:
                 entityx::TimeDelta dt) final;
 
 private:
+    // TODO add 'mod' to comparison check
+    // TODO allow binding configuration
+    struct Binding {
+        SDL_Keycode sym = 0;
+        Uint16 mod = 0;
+
+        auto operator<=>(const Binding& other) const {
+            return sym <=> other.sym;
+        }
+    };
+
+    std::map<Binding, std::string> bindings;
     bool isMouseDown;
 };
 

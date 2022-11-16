@@ -2,7 +2,7 @@
  * @file input.cpp
  * Handles user input received from SDL.
  *
- * Copyright (C) 2020 Clyne Sullivan
+ * Copyright (C) 2022 Clyne Sullivan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,53 +30,75 @@ InputSystem::InputSystem() :
  * Prepares the system for running.
  */
 void InputSystem::configure([[maybe_unused]] entityx::EntityManager& entities,
-                            [[maybe_unused]] entityx::EventManager& events) {}
+                            [[maybe_unused]] entityx::EventManager& events)
+{
+    bindings.emplace(Binding {SDLK_a, 0}, "MoveLeft");
+    bindings.emplace(Binding {SDLK_d, 0}, "MoveRight");
+    bindings.emplace(Binding {SDLK_SPACE, 0}, "JumpKey");
+}
 
 /**
  * Updates the system by checking for SDL events.
  */
 void InputSystem::update(entityx::EntityManager& entities,
             entityx::EventManager& events,
-            [[maybe_unused]] entityx::TimeDelta dt)
+            entityx::TimeDelta)
 {
+    std::string listener;
+
     for (SDL_Event event; SDL_PollEvent(&event);) {
-        switch (event.type) {
-        case SDL_KEYUP:
-            if (auto key = event.key; key.repeat == 0)
-                events.emit<KeyUpEvent>(key.keysym);
-            break;
-        case SDL_KEYDOWN:
-            if (auto key = event.key; key.repeat == 0)
-                events.emit<KeyDownEvent>(key.keysym);
-            break;
-        case SDL_MOUSEBUTTONDOWN:
+        std::function tryListener =
+            [&listener](entityx::Entity, EventListener& el, Scripted& s) {
+                el.tryListener(listener, s.caller);
+            };
+
+        if (event.type == SDL_KEYUP) {
+            if (event.key.repeat == 0) {
+                auto b = bindings.find({event.key.keysym.sym, event.key.keysym.mod});
+
+                if (b != bindings.end())
+                    listener = b->second + "Released";
+                else
+                    events.emit<KeyUpEvent>(event.key.keysym);
+            }
+        } else if (event.type == SDL_KEYDOWN) {
+            if (event.key.repeat == 0) {
+                auto b = bindings.find({event.key.keysym.sym, event.key.keysym.mod});
+
+                if (b != bindings.end())
+                    listener = b->second + "Pressed";
+                else
+                    events.emit<KeyDownEvent>(event.key.keysym);
+            }
+        } else if (event.type == SDL_MOUSEBUTTONDOWN) {
             if (!isMouseDown) {
                 isMouseDown = true;
-                entities.each<EventListener>(
-                    [&event](entityx::Entity e, EventListener& el) {
-                        el.tryListener("MousePressed",
-                            e.component<Scripted>()->caller,
-                            event.button.x,
-                            event.button.y,
-                            event.button.button);
-                    });
+                listener = "MousePressed";
+
+                tryListener =
+                    [&listener, m = event.button]
+                    (entityx::Entity, EventListener& el, Scripted& s) {
+                        el.tryListener(listener, s.caller,
+                                       m.x, m.y, m.button);
+                    };
             }
-            break;
-        case SDL_MOUSEBUTTONUP:
+        } else if (event.type == SDL_MOUSEBUTTONUP) {
             if (isMouseDown) {
                 isMouseDown = false;
-                entities.each<EventListener>(
-                    [&event](entityx::Entity e, EventListener& el) {
-                        el.tryListener("MouseReleased",
-                            e.component<Scripted>()->caller,
-                            event.button.x,
-                            event.button.y,
-                            event.button.button);
-                    });
+                listener = "MouseReleased";
+
+                tryListener =
+                    [&listener, m = event.button]
+                    (entityx::Entity, EventListener& el, Scripted& s) {
+                        el.tryListener(listener, s.caller,
+                                       m.x, m.y, m.button);
+                    };
             }
-            break;
-        default:
-            break;
+        }
+
+        if (!listener.empty()) {
+            entities.each<EventListener, Scripted>(tryListener);
+            listener.clear();
         }
     }
 }

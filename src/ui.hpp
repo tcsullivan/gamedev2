@@ -1,7 +1,6 @@
 /**
  * @file ui.hpp
  *
- *
  * Copyright (C) 2022 Clyne Sullivan
  *
  * This program is free software: you can redistribute it and/or modify

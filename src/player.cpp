@@ -2,7 +2,7 @@
  * @file player.cpp
  * Manages player input.
  *
- * Copyright (C) 2019 Clyne Sullivan
+ * Copyright (C) 2022 Clyne Sullivan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,18 +24,16 @@
 #include "components/Script.hpp"
 #include "components/Velocity.hpp"
 
-void PlayerSystem::configure([[maybe_unused]] entityx::EntityManager& entities,
+void PlayerSystem::configure(entityx::EntityManager&,
                              entityx::EventManager& events)
 {
     events.subscribe<entityx::ComponentAddedEvent<Player>>(*this);
     events.subscribe<entityx::ComponentRemovedEvent<Player>>(*this);
-    events.subscribe<KeyUpEvent>(*this);
-    events.subscribe<KeyDownEvent>(*this);
 }
 
-void PlayerSystem::update([[maybe_unused]] entityx::EntityManager& entites,
-                          [[maybe_unused]] entityx::EventManager& events,
-                          [[maybe_unused]] entityx::TimeDelta dt)
+void PlayerSystem::update(entityx::EntityManager&,
+                          entityx::EventManager&,
+                          entityx::TimeDelta)
 {
 }
 
@@ -48,55 +46,5 @@ void PlayerSystem::receive(const entityx::ComponentRemovedEvent<Player>& cre)
 {
     if (player == cre.entity)
         player.invalidate();
-}
-
-void PlayerSystem::receive(const KeyDownEvent& kue)
-{
-    if (player.valid()) {
-        if (kue.sym == SDLK_a) {
-            entities.each<EventListener>(
-                [](entityx::Entity e, EventListener& el) {
-                    el.tryListener("MoveLeftPressed",
-                                   e.component<Scripted>()->caller);
-                });
-        } else if (kue.sym == SDLK_d) {
-            entities.each<EventListener>(
-                [](entityx::Entity e, EventListener& el) {
-                    el.tryListener("MoveRightPressed",
-                                   e.component<Scripted>()->caller);
-                });
-        } else if (kue.sym == SDLK_SPACE) {
-            entities.each<EventListener>(
-                [](entityx::Entity e, EventListener& el) {
-                    el.tryListener("JumpKeyPressed",
-                                   e.component<Scripted>()->caller);
-                });
-        }
-    }
-}
-
-void PlayerSystem::receive(const KeyUpEvent& kue)
-{
-    if (player.valid()) {
-        if (kue.sym == SDLK_a) {
-            entities.each<EventListener>(
-                [](entityx::Entity e, EventListener& el) {
-                    el.tryListener("MoveLeftReleased",
-                                   e.component<Scripted>()->caller);
-                });
-        } else if (kue.sym == SDLK_d) {
-            entities.each<EventListener>(
-                [](entityx::Entity e, EventListener& el) {
-                    el.tryListener("MoveRightReleased",
-                                   e.component<Scripted>()->caller);
-                });
-        } else if (kue.sym == SDLK_SPACE) {
-            entities.each<EventListener>(
-                [](entityx::Entity e, EventListener& el) {
-                    el.tryListener("JumpKeyReleased",
-                                   e.component<Scripted>()->caller);
-                });
-        }
-    }
 }
 
