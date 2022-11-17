@@ -24,12 +24,16 @@ player = {
             end
         end,
         JumpKeyReleased = function(self)
-            game.dialog(30, 50, 400, 100)
-            game.puts("dialog", 36, 52, "Hey. Hag?")
         end,
         MousePressed = function(self, mx, my)
-            if mx > 30 and mx < 430 and my > 50 and my < 150 then
-                game.dialogClear()
+            mp = game.uiToWorldCoord(mx, my)
+            if math.abs(mp.x - self.Position.x) < 1 and math.abs(mp.y - self.Position.y) < 1 then
+                game.dialog(30, 50, 400, 100)
+                game.puts("dialog", 36, 52, "What do you think you're doing?")
+            else
+                if mx > 30 and mx < 430 and my > 50 and my < 150 then
+                    game.dialogClear()
+                end
             end
         end
     },

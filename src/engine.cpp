@@ -76,6 +76,9 @@ int Engine::init(void)
                      systems.system<UISystem>().get()));
     script->addToGameNamespace("dialogClear",
         [this] { events.emit<HideDialog>(); });
+    script->addToGameNamespace("uiToWorldCoord",
+        bindInstance(&RenderSystem::uiToWorldCoord,
+                     systems.system<RenderSystem>().get()));
     script->init();
     
 

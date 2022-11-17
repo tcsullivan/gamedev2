@@ -21,14 +21,18 @@
 #ifndef SYSTEM_SCRIPT_HPP_
 #define SYSTEM_SCRIPT_HPP_
 
+#include "world.hpp"
+
 #include <entityx/entityx.h>
 #include <sol/sol.hpp>
 
-#include "world.hpp"
+#include <concepts>
 
 /**
  * Utility for pairing class instances to their member function calls.
  * This is useful for adding functions to the Lua game namespace.
+ *
+ * TODO I am certain that this can be done better. -clyne
  *
  * @param func The member function to call
  * @param instance The instance to bind to
@@ -37,7 +41,18 @@
 template<class C, typename R, typename... Args>
 auto bindInstance(R (C::* func)(Args...), C *instance)
 {
-    return [instance, func](Args... args) { (instance->*func)(args...); };
+    if constexpr (std::same_as<R, void>)
+        return [instance, func](Args... args) { (instance->*func)(args...); };
+    else
+        return [instance, func](Args... args) { return (instance->*func)(args...); };
+}
+template<class C, typename R, typename... Args>
+auto bindInstance(R (C::* func)(Args...) const, const C *instance)
+{
+    if constexpr (std::same_as<R, void>)
+        return [instance, func](Args... args) { (instance->*func)(args...); };
+    else
+        return [instance, func](Args... args) { return (instance->*func)(args...); };
 }
 
 

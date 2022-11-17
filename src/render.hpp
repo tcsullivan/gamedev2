@@ -82,11 +82,12 @@ private:
     std::map<GLuint, WorldRenderData> worldRenders;
 
     entityx::Entity player; // Save the player so we can track the camera
+
 public:
     RenderSystem() :
         window(nullptr, SDL_DestroyWindow) {}
 
-    ~RenderSystem(void)
+    ~RenderSystem()
     {
         SDL_GL_DeleteContext(context);
         SDL_Quit();
@@ -109,7 +110,24 @@ public:
      * Initializes the rendering system
      * @return Zero on success, non-zero on error
      */
-    int init(void);
+    int init();
+
+    glm::vec3 getCameraPosition() const {
+        return camPos;
+    }
+
+    Position uiToWorldCoord(float x, float y) const;
+
+    /**
+     * Returns the width of the camera's view in world coordinates.
+     */
+    float getWorldViewWidth() const;
+
+    /**
+     * Returns the height of the camera's view in world coordinates.
+     */
+    float getWorldViewHeight() const;
+
 
     /************
     *  EVENTS  *

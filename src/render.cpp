@@ -25,8 +25,8 @@
 #include <components/Light.hpp>
 #include <components/Script.hpp>
 
-void RenderSystem::configure([[maybe_unused]] entityx::EntityManager& entities,
-                             [[maybe_unused]] entityx::EventManager& events)
+void RenderSystem::configure(entityx::EntityManager&,
+                             entityx::EventManager& events)
 {
     events.subscribe<NewRenderEvent>(*this);
     events.subscribe<DelRenderEvent>(*this);
@@ -40,9 +40,33 @@ void RenderSystem::configure([[maybe_unused]] entityx::EntityManager& entities,
     init();
 }
 
-void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
-                          [[maybe_unused]] entityx::EventManager& events,
-                          [[maybe_unused]] entityx::TimeDelta dt)
+float RenderSystem::getWorldViewWidth() const
+{
+    return camPos.z * height / width * 2.0;
+}
+
+float RenderSystem::getWorldViewHeight() const
+{
+    return getWorldViewWidth() * height / width;
+}
+
+Position RenderSystem::uiToWorldCoord(float x, float y) const
+{
+    glm::vec2 scaled;
+    scaled.x = x / width - 0.5;
+    scaled.y = y / height - 0.5;
+
+    Position world;
+    world.x = scaled.x * getWorldViewWidth() + camPos.x;
+    world.y = scaled.y * getWorldViewHeight() + camPos.y;
+    world.z = camPos.z;
+
+    return world;
+}
+
+void RenderSystem::update(entityx::EntityManager& entities,
+                          entityx::EventManager&,
+                          entityx::TimeDelta)
 {
     // TODO move these to only happen once to speed up rendering
     static GLuint s = worldShader.getProgram();
@@ -309,7 +333,7 @@ void RenderSystem::update([[maybe_unused]] entityx::EntityManager& entities,
     SDL_GL_SwapWindow(window.get());
 }
 
-int RenderSystem::init(void)
+int RenderSystem::init()
 {
 
     if (SDL_InitSubSystem(SDL_INIT_VIDEO) != 0) {
