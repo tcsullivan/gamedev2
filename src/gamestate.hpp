@@ -98,7 +98,13 @@ private:
         for (auto entity : entities.entities_for_debugging()) {
             archive.setNextName((name + std::to_string(i++)).c_str());
             archive.startNode();
-            entities.entity_serialize(entity, save, archive);
+            entities.serialize(entity,
+                [&archive, &save](auto c) {
+                    archive.setNextName(c->serializeName().c_str());
+                    archive.startNode();
+                    c->internal_serialize(save, static_cast<void*>(&archive));
+                    archive.finishNode();
+                });
             archive.finishNode();
         }
     }

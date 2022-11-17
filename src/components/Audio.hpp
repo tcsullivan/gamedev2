@@ -47,7 +47,7 @@ public:
     void serialize([[maybe_unused]] cereal::JSONOutputArchive& ar) final {}
     void serialize([[maybe_unused]] cereal::JSONInputArchive& ar) final {}
 
-    std::string serializeName(void) const final {
+    virtual std::string serializeName(void) const final {
         return "Audio";
     }
 };
