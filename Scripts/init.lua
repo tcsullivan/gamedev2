@@ -1,6 +1,9 @@
 game.loadFont("default", "Assets/FreePixel.ttf", 16)
 game.loadFont("dialog", "Assets/FreePixel.ttf", 16)
 
+-- Include UI functionality
+dofile("Scripts/ui.lua")
+
 player = {
     Player = 0,
     EventListeners = {
@@ -26,14 +29,14 @@ player = {
         JumpKeyReleased = function(self)
         end,
         MousePressed = function(self, mx, my)
+            ui.dialog:update(mx, my)
+
             mp = game.uiToWorldCoord(mx, my)
-            if math.abs(mp.x - self.Position.x) < 1 and math.abs(mp.y - self.Position.y) < 1 then
-                game.dialog(30, 50, 400, 100)
-                game.puts("dialog", 36, 52, "What do you think you're doing?")
-            else
-                if mx > 30 and mx < 430 and my > 50 and my < 150 then
-                    game.dialogClear()
-                end
+            if math.abs(mp.x - self.Position.x) < 1 and
+               math.abs(mp.y - self.Position.y) < 1 then
+                ui.dialog:queue("Hi there! My name is Bob.")
+                ui.dialog:queue("Maybe.")
+                ui.dialog:queue("I'm really not sure, actually...")
             end
         end
     },
